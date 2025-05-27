@@ -5,4 +5,3 @@ pytest
 black
 pytest-sugar
 pydantic-settings
-jsonschema

@@ -1,7 +1,6 @@
 import requests
 import logging
-import jsonschema
-from schemas import get_list_user_schema, get_single_user_schema
+from app.models import UsersListResponse, SingleUserResponse
 
 
 logging.basicConfig(
@@ -15,22 +14,21 @@ BASE_URL = "http://localhost:8000"
 class TestUsers:
     """Тесты для пользователей"""
 
-    def test_list_users_page_1(self):
+    def test_list_users_page_1(self, api_client):
         """Тест первой страницы"""
-        response = requests.get(f"{BASE_URL}/api/users?page=1")
+        response = api_client.get("/api/users", params={"page": 1})
         logger.info(f"GET /api/users?page=1 - Status: {response.status_code}")
 
         assert response.status_code == 200
-        data = response.json()
 
-        # Валидация схемы ответа
-        jsonschema.validate(data, get_list_user_schema)
+        # Парсим и валидируем через pydantic
+        users_response = UsersListResponse(**response.json())
 
-        assert data["page"] == 1
-        assert data["per_page"] == 6
-        assert data["total"] == 12
-        assert data["total_pages"] == 2
-        assert len(data["data"]) == 6
+        assert users_response.page == 1
+        assert users_response.per_page == 6
+        assert users_response.total == 12
+        assert users_response.total_pages == 2
+        assert len(users_response.data) == 6
         logger.info("Page 1 works, schema valid")
 
     def test_list_users_page_2(self):
@@ -39,42 +37,41 @@ class TestUsers:
         logger.info(f"GET /api/users?page=2 - Status: {response.status_code}")
 
         assert response.status_code == 200
-        data = response.json()
-        jsonschema.validate(data, get_list_user_schema)
 
-        assert data["page"] == 2
-        assert data["per_page"] == 6
-        assert len(data["data"]) == 6
-        assert data["data"][0]["id"] == 7
+        users_response = UsersListResponse(**response.json())
+
+        assert users_response.page == 2
+        assert users_response.per_page == 6
+        assert len(users_response.data) == 6
+        assert users_response.data[0].id == 7
         logger.info("Page 2 works, schema valid")
 
-    def test_default_params(self):
+    def test_default_params(self, api_client):
         """Тест без параметров"""
-        response = requests.get(f"{BASE_URL}/api/users")
+        response = api_client.get("/api/users")
         logger.info(f"GET /api/users (default) - Status: {response.status_code}")
 
         assert response.status_code == 200
-        data = response.json()
-        jsonschema.validate(data, get_list_user_schema)
 
-        assert data["page"] == 1
-        assert data["per_page"] == 6
+        users_response = UsersListResponse(**response.json())
+
+        assert users_response.page == 1
+        assert users_response.per_page == 6
         logger.info("Default params work, schema valid")
 
-    def test_single_user_exists(self):
+    def test_single_user_exists(self, api_client):
         """Тест получения существующего пользователя"""
-        response = requests.get(f"{BASE_URL}/api/users/2")
+        response = api_client.get("/api/users/2")
         logger.info(f"GET /api/users/2 - Status: {response.status_code}")
 
         assert response.status_code == 200
-        data = response.json()
-        jsonschema.validate(data, get_single_user_schema)
 
-        assert "data" in data
-        assert data["data"]["id"] == 2
-        assert data["data"]["email"] == "janet.weaver@reqres.in"
-        assert data["data"]["first_name"] == "Janet"
-        assert data["data"]["last_name"] == "Weaver"
+        user_response = SingleUserResponse(**response.json())
+
+        assert user_response.data.id == 2
+        assert user_response.data.email == "janet.weaver@reqres.in"
+        assert user_response.data.first_name == "Janet"
+        assert user_response.data.last_name == "Weaver"
         logger.info("User 2 found, schema valid")
 
     def test_single_user_not_found(self):
@@ -100,28 +97,24 @@ class TestUsers:
     def test_different_users(self):
         """Тест получения разных пользователей"""
         # Первый пользователь
-        response1 = requests.get(f"{BASE_URL}/api/users/1")
-        logger.info(f"GET /api/users/1 - Status: {response1.status_code}")
+        response_first_user = requests.get(f"{BASE_URL}/api/users/1")
+        logger.info(f"GET /api/users/1 - Status: {response_first_user.status_code}")
 
-        assert response1.status_code == 200
-        data1 = response1.json()
-        jsonschema.validate(data1, get_single_user_schema)
+        assert response_first_user.status_code == 200
+        user1 = SingleUserResponse(**response_first_user.json())
 
-        user1 = data1["data"]
-        assert user1["first_name"] == "George"
-        assert user1["last_name"] == "Bluth"
+        assert user1.data.first_name == "George"
+        assert user1.data.last_name == "Bluth"
 
         # Последний пользователь
-        response12 = requests.get(f"{BASE_URL}/api/users/12")
-        logger.info(f"GET /api/users/12 - Status: {response12.status_code}")
+        response_last_user = requests.get(f"{BASE_URL}/api/users/12")
+        logger.info(f"GET /api/users/12 - Status: {response_last_user.status_code}")
 
-        assert response12.status_code == 200
-        data12 = response12.json()
-        jsonschema.validate(data12, get_single_user_schema)
+        assert response_last_user.status_code == 200
+        user12 = SingleUserResponse(**response_last_user.json())
 
-        user12 = data12["data"]
-        assert user12["first_name"] == "Rachel"
-        assert user12["last_name"] == "Howell"
+        assert user12.data.first_name == "Rachel"
+        assert user12.data.last_name == "Howell"
         logger.info("Different users work, schemas valid")
 
     def test_middle_user(self):
@@ -130,17 +123,15 @@ class TestUsers:
         logger.info(f"GET /api/users/7 - Status: {response.status_code}")
 
         assert response.status_code == 200
-        data = response.json()
-        jsonschema.validate(data, get_single_user_schema)
+        user = SingleUserResponse(**response.json())
 
-        user = data["data"]
-        assert user["first_name"] == "Michael"
-        assert user["last_name"] == "Lawson"
+        assert user.data.first_name == "Michael"
+        assert user.data.last_name == "Lawson"
         logger.info("User 7 found, schema valid")
 
 
 class TestResources:
-    """Тесты для ресурсов"""
+    """Тесты для ресурсов (цвета/продукты)"""
 
     def test_list_resources(self):
         """Тест списка ресурсов"""
