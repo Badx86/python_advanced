@@ -2,15 +2,16 @@ import requests
 import logging
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
 BASE_URL = "http://localhost:8000"
 
 
-class TestAPI:
-    """Тесты для API"""
+class TestUsers:
+    """Тесты для пользователей"""
 
     def test_list_users_page_1(self):
         """Тест первой страницы"""
@@ -74,6 +75,16 @@ class TestAPI:
         assert data["detail"] == {}
         logger.info("User 999 not found (404)")
 
+    def test_single_user_23_not_found(self):
+        """Тест получения пользователя 23 (как в оригинальном reqres)"""
+        response = requests.get(f"{BASE_URL}/api/users/23")
+        logger.info(f"GET /api/users/23 - Status: {response.status_code}")
+
+        assert response.status_code == 404
+        data = response.json()
+        assert data["detail"] == {}
+        logger.info("User 23 not found (404)")
+
     def test_different_users(self):
         """Тест получения разных пользователей"""
         # Первый пользователь
@@ -105,3 +116,79 @@ class TestAPI:
         assert user["first_name"] == "Michael"
         assert user["last_name"] == "Lawson"
         logger.info("User 7 found")
+
+
+class TestResources:
+    """Тесты для ресурсов"""
+
+    def test_list_resources(self):
+        """Тест списка ресурсов"""
+        # GET /api/unknown
+        pass
+
+    def test_single_resource(self):
+        """Тест получения одного ресурса"""
+        # GET /api/unknown/2
+        pass
+
+    def test_single_resource_not_found(self):
+        """Тест получения несуществующего ресурса"""
+        # GET /api/unknown/23
+        pass
+
+
+class TestCRUD:
+    """Тесты для создания, обновления, удаления"""
+
+    def test_create_user(self):
+        """Тест создания пользователя"""
+        # POST /api/users
+        pass
+
+    def test_update_user_put(self):
+        """Тест полного обновления пользователя"""
+        # PUT /api/users/2
+        pass
+
+    def test_update_user_patch(self):
+        """Тест частичного обновления пользователя"""
+        # PATCH /api/users/2
+        pass
+
+    def test_delete_user(self):
+        """Тест удаления пользователя"""
+        # DELETE /api/users/2
+        pass
+
+
+class TestAuth:
+    """Тесты для аутентификации"""
+
+    def test_register_successful(self):
+        """Тест успешной регистрации"""
+        # POST /api/register
+        pass
+
+    def test_register_unsuccessful(self):
+        """Тест неуспешной регистрации"""
+        # POST /api/register (без пароля)
+        pass
+
+    def test_login_successful(self):
+        """Тест успешного логина"""
+        # POST /api/login
+        pass
+
+    def test_login_unsuccessful(self):
+        """Тест неуспешного логина"""
+        # POST /api/login (неверные данные)
+        pass
+
+
+class TestSpecial:
+    """Специальные тесты"""
+
+    def test_delayed_response(self):
+        """Тест задержанного ответа"""
+        # GET /api/users?delay=3
+        pass
