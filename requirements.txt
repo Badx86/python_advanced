@@ -1,0 +1,6 @@
+requests
+FastAPI
+uvicorn
+pytest
+black
+pytest-sugar
