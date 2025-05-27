@@ -1,9 +1,11 @@
 import requests
 import logging
+import jsonschema
+from schemas import get_list_user_schema, get_single_user_schema
+
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -20,12 +22,16 @@ class TestUsers:
 
         assert response.status_code == 200
         data = response.json()
+
+        # Валидация схемы ответа
+        jsonschema.validate(data, get_list_user_schema)
+
         assert data["page"] == 1
         assert data["per_page"] == 6
         assert data["total"] == 12
         assert data["total_pages"] == 2
         assert len(data["data"]) == 6
-        logger.info("Page 1 works")
+        logger.info("Page 1 works, schema valid")
 
     def test_list_users_page_2(self):
         """Тест второй страницы"""
@@ -34,11 +40,13 @@ class TestUsers:
 
         assert response.status_code == 200
         data = response.json()
+        jsonschema.validate(data, get_list_user_schema)
+
         assert data["page"] == 2
         assert data["per_page"] == 6
         assert len(data["data"]) == 6
         assert data["data"][0]["id"] == 7
-        logger.info("Page 2 works")
+        logger.info("Page 2 works, schema valid")
 
     def test_default_params(self):
         """Тест без параметров"""
@@ -47,9 +55,11 @@ class TestUsers:
 
         assert response.status_code == 200
         data = response.json()
+        jsonschema.validate(data, get_list_user_schema)
+
         assert data["page"] == 1
         assert data["per_page"] == 6
-        logger.info("Default params work")
+        logger.info("Default params work, schema valid")
 
     def test_single_user_exists(self):
         """Тест получения существующего пользователя"""
@@ -58,12 +68,14 @@ class TestUsers:
 
         assert response.status_code == 200
         data = response.json()
+        jsonschema.validate(data, get_single_user_schema)
+
         assert "data" in data
         assert data["data"]["id"] == 2
         assert data["data"]["email"] == "janet.weaver@reqres.in"
         assert data["data"]["first_name"] == "Janet"
         assert data["data"]["last_name"] == "Weaver"
-        logger.info("User 2 found")
+        logger.info("User 2 found, schema valid")
 
     def test_single_user_not_found(self):
         """Тест получения несуществующего пользователя"""
@@ -92,7 +104,10 @@ class TestUsers:
         logger.info(f"GET /api/users/1 - Status: {response1.status_code}")
 
         assert response1.status_code == 200
-        user1 = response1.json()["data"]
+        data1 = response1.json()
+        jsonschema.validate(data1, get_single_user_schema)
+
+        user1 = data1["data"]
         assert user1["first_name"] == "George"
         assert user1["last_name"] == "Bluth"
 
@@ -101,10 +116,13 @@ class TestUsers:
         logger.info(f"GET /api/users/12 - Status: {response12.status_code}")
 
         assert response12.status_code == 200
-        user12 = response12.json()["data"]
+        data12 = response12.json()
+        jsonschema.validate(data12, get_single_user_schema)
+
+        user12 = data12["data"]
         assert user12["first_name"] == "Rachel"
         assert user12["last_name"] == "Howell"
-        logger.info("Different users work")
+        logger.info("Different users work, schemas valid")
 
     def test_middle_user(self):
         """Тест пользователя из середины списка"""
@@ -112,10 +130,13 @@ class TestUsers:
         logger.info(f"GET /api/users/7 - Status: {response.status_code}")
 
         assert response.status_code == 200
-        user = response.json()["data"]
+        data = response.json()
+        jsonschema.validate(data, get_single_user_schema)
+
+        user = data["data"]
         assert user["first_name"] == "Michael"
         assert user["last_name"] == "Lawson"
-        logger.info("User 7 found")
+        logger.info("User 7 found, schema valid")
 
 
 class TestResources:
