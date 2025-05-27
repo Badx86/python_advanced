@@ -42,8 +42,9 @@ GET /api/users/999  # 404 Not Found
 ## Файлы
 
 - `main.py` - FastAPI сервер
-- `test_reqres.py` - Тесты с jsonschema валидацией
-- `schemas.py` - JSON схемы для тестов
+- `tests/test_reqres.py` - Тесты с Pydantic валидацией
+- `app/models.py` - Pydantic модели для валидации
+- `tests/conftest.py` - Pytest фикстуры
 - `requirements.txt` - Зависимости
 
 ## Тесты
@@ -53,7 +54,6 @@ GET /api/users/999  # 404 Not Found
 - ✅ Список пользователей (пагинация)
 - ✅ Получение пользователя по ID
 - ✅ 404 для несуществующих пользователей
-- ✅ JSON schema валидация
 
 Заготовки для будущего (не покрыто тестами):
 
