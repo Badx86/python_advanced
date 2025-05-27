@@ -1,17 +1,22 @@
 from fastapi import FastAPI, HTTPException
 import math
 import logging
+from typing import Dict, Any, List
 
 # Настройка логгера
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("api.log", encoding='utf-8'),  # в файл
+        logging.StreamHandler(),  # в консоль
+    ],
 )
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# 12 users
-users = [
+users: List[Dict[str, Any]] = [
     {
         "id": 1,
         "email": "george.bluth@reqres.in",
@@ -99,8 +104,17 @@ users = [
 ]
 
 
+def find_user_by_id(user_id: int) -> Dict[str, Any] | None:
+    """Поиск пользователя по ID"""
+    for user in users:
+        if user["id"] == user_id:
+            return user
+    return None
+
+
 @app.get("/api/users")
-def get_users(page: int = 1, per_page: int = 6):
+def get_users(page: int = 1, per_page: int = 6) -> Dict[str, Any]:
+    """Получение списка пользователей с пагинацией"""
     logger.info(f"Getting users list: page={page}, per_page={per_page}")
 
     total = len(users)
@@ -125,15 +139,11 @@ def get_users(page: int = 1, per_page: int = 6):
 
 
 @app.get("/api/users/{user_id}")
-def get_single_user(user_id: int):
+def get_single_user(user_id: int) -> Dict[str, Any]:
+    """Получение одного пользователя по ID"""
     logger.info(f"Getting single user: user_id={user_id}")
 
-    # Ищем пользователя по ID
-    user = None
-    for u in users:
-        if u["id"] == user_id:
-            user = u
-            break
+    user = find_user_by_id(user_id)
 
     if not user:
         logger.warning(f"User {user_id} not found")
@@ -150,7 +160,7 @@ def get_single_user(user_id: int):
 
 
 if __name__ == "__main__":
-    logger.info("🚀 Starting server...")
+    logger.info("Starting server...")
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
