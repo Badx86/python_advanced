@@ -1,10 +1,19 @@
 import requests
 import logging
-from app.models import UsersListResponse, SingleUserResponse
-
+from tests.assertions import (
+    assert_users_list_response,
+    assert_user_response,
+    assert_resources_list_response,
+    assert_resource_response,
+    assert_404_error,
+    assert_user_fields,
+    assert_resource_fields,
+)
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
@@ -17,137 +26,148 @@ class TestUsers:
     def test_list_users_page_1(self, api_client) -> None:
         """Тест первой страницы"""
         response = api_client.get("/api/users", params={"page": 1})
-        logger.info(f"GET /api/users?page=1 - Status: {response.status_code}")
+        users_response = assert_users_list_response(response, "/api/users?page=1")
 
-        assert response.status_code == 200
-
-        # Парсим и валидируем через pydantic
-        users_response: UsersListResponse = UsersListResponse(**response.json())
-
-        # Работаем с типизированным объектом
-        assert users_response.page == 1
-        assert users_response.per_page == 6
-        assert users_response.total == 12
-        assert users_response.total_pages == 2
         assert len(users_response.data) == 6
         logger.info("Page 1 works, schema valid")
 
     def test_list_users_page_2(self) -> None:
         """Тест второй страницы"""
         response = requests.get(f"{BASE_URL}/api/users?page=2")
-        logger.info(f"GET /api/users?page=2 - Status: {response.status_code}")
+        users_response = assert_users_list_response(
+            response, "/api/users?page=2", page=2
+        )
 
-        assert response.status_code == 200
-
-        users_response: UsersListResponse = UsersListResponse(**response.json())
-
-        assert users_response.page == 2
-        assert users_response.per_page == 6
-        assert len(users_response.data) == 6
         assert users_response.data[0].id == 7
         logger.info("Page 2 works, schema valid")
 
     def test_default_params(self, api_client) -> None:
         """Тест без параметров"""
         response = api_client.get("/api/users")
-        logger.info(f"GET /api/users (default) - Status: {response.status_code}")
-
-        assert response.status_code == 200
-
-        users_response: UsersListResponse = UsersListResponse(**response.json())
-
-        assert users_response.page == 1
-        assert users_response.per_page == 6
+        assert_users_list_response(response, "/api/users (default)")
         logger.info("Default params work, schema valid")
 
     def test_single_user_exists(self, api_client) -> None:
         """Тест получения существующего пользователя"""
         response = api_client.get("/api/users/2")
-        logger.info(f"GET /api/users/2 - Status: {response.status_code}")
+        user_response = assert_user_response(response, "/api/users/2")
 
-        assert response.status_code == 200
-
-        user_response: SingleUserResponse = SingleUserResponse(**response.json())
-
-        assert user_response.data.id == 2
-        assert user_response.data.email == "janet.weaver@reqres.in"
-        assert user_response.data.first_name == "Janet"
-        assert user_response.data.last_name == "Weaver"
+        assert_user_fields(
+            user_response.data.dict(),
+            expected_id=2,
+            expected_email="janet.weaver@reqres.in",
+            expected_first_name="Janet",
+            expected_last_name="Weaver",
+        )
         logger.info("User 2 found, schema valid")
 
     def test_single_user_not_found(self) -> None:
         """Тест получения несуществующего пользователя"""
         response = requests.get(f"{BASE_URL}/api/users/999")
-        logger.info(f"GET /api/users/999 - Status: {response.status_code}")
-
-        assert response.status_code == 404
-        data = response.json()
-        assert data["detail"] == {}
+        assert_404_error(response, "/api/users/999")
         logger.info("User 999 not found (404)")
 
     def test_single_user_23_not_found(self) -> None:
         """Тест получения пользователя 23 (как в оригинальном reqres)"""
         response = requests.get(f"{BASE_URL}/api/users/23")
-        logger.info(f"GET /api/users/23 - Status: {response.status_code}")
-
-        assert response.status_code == 404
-        data = response.json()
-        assert data["detail"] == {}
+        assert_404_error(response, "/api/users/23")
         logger.info("User 23 not found (404)")
 
     def test_different_users(self) -> None:
         """Тест получения разных пользователей"""
         # Первый пользователь
-        response_first_user = requests.get(f"{BASE_URL}/api/users/1")
-        logger.info(f"GET /api/users/1 - Status: {response_first_user.status_code}")
-
-        assert response_first_user.status_code == 200
-        user1: SingleUserResponse = SingleUserResponse(**response_first_user.json())
-
-        assert user1.data.first_name == "George"
-        assert user1.data.last_name == "Bluth"
+        response_first = requests.get(f"{BASE_URL}/api/users/1")
+        user1 = assert_user_response(response_first, "/api/users/1")
+        assert_user_fields(
+            user1.data.dict(), 1, "george.bluth@reqres.in", "George", "Bluth"
+        )
 
         # Последний пользователь
-        response_last_user = requests.get(f"{BASE_URL}/api/users/12")
-        logger.info(f"GET /api/users/12 - Status: {response_last_user.status_code}")
+        response_last = requests.get(f"{BASE_URL}/api/users/12")
+        user12 = assert_user_response(response_last, "/api/users/12")
+        assert_user_fields(
+            user12.data.dict(), 12, "rachel.howell@reqres.in", "Rachel", "Howell"
+        )
 
-        assert response_last_user.status_code == 200
-        user12: SingleUserResponse = SingleUserResponse(**response_last_user.json())
-
-        assert user12.data.first_name == "Rachel"
-        assert user12.data.last_name == "Howell"
         logger.info("Different users work, schemas valid")
 
     def test_middle_user(self) -> None:
         """Тест пользователя из середины списка"""
         response = requests.get(f"{BASE_URL}/api/users/7")
-        logger.info(f"GET /api/users/7 - Status: {response.status_code}")
-
-        assert response.status_code == 200
-        user: SingleUserResponse = SingleUserResponse(**response.json())
-
-        assert user.data.first_name == "Michael"
-        assert user.data.last_name == "Lawson"
+        user = assert_user_response(response, "/api/users/7")
+        assert_user_fields(
+            user.data.dict(), 7, "michael.lawson@reqres.in", "Michael", "Lawson"
+        )
         logger.info("User 7 found, schema valid")
 
 
 class TestResources:
     """Тесты для ресурсов"""
 
-    def test_list_resources(self) -> None:
+    def test_list_resources(self, api_client) -> None:
         """Тест списка ресурсов"""
-        # GET /api/unknown
-        pass
+        response = api_client.get("/api/unknown")
+        resources_response = assert_resources_list_response(response, "/api/unknown")
 
-    def test_single_resource(self) -> None:
+        assert resources_response.data[0].name == "cerulean"
+        assert resources_response.data[0].year == 2000
+        logger.info("Resources list works, schema valid")
+
+    def test_single_resource(self, api_client) -> None:
         """Тест получения одного ресурса"""
-        # GET /api/unknown/2
-        pass
+        response = api_client.get("/api/unknown/2")
+        resource_response = assert_resource_response(response, "/api/unknown/2")
+
+        assert_resource_fields(
+            resource_response.data.dict(),
+            expected_id=2,
+            expected_name="fuchsia rose",
+            expected_year=2001,
+            expected_color="#C74375",
+            expected_pantone="17-2031",
+        )
+        logger.info("Resource 2 found, schema valid")
 
     def test_single_resource_not_found(self) -> None:
         """Тест получения несуществующего ресурса"""
-        # GET /api/unknown/23
-        pass
+        response = requests.get(f"{BASE_URL}/api/unknown/23")
+        assert_404_error(response, "/api/unknown/23")
+        logger.info("Resource 23 not found (404)")
+
+    def test_resources_page_2(self) -> None:
+        """Тест второй страницы ресурсов"""
+        response = requests.get(f"{BASE_URL}/api/unknown?page=2")
+        resources_response = assert_resources_list_response(
+            response, "/api/unknown?page=2", page=2
+        )
+
+        assert resources_response.data[0].id == 7
+        assert resources_response.data[0].name == "sand dollar"
+        logger.info("Page 2 resources work, schema valid")
+
+    def test_resources_default_params(self, api_client) -> None:
+        """Тест ресурсов без параметров"""
+        response = api_client.get("/api/unknown")
+        assert_resources_list_response(response, "/api/unknown (default)")
+        logger.info("Default params for resources work, schema valid")
+
+    def test_first_and_last_resource(self) -> None:
+        """Тест первого и последнего ресурса"""
+        # Первый ресурс
+        response_first = requests.get(f"{BASE_URL}/api/unknown/1")
+        resource1 = assert_resource_response(response_first, "/api/unknown/1")
+        assert_resource_fields(
+            resource1.data.dict(), 1, "cerulean", 2000, "#98B2D1", "15-4020"
+        )
+
+        # Последний ресурс
+        response_last = requests.get(f"{BASE_URL}/api/unknown/12")
+        resource12 = assert_resource_response(response_last, "/api/unknown/12")
+        assert_resource_fields(
+            resource12.data.dict(), 12, "honeysuckle", 2011, "#D94F70", "18-2120"
+        )
+
+        logger.info("First and last resources work, schemas valid")
 
 
 class TestCRUD:

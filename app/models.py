@@ -13,6 +13,16 @@ class User(BaseModel):
     avatar: str
 
 
+class Resource(BaseModel):
+    """Модель ресурса"""
+
+    id: int
+    name: str
+    year: int
+    color: str
+    pantone_value: str
+
+
 class Support(BaseModel):
     """Модель блока поддержки"""
 
@@ -31,10 +41,28 @@ class UsersListResponse(BaseModel):
     support: Support
 
 
+class ResourcesListResponse(BaseModel):
+    """Ответ со списком ресурсов"""
+
+    page: int
+    per_page: int
+    total: int
+    total_pages: int
+    data: List[Resource]
+    support: Support
+
+
 class SingleUserResponse(BaseModel):
     """Ответ с одним пользователем"""
 
     data: User
+    support: Support
+
+
+class SingleResourceResponse(BaseModel):
+    """Ответ с одним ресурсом"""
+
+    data: Resource
     support: Support
 
 
