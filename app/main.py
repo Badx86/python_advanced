@@ -1,7 +1,15 @@
 from fastapi import FastAPI, HTTPException
 import math
 import logging
+import random
 from typing import Dict, Any, List
+from datetime import datetime
+from app.models import (
+    CreateUserRequest,
+    CreateUserResponse,
+    UpdateUserRequest,
+    UpdateUserResponse,
+)
 
 # Настройка логгера
 logging.basicConfig(
@@ -300,6 +308,59 @@ def get_single_resource(resource_id: int) -> Dict[str, Any]:
             "text": "Tired of writing endless social media content? Let Content Caddy generate it for you.",
         },
     }
+
+
+@app.post("/api/users", status_code=201)
+def create_user(user_data: CreateUserRequest) -> CreateUserResponse:
+    """Создание нового пользователя"""
+    logger.info(f"Creating user: name={user_data.name}, job={user_data.job}")
+
+    new_id = str(random.randint(100, 9999))
+    created_at = datetime.now()
+
+    logger.info(f"Created user with ID: {new_id}")
+
+    return CreateUserResponse(
+        name=user_data.name, job=user_data.job, id=new_id, createdAt=created_at
+    )
+
+
+@app.put("/api/users/{user_id}")
+def update_user_put(user_id: int, user_data: UpdateUserRequest) -> UpdateUserResponse:
+    """Полное обновление пользователя"""
+    logger.info(
+        f"PUT updating user {user_id}: name={user_data.name}, job={user_data.job}"
+    )
+
+    updated_at = datetime.now()
+
+    logger.info(f"Updated user {user_id}")
+
+    return UpdateUserResponse(
+        name=user_data.name, job=user_data.job, updatedAt=updated_at
+    )
+
+
+@app.patch("/api/users/{user_id}")
+def update_user_patch(user_id: int, user_data: UpdateUserRequest) -> UpdateUserResponse:
+    """Частичное обновление пользователя"""
+    logger.info(
+        f"PATCH updating user {user_id}: name={user_data.name}, job={user_data.job}"
+    )
+
+    updated_at = datetime.now()
+
+    logger.info(f"Patched user {user_id}")
+
+    return UpdateUserResponse(
+        name=user_data.name, job=user_data.job, updatedAt=updated_at
+    )
+
+
+@app.delete("/api/users/{user_id}", status_code=204)
+def delete_user(user_id: int) -> None:
+    """Удаление пользователя"""
+    logger.info(f"Deleting user {user_id}")
 
 
 if __name__ == "__main__":

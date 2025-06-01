@@ -5,3 +5,4 @@ pytest
 black
 pytest-sugar
 pydantic-settings
+mimesis

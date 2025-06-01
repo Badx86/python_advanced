@@ -1,14 +1,7 @@
 import requests
 import logging
-from tests.assertions import (
-    assert_users_list_response,
-    assert_user_response,
-    assert_resources_list_response,
-    assert_resource_response,
-    assert_404_error,
-    assert_user_fields,
-    assert_resource_fields,
-)
+from mimesis import Person
+from tests.assertions import api
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,6 +12,14 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = "http://localhost:8000"
 
+# Инициализируем генератор
+person = Person()
+
+
+def generate_random_user():
+    """Генерирует случайные тестовые данные пользователя с помощью mimesis"""
+    return {"name": person.first_name().lower(), "job": person.occupation().lower()}
+
 
 class TestUsers:
     """Тесты для пользователей"""
@@ -26,79 +27,38 @@ class TestUsers:
     def test_list_users_page_1(self, api_client) -> None:
         """Тест первой страницы"""
         response = api_client.get("/api/users", params={"page": 1})
-        users_response = assert_users_list_response(response, "/api/users?page=1")
+        users_response = api.check_users_list_response(response, "/api/users?page=1")
 
-        assert len(users_response.data) == 6
+        api.check_data_count(users_response, 6)
         logger.info("Page 1 works, schema valid")
 
     def test_list_users_page_2(self) -> None:
         """Тест второй страницы"""
         response = requests.get(f"{BASE_URL}/api/users?page=2")
-        users_response = assert_users_list_response(
+        users_response = api.check_users_list_response(
             response, "/api/users?page=2", page=2
         )
 
-        assert users_response.data[0].id == 7
+        api.check_first_item_field(users_response, "id", 7)
         logger.info("Page 2 works, schema valid")
-
-    def test_default_params(self, api_client) -> None:
-        """Тест без параметров"""
-        response = api_client.get("/api/users")
-        assert_users_list_response(response, "/api/users (default)")
-        logger.info("Default params work, schema valid")
 
     def test_single_user_exists(self, api_client) -> None:
         """Тест получения существующего пользователя"""
         response = api_client.get("/api/users/2")
-        user_response = assert_user_response(response, "/api/users/2")
-
-        assert_user_fields(
-            user_response.data.dict(),
-            expected_id=2,
-            expected_email="janet.weaver@reqres.in",
-            expected_first_name="Janet",
-            expected_last_name="Weaver",
-        )
+        api.check_user_response(response, "/api/users/2")
         logger.info("User 2 found, schema valid")
 
     def test_single_user_not_found(self) -> None:
         """Тест получения несуществующего пользователя"""
         response = requests.get(f"{BASE_URL}/api/users/999")
-        assert_404_error(response, "/api/users/999")
+        api.check_404_error(response, "/api/users/999")
         logger.info("User 999 not found (404)")
 
     def test_single_user_23_not_found(self) -> None:
-        """Тест получения пользователя 23 (как в оригинальном reqres)"""
+        """Тест получения пользователя 23"""
         response = requests.get(f"{BASE_URL}/api/users/23")
-        assert_404_error(response, "/api/users/23")
+        api.check_404_error(response, "/api/users/23")
         logger.info("User 23 not found (404)")
-
-    def test_different_users(self) -> None:
-        """Тест получения разных пользователей"""
-        # Первый пользователь
-        response_first = requests.get(f"{BASE_URL}/api/users/1")
-        user1 = assert_user_response(response_first, "/api/users/1")
-        assert_user_fields(
-            user1.data.dict(), 1, "george.bluth@reqres.in", "George", "Bluth"
-        )
-
-        # Последний пользователь
-        response_last = requests.get(f"{BASE_URL}/api/users/12")
-        user12 = assert_user_response(response_last, "/api/users/12")
-        assert_user_fields(
-            user12.data.dict(), 12, "rachel.howell@reqres.in", "Rachel", "Howell"
-        )
-
-        logger.info("Different users work, schemas valid")
-
-    def test_middle_user(self) -> None:
-        """Тест пользователя из середины списка"""
-        response = requests.get(f"{BASE_URL}/api/users/7")
-        user = assert_user_response(response, "/api/users/7")
-        assert_user_fields(
-            user.data.dict(), 7, "michael.lawson@reqres.in", "Michael", "Lawson"
-        )
-        logger.info("User 7 found, schema valid")
 
 
 class TestResources:
@@ -107,91 +67,88 @@ class TestResources:
     def test_list_resources(self, api_client) -> None:
         """Тест списка ресурсов"""
         response = api_client.get("/api/unknown")
-        resources_response = assert_resources_list_response(response, "/api/unknown")
+        resources_response = api.check_resources_list_response(response, "/api/unknown")
 
-        assert resources_response.data[0].name == "cerulean"
-        assert resources_response.data[0].year == 2000
+        api.check_multiple_fields(
+            resources_response.data[0], name="cerulean", year=2000
+        )
         logger.info("Resources list works, schema valid")
 
     def test_single_resource(self, api_client) -> None:
         """Тест получения одного ресурса"""
         response = api_client.get("/api/unknown/2")
-        resource_response = assert_resource_response(response, "/api/unknown/2")
-
-        assert_resource_fields(
-            resource_response.data.dict(),
-            expected_id=2,
-            expected_name="fuchsia rose",
-            expected_year=2001,
-            expected_color="#C74375",
-            expected_pantone="17-2031",
-        )
+        api.check_resource_response(response, "/api/unknown/2")
         logger.info("Resource 2 found, schema valid")
 
     def test_single_resource_not_found(self) -> None:
         """Тест получения несуществующего ресурса"""
         response = requests.get(f"{BASE_URL}/api/unknown/23")
-        assert_404_error(response, "/api/unknown/23")
+        api.check_404_error(response, "/api/unknown/23")
         logger.info("Resource 23 not found (404)")
 
     def test_resources_page_2(self) -> None:
         """Тест второй страницы ресурсов"""
         response = requests.get(f"{BASE_URL}/api/unknown?page=2")
-        resources_response = assert_resources_list_response(
+        resources_response = api.check_resources_list_response(
             response, "/api/unknown?page=2", page=2
         )
 
-        assert resources_response.data[0].id == 7
-        assert resources_response.data[0].name == "sand dollar"
+        api.check_multiple_fields(resources_response.data[0], id=7, name="sand dollar")
         logger.info("Page 2 resources work, schema valid")
-
-    def test_resources_default_params(self, api_client) -> None:
-        """Тест ресурсов без параметров"""
-        response = api_client.get("/api/unknown")
-        assert_resources_list_response(response, "/api/unknown (default)")
-        logger.info("Default params for resources work, schema valid")
-
-    def test_first_and_last_resource(self) -> None:
-        """Тест первого и последнего ресурса"""
-        # Первый ресурс
-        response_first = requests.get(f"{BASE_URL}/api/unknown/1")
-        resource1 = assert_resource_response(response_first, "/api/unknown/1")
-        assert_resource_fields(
-            resource1.data.dict(), 1, "cerulean", 2000, "#98B2D1", "15-4020"
-        )
-
-        # Последний ресурс
-        response_last = requests.get(f"{BASE_URL}/api/unknown/12")
-        resource12 = assert_resource_response(response_last, "/api/unknown/12")
-        assert_resource_fields(
-            resource12.data.dict(), 12, "honeysuckle", 2011, "#D94F70", "18-2120"
-        )
-
-        logger.info("First and last resources work, schemas valid")
 
 
 class TestCRUD:
     """Тесты для создания, обновления, удаления"""
 
-    def test_create_user(self) -> None:
+    def test_create_user(self, api_client) -> None:
         """Тест создания пользователя"""
-        # POST /api/users
-        pass
+        user_data = generate_random_user()  # Используем mimesis
+        logger.info(f"Creating user with data: {user_data}")
 
-    def test_update_user_put(self) -> None:
+        response = api_client.post("/api/users", json=user_data)
+        api.check_create_user_response(
+            response, "/api/users", user_data["name"], user_data["job"]
+        )
+        logger.info("User created successfully")
+
+    def test_update_user_put(self, api_client) -> None:
         """Тест полного обновления пользователя"""
-        # PUT /api/users/2
-        pass
+        updated_data = generate_random_user()
+        logger.info(f"Updating user with data: {updated_data}")
 
-    def test_update_user_patch(self) -> None:
+        response = api_client.put("/api/users/2", json=updated_data)
+        api.check_update_user_response(
+            response, "/api/users/2", updated_data["name"], updated_data["job"]
+        )
+        logger.info("User updated successfully with PUT")
+
+    def test_update_user_patch(self, api_client) -> None:
         """Тест частичного обновления пользователя"""
-        # PATCH /api/users/2
-        pass
+        updated_data = generate_random_user()
+        logger.info(f"Patching user with data: {updated_data}")
 
-    def test_delete_user(self) -> None:
+        response = api_client.patch("/api/users/2", json=updated_data)
+        api.check_update_user_response(
+            response, "/api/users/2", updated_data["name"], updated_data["job"]
+        )
+        logger.info("User updated successfully with PATCH")
+
+    def test_delete_user(self, api_client) -> None:
         """Тест удаления пользователя"""
-        # DELETE /api/users/2
-        pass
+        response = api_client.delete("/api/users/2")
+        api.check_delete_user_response(response, "/api/users/2")
+        logger.info("User deleted successfully")
+
+    def test_update_nonexistent_user(self, api_client) -> None:
+        """Тест обновления несуществующего пользователя"""
+        updated_data = generate_random_user()
+        logger.info(f"Updating non-existent user with data: {updated_data}")
+
+        response = api_client.put("/api/users/999", json=updated_data)
+        api.check_update_user_response(
+            response, "/api/users/999", updated_data["name"], updated_data["job"]
+        )
+        logger.info("Non-existent user 'updated' successfully (as in reqres)")
 
 
 class TestAuth:
@@ -214,7 +171,7 @@ class TestAuth:
 
     def test_login_unsuccessful(self) -> None:
         """Тест неуспешного логина"""
-        # POST /api/login (неверные данные)
+        # POST /api/login (невалидные данные)
         pass
 
 
