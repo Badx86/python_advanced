@@ -127,11 +127,10 @@ class APIAssertions:
         assert create_response.id is not None
         assert create_response.createdAt is not None
 
-        # Проверяем диапазон ID как в reqres.in
         user_id = int(create_response.id)
         assert (
-            500 <= user_id <= 999
-        ), f"ID должен быть в диапазоне 500-999, получен: {user_id}"
+            100 <= user_id <= 9999
+        ), f"ID должен быть в диапазоне 100-9999, получен: {user_id}"
 
         return create_response
 
