@@ -14,6 +14,9 @@ pydantic-settings = "^2.9.1"
 pytest = "^8.4.0"
 selene = "^1.0.2"
 mimesis = "^18.0.0"
+python-dotenv = "^1.1.0"
+fastapi-pagination = "^0.13.2"
+email-validator = "^2.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"

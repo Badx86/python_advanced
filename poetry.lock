@@ -367,6 +367,43 @@ graph = ["objgraph (>=1.7.2)"]
 profile = ["gprof2dot (>=2022.7.29)"]
 
 [[package]]
+name = "dnspython"
+version = "2.7.0"
+description = "DNS toolkit"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "dnspython-2.7.0-py3-none-any.whl", hash = "sha256:b4c34b7d10b51bcc3a5071e7b8dee77939f1e878477eeecc965e9835f63c6c86"},
+    {file = "dnspython-2.7.0.tar.gz", hash = "sha256:ce9c432eda0dc91cf618a5cedf1a4e142651196bbcd2c80e89ed5a907e5cfaf1"},
+]
+
+[package.extras]
+dev = ["black (>=23.1.0)", "coverage (>=7.0)", "flake8 (>=7)", "hypercorn (>=0.16.0)", "mypy (>=1.8)", "pylint (>=3)", "pytest (>=7.4)", "pytest-cov (>=4.1.0)", "quart-trio (>=0.11.0)", "sphinx (>=7.2.0)", "sphinx-rtd-theme (>=2.0.0)", "twine (>=4.0.0)", "wheel (>=0.42.0)"]
+dnssec = ["cryptography (>=43)"]
+doh = ["h2 (>=4.1.0)", "httpcore (>=1.0.0)", "httpx (>=0.26.0)"]
+doq = ["aioquic (>=1.0.0)"]
+idna = ["idna (>=3.7)"]
+trio = ["trio (>=0.23)"]
+wmi = ["wmi (>=1.5.1)"]
+
+[[package]]
+name = "email-validator"
+version = "2.2.0"
+description = "A robust email address syntax and deliverability validation library."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "email_validator-2.2.0-py3-none-any.whl", hash = "sha256:561977c2d73ce3611850a06fa56b414621e0c8faa9d66f2611407d87465da631"},
+    {file = "email_validator-2.2.0.tar.gz", hash = "sha256:cb690f344c617a714f22e66ae771445a1ceb46821152df8e165c5f9a364582b7"},
+]
+
+[package.dependencies]
+dnspython = ">=2.0.0"
+idna = ">=2.0.0"
+
+[[package]]
 name = "fastapi"
 version = "0.115.12"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -386,6 +423,42 @@ typing-extensions = ">=4.8.0"
 [package.extras]
 all = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.5)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)", "jinja2 (>=3.1.5)", "orjson (>=3.2.1)", "pydantic-extra-types (>=2.0.0)", "pydantic-settings (>=2.0.0)", "python-multipart (>=0.0.18)", "pyyaml (>=5.3.1)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0)", "uvicorn[standard] (>=0.12.0)"]
 standard = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.5)", "httpx (>=0.23.0)", "jinja2 (>=3.1.5)", "python-multipart (>=0.0.18)", "uvicorn[standard] (>=0.12.0)"]
+
+[[package]]
+name = "fastapi-pagination"
+version = "0.13.2"
+description = "FastAPI pagination"
+optional = false
+python-versions = "<4.0,>=3.9"
+groups = ["main"]
+files = [
+    {file = "fastapi_pagination-0.13.2-py3-none-any.whl", hash = "sha256:d2ec66ffda5cd9c1d665521f3916b16ebbb15d5010a945449292540ef70c4d9a"},
+    {file = "fastapi_pagination-0.13.2.tar.gz", hash = "sha256:5e76f129aef706601b86114428ca3ff68715bfa3929bf4df8c7ed27561d7f661"},
+]
+
+[package.dependencies]
+fastapi = ">=0.93.0"
+pydantic = ">=1.9.1"
+typing-extensions = ">=4.8.0,<5"
+
+[package.extras]
+all = ["asyncpg (>=0.24.0)", "beanie (>=1.25.0)", "bunnet (>=1.1.0,<2)", "databases (>=0.6.0)", "django (<6.0.0)", "elasticsearch-dsl (>=8.13.0,<9)", "google-cloud-firestore (>=2.19.0,<3)", "mongoengine (>=0.23.1,<0.30.0)", "motor (>=3.6.0,<4.0.0)", "odmantic (>=1.0.2,<2)", "orm (>=0.3.1)", "piccolo (>=0.89,<1.25)", "pony (>=0.7.16,<0.8)", "scylla-driver (>=3.25.6,<4)", "sqlakeyset (>=2.0.1680321678,<3)", "sqlalchemy (>=1.3.20)", "sqlmodel (>=0.0.22)", "tortoise-orm (>=0.22.0)"]
+asyncpg = ["asyncpg (>=0.24.0)", "sqlalchemy (>=1.3.20)"]
+beanie = ["beanie (>=1.25.0)"]
+bunnet = ["bunnet (>=1.1.0,<2)"]
+databases = ["databases (>=0.6.0)"]
+django = ["databases (>=0.6.0)", "django (<6.0.0)"]
+elasticsearch = ["elasticsearch-dsl (>=8.13.0,<9)"]
+firestore = ["google-cloud-firestore (>=2.19.0,<3)"]
+mongoengine = ["mongoengine (>=0.23.1,<0.30.0)"]
+motor = ["motor (>=3.6.0,<4.0.0)"]
+odmantic = ["odmantic (>=1.0.2,<2)"]
+orm = ["databases (>=0.6.0)", "orm (>=0.3.1)"]
+piccolo = ["piccolo (>=0.89,<1.25)"]
+scylla-driver = ["scylla-driver (>=3.25.6,<4)"]
+sqlalchemy = ["sqlakeyset (>=2.0.1680321678,<3)", "sqlalchemy (>=1.3.20)"]
+sqlmodel = ["sqlakeyset (>=2.0.1680321678,<3)", "sqlmodel (>=0.0.22)"]
+tortoise = ["tortoise-orm (>=0.22.0)"]
 
 [[package]]
 name = "future"
@@ -1147,4 +1220,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "69381f11c0d9a8573577f057547f909a4e5cfcd6011f9bf9cbf9a02af03787dd"
+content-hash = "04c864ca3e97d006565e339396d5a1cc7a1eccce4c8596963762e5e1a85c4aa3"

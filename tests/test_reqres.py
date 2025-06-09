@@ -26,7 +26,7 @@ class TestUsers:
 
     def test_list_users_page_1(self, api_client) -> None:
         """Тест первой страницы"""
-        response = api_client.get("/api/users", params={"page": 1})
+        response = api_client.get("/api/users", params={"page": 1, "per_page": 6})
         users_response = api.check_users_list_response(response, "/api/users?page=1")
 
         api.check_data_count(users_response, 6)
@@ -34,7 +34,7 @@ class TestUsers:
 
     def test_list_users_page_2(self) -> None:
         """Тест второй страницы"""
-        response = requests.get(f"{BASE_URL}/api/users?page=2")
+        response = requests.get(f"{BASE_URL}/api/users?page=2&per_page=6")
         users_response = api.check_users_list_response(
             response, "/api/users?page=2", page=2
         )
@@ -66,11 +66,11 @@ class TestResources:
 
     def test_list_resources(self, api_client) -> None:
         """Тест списка ресурсов"""
-        response = api_client.get("/api/unknown")
+        response = api_client.get("/api/unknown", params={"page": 1, "per_page": 6})
         resources_response = api.check_resources_list_response(response, "/api/unknown")
 
         api.check_multiple_fields(
-            resources_response.data[0], name="cerulean", year=2000
+            resources_response.items[0], name="cerulean", year=2000
         )
         logger.info("Resources list works, schema valid")
 
@@ -88,12 +88,12 @@ class TestResources:
 
     def test_resources_page_2(self) -> None:
         """Тест второй страницы ресурсов"""
-        response = requests.get(f"{BASE_URL}/api/unknown?page=2")
+        response = requests.get(f"{BASE_URL}/api/unknown?page=2&per_page=6")
         resources_response = api.check_resources_list_response(
             response, "/api/unknown?page=2", page=2
         )
 
-        api.check_multiple_fields(resources_response.data[0], id=7, name="sand dollar")
+        api.check_multiple_fields(resources_response.items[0], id=7, name="sand dollar")
         logger.info("Page 2 resources work, schema valid")
 
 
