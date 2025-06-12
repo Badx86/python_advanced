@@ -26,3 +26,17 @@ pylint = "^3.3.7"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+log_cli = false
+log_cli_level = "INFO"
+addopts = "--tb=short --strict-markers"
+
+markers = [
+    "smoke: Smoke tests for basic functionality",
+    "auth: Authentication related tests",
+    "crud: CRUD operation tests",
+    "pagination: Pagination related tests",
+    "slow: Tests that take longer to run"
+]

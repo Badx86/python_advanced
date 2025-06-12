@@ -14,6 +14,7 @@ def generate_random_user():
     return {"name": person.first_name().lower(), "job": person.occupation().lower()}
 
 
+@pytest.mark.crud
 class TestCRUD:
     """Тесты для создания, обновления, удаления"""
 

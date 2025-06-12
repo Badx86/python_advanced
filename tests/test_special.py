@@ -6,6 +6,7 @@ from tests.assertions import api
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.slow
 class TestSpecial:
     """Специальные тесты"""
 

@@ -1,3 +1,4 @@
+import pytest
 import logging
 from tests.assertions import api
 
@@ -7,6 +8,7 @@ logger = logging.getLogger(__name__)
 class TestResources:
     """Тесты для ресурсов"""
 
+    @pytest.mark.pagination
     def test_list_resources(self, api_client) -> None:
         """Тест списка ресурсов"""
         response = api_client.get("/api/unknown", params={"page": 1, "per_page": 6})
@@ -29,6 +31,7 @@ class TestResources:
         api.check_404_error(response, "/api/unknown/23")
         logger.info("Resource 23 not found (404)")
 
+    @pytest.mark.pagination
     def test_resources_page_2(self, api_client) -> None:
         """Тест второй страницы ресурсов"""
         response = api_client.get("/api/unknown", params={"page": 2, "per_page": 6})

@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 class TestUsers:
     """Тесты для пользователей"""
 
+    @pytest.mark.pagination
     def test_list_users_page_1(self, api_client) -> None:
         """Тест первой страницы"""
         response = api_client.get("/api/users", params={"page": 1, "per_page": 6})
@@ -16,6 +17,7 @@ class TestUsers:
         api.check_data_count(users_response, 6)
         logger.info("Page 1 works, schema valid")
 
+    @pytest.mark.pagination
     def test_list_users_page_2(self, api_client) -> None:
         """Тест второй страницы"""
         response = api_client.get("/api/users", params={"page": 2, "per_page": 6})

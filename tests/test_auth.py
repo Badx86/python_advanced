@@ -5,6 +5,7 @@ from tests.assertions import api
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.auth
 class TestAuth:
     """Тесты для аутентификации"""
 
