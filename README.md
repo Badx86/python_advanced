@@ -2,29 +2,65 @@
 
 Микросервис на FastAPI с автотестами.
 
-## Запуск
+## Установка и запуск
 
-### 1. Установка
+### 1. Установка зависимостей
 
 ```bash
-pip install -r requirements.txt
+# Установка Poetry (если еще не установлен)
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Установка зависимостей проекта
+poetry install
 ```
 
-### 2. Запуск сервера
+### 2. Настройка окружения
+
+Создайте `.env` файл в корне проекта:
 
 ```bash
-python main.py
+# API Configuration
+API_URL=http://localhost:8000
+API_KEY=reqres-free-v1
+HOST=0.0.0.0
+PORT=8000
+```
+
+**Важно:** Если сервис недоступен, тесты автоматически остановятся с сообщением о проблеме.
+
+### 3. Запуск сервера
+
+```bash
+# Через Poetry
+poetry run python app/main.py
+
+# Или активировать виртуальное окружение
+poetry shell
+python app/main.py
 ```
 
 Сервер: http://localhost:8000
 
-### 3. Запуск тестов
+### 4. Запуск тестов
 
 ```bash
-pytest test_reqres.py -v
+# Все тесты
+poetry run pytest tests/ -v
+
+# Только основные тесты
+poetry run pytest tests/test_reqres.py -v
+
+# Только smoke тесты
+poetry run pytest tests/test_smoke.py -v
 ```
 
 ## API
+
+### Статус
+
+```
+GET /status                          # Статус приложения
+```
 
 ### Пользователи
 
@@ -46,24 +82,39 @@ GET /api/unknown/2                   # Один ресурс
 GET /api/unknown/23                  # 404 Not Found
 ```
 
-## Файлы
+## Структура проекта
 
-- `app/main.py` - FastAPI сервер
-- `app/models.py` - Pydantic модели для валидации
-- `tests/test_reqres.py` - Тесты с Pydantic валидацией
-- `tests/conftest.py` - Pytest фикстуры
-- `tests/assertions.py` - Хелперы для проверок в тестах
-- `requirements.txt` - Зависимости
+```
+├── app/
+│   ├── main.py              # FastAPI сервер
+│   └── models.py            # Pydantic модели для валидации
+├── tests/
+│   ├── test_reqres.py       # Автотесты с Pydantic валидацией
+│   ├── test_smoke.py        # Smoke тесты
+│   ├── conftest.py          # Pytest фикстуры
+│   └── assertions.py        # Хелперы для проверок в тестах
+├── pyproject.toml           # Poetry конфигурация и зависимости
+├── poetry.lock              # Закрепленные версии зависимостей
+├── .env                     # Переменные окружения
+├── .gitignore              # Git ignore файл
+├── api.log                 # Логи API (генерируется автоматически)
+└── README.md               # Документация проекта
+```
 
 ## Тесты
 
-Покрыто тестами:
+**Smoke тесты:**
+
+- ✅ Проверка доступности сервиса
+- ✅ Статус приложения
+- ✅ Основные эндпоинты
 
 **Пользователи:**
 
 - ✅ Список пользователей (пагинация)
 - ✅ Получение пользователя по ID
 - ✅ 404 для несуществующих пользователей
+- ✅ Уникальность ID пользователей
 - ✅ Создание пользователя (POST)
 - ✅ Обновление пользователя (PUT/PATCH)
 - ✅ Удаление пользователя (DELETE)
@@ -81,6 +132,8 @@ GET /api/unknown/23                  # 404 Not Found
 
 ## Особенности
 
+- Автоматическая проверка доступности сервиса перед запуском тестов
 - Тестовые данные генерируются с помощью `mimesis`
 - Универсальные хелперы для проверок в `assertions.py`
 - Структура файлов разделена на `app/` и `tests/`
+- Автоматическая загрузка переменных окружения в тестах

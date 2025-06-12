@@ -130,3 +130,11 @@ class ErrorResponse(BaseModel):
     """Модель ошибки"""
 
     error: str
+
+
+# Health Check модель
+class AppStatus(BaseModel):
+    """Статус приложения"""
+
+    users: bool
+    resources: bool

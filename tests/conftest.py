@@ -1,5 +1,7 @@
+import dotenv
 import pytest
 import requests
+import os
 from typing import Dict, Optional, Any
 
 
@@ -63,25 +65,29 @@ class APIClient:
         return requests.delete(f"{self.base_url}{endpoint}", headers=headers)
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
+def envs():
+    dotenv.load_dotenv()
+
+
+@pytest.fixture(scope="session")
 def base_url() -> str:
     """Базовый URL для API"""
-    return "http://localhost:8000"
+    return os.getenv("API_URL", "http://localhost:8000")
+
+
+@pytest.fixture(scope="session")
+def health_check(base_url: str) -> None:
+    """Проверяет доступность сервиса перед запуском всех тестов"""
+    try:
+        response = requests.get(f"{base_url}/status", timeout=5)
+        if response.status_code != 200:
+            pytest.exit(f"Service unhealthy: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        pytest.exit(f"Service unavailable: {e}")
 
 
 @pytest.fixture
-def api_client(base_url: str) -> APIClient:
+def api_client(base_url: str, health_check) -> APIClient:
     """API клиент для всех HTTP методов"""
     return APIClient(base_url)
-
-
-@pytest.fixture
-def auth_headers() -> Dict[str, str]:
-    """Заголовки с API ключом для аутентификации"""
-    return {"x-api-key": "reqres-free-v1"}
-
-
-@pytest.fixture
-def sample_user_data() -> Dict[str, str]:
-    """Тестовые данные пользователя"""
-    return {"name": "morpheus", "job": "leader"}

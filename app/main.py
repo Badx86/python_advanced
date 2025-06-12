@@ -1,10 +1,12 @@
-from fastapi_pagination import Page
-from fastapi import FastAPI, HTTPException, Query
-from typing import Dict, Any, List
-from datetime import datetime
-from http import HTTPStatus
+import os
 import logging
 import random
+from datetime import datetime
+from http import HTTPStatus
+from typing import Dict, Any, List
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Query
+from fastapi_pagination import Page
 from app.models import (
     CreateUserRequest,
     CreateUserResponse,
@@ -12,7 +14,15 @@ from app.models import (
     UpdateUserResponse,
     User,
     Resource,
+    AppStatus,
 )
+
+# Загружаем переменные окружения
+load_dotenv()
+
+# Получаем настройки из .env
+HOST = os.getenv("HOST", "0.0.0.0")
+PORT = int(os.getenv("PORT", "8000"))
 
 # Настройка логгера
 logging.basicConfig(
@@ -26,7 +36,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+app = FastAPI(
+    title="FastAPI Reqres Clone",
+    description="Микросервис-клон Reqres API для тестирования",
+    version="1.0.0",
+)
 
 users_data = [
     User(
@@ -176,15 +190,27 @@ def find_resource_by_id(resource_id: int) -> Resource | None:
     )
 
 
+@app.get("/status")
+def get_status() -> AppStatus:
+    """Проверка статуса приложения"""
+    logger.info("Health check requested")
+    return AppStatus(users=bool(users_data), resources=bool(resources_data))
+
+
 @app.get("/api/users")
 def get_users(
     page: int = Query(1, ge=1), size: int = Query(6, ge=1, le=50, alias="per_page")
 ) -> Page[User]:
-    return paginate_data(users_data, page, size)
+    """Получить список пользователей с пагинацией"""
+    logger.info(f"Getting users list: page={page}, per_page={size}")
+    users_page = paginate_data(users_data, page, size)
+    logger.info(f"Returning {len(users_page.items)} users for page {page}")
+    return users_page
 
 
 @app.get("/api/users/{user_id}")
 def get_single_user(user_id: int) -> Dict[str, Any]:
+    """Получить пользователя по ID"""
     logger.info(f"Getting single user: user_id={user_id}")
     user = find_user_by_id(user_id)
     if not user:
@@ -205,11 +231,16 @@ def get_single_user(user_id: int) -> Dict[str, Any]:
 def get_resources(
     page: int = Query(1, ge=1), size: int = Query(6, ge=1, le=50, alias="per_page")
 ) -> Page[Resource]:
-    return paginate_data(resources_data, page, size)
+    """Получить список ресурсов с пагинацией"""
+    logger.info(f"Getting resources list: page={page}, per_page={size}")
+    resources_page = paginate_data(resources_data, page, size)
+    logger.info(f"Returning {len(resources_page.items)} resources for page {page}")
+    return resources_page
 
 
 @app.get("/api/unknown/{resource_id}")
 def get_single_resource(resource_id: int) -> Dict[str, Any]:
+    """Получить ресурс по ID"""
     logger.info(f"Getting single resource: resource_id={resource_id}")
     resource = find_resource_by_id(resource_id)
     if not resource:
@@ -228,6 +259,7 @@ def get_single_resource(resource_id: int) -> Dict[str, Any]:
 
 @app.post("/api/users", status_code=HTTPStatus.CREATED)
 def create_user(user_data: CreateUserRequest) -> CreateUserResponse:
+    """Создать нового пользователя"""
     logger.info(f"Creating user: name={user_data.name}, job={user_data.job}")
     new_id = str(random.randint(100, 9999))
     created_at = datetime.now()
@@ -239,6 +271,7 @@ def create_user(user_data: CreateUserRequest) -> CreateUserResponse:
 
 @app.put("/api/users/{user_id}")
 def update_user_put(user_id: int, user_data: UpdateUserRequest) -> UpdateUserResponse:
+    """Полное обновление пользователя"""
     logger.info(
         f"PUT updating user {user_id}: name={user_data.name}, job={user_data.job}"
     )
@@ -251,6 +284,7 @@ def update_user_put(user_id: int, user_data: UpdateUserRequest) -> UpdateUserRes
 
 @app.patch("/api/users/{user_id}")
 def update_user_patch(user_id: int, user_data: UpdateUserRequest) -> UpdateUserResponse:
+    """Частичное обновление пользователя"""
     logger.info(
         f"PATCH updating user {user_id}: name={user_data.name}, job={user_data.job}"
     )
@@ -263,11 +297,12 @@ def update_user_patch(user_id: int, user_data: UpdateUserRequest) -> UpdateUserR
 
 @app.delete("/api/users/{user_id}", status_code=HTTPStatus.NO_CONTENT)
 def delete_user(user_id: int) -> None:
+    """Удалить пользователя"""
     logger.info(f"Deleting user {user_id}")
 
 
 if __name__ == "__main__":
-    logger.info("Starting server...")
+    logger.info(f"Starting server on {HOST}:{PORT}...")
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=HOST, port=PORT)
