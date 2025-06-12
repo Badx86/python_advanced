@@ -1,12 +1,14 @@
-import os
-import logging
-import random
-from datetime import datetime
-from http import HTTPStatus
-from typing import Dict, Any, List
-from dotenv import load_dotenv
+from email_validator import validate_email, EmailNotValidError
 from fastapi import FastAPI, HTTPException, Query
 from fastapi_pagination import Page
+from typing import Dict, Any, List
+from dotenv import load_dotenv
+from datetime import datetime
+from http import HTTPStatus
+import logging
+import random
+import time
+import os
 from app.models import (
     CreateUserRequest,
     CreateUserResponse,
@@ -215,7 +217,10 @@ def get_single_user(user_id: int) -> Dict[str, Any]:
     user = find_user_by_id(user_id)
     if not user:
         logger.warning(f"User {user_id} not found")
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail={})
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail={"error": f"User {user_id} not found"},
+        )
 
     logger.info(f"Found user: {user.first_name} {user.last_name}")
     return {
@@ -245,7 +250,10 @@ def get_single_resource(resource_id: int) -> Dict[str, Any]:
     resource = find_resource_by_id(resource_id)
     if not resource:
         logger.warning(f"Resource {resource_id} not found")
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail={})
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail={"error": f"Resource {resource_id} not found"},
+        )
 
     logger.info(f"Found resource: {resource.name} ({resource.year})")
     return {
@@ -299,6 +307,113 @@ def update_user_patch(user_id: int, user_data: UpdateUserRequest) -> UpdateUserR
 def delete_user(user_id: int) -> None:
     """Удалить пользователя"""
     logger.info(f"Deleting user {user_id}")
+
+
+@app.post("/api/register", status_code=HTTPStatus.CREATED)
+def register_user(user_data: dict) -> dict:
+    """Регистрация пользователя"""
+    email = user_data.get("email")
+    password = user_data.get("password")
+
+    logger.info(f"Registering user: email={email}")
+
+    # Проверяем наличие email
+    if not email:
+        logger.warning("Registration failed: missing email")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail={"error": "Missing email"}
+        )
+
+    # Валидация email
+    try:
+        validate_email(email)
+    except EmailNotValidError:
+        logger.warning(f"Registration failed for {email}: invalid email format")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail={"error": "Invalid email format"}
+        )
+
+    # Проверяем наличие пароля
+    if not password:
+        logger.warning(f"Registration failed for {email}: missing password")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail={"error": "Missing password"}
+        )
+
+    # Успешная регистрация (имитация)
+    user_id = random.randint(1, 10)
+    token = "QpwL5tke4Pnpja7X4"
+
+    logger.info(f"User registered successfully: id={user_id}")
+    return {"id": user_id, "token": token}
+
+
+@app.post("/api/login")
+def login_user(user_data: dict) -> dict:
+    """Вход пользователя"""
+    email = user_data.get("email")
+    password = user_data.get("password")
+
+    logger.info(f"Login attempt: email={email}")
+
+    # Проверяем наличие email
+    if not email:
+        logger.warning("Login failed: missing email")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail={"error": "Missing email"}
+        )
+
+    # Валидация email
+    try:
+        validate_email(email)
+    except EmailNotValidError:
+        logger.warning(f"Login failed for {email}: invalid email format")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail={"error": "Invalid email format"}
+        )
+
+    # Проверяем наличие пароля
+    if not password:
+        logger.warning(f"Login failed for {email}: missing password")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail={"error": "Missing password"}
+        )
+
+    # Успешный логин (имитация)
+    token = "QpwL5tke4Pnpja7X4"
+
+    logger.info(f"User logged in successfully: {email}")
+    return {"token": token}
+
+
+@app.get("/api/users")
+def get_users_with_delay(
+    page: int = Query(1, ge=1),
+    size: int = Query(6, ge=1, le=50, alias="per_page"),
+    delay: int = Query(0, ge=0, le=10),
+) -> Dict[str, Any]:
+    """Получить список пользователей с пагинацией и опциональной задержкой"""
+    logger.info(f"Getting users list: page={page}, per_page={size}, delay={delay}")
+
+    # Добавляем задержку если указана
+    if delay > 0:
+        logger.info(f"Applying delay: {delay} seconds")
+        time.sleep(delay)
+
+    users_page = paginate_data(users_data, page, size)
+    logger.info(f"Returning {len(users_page.items)} users for page {page}")
+
+    return {
+        "page": users_page.page,
+        "per_page": users_page.size,
+        "total": users_page.total,
+        "total_pages": users_page.pages,
+        "data": [user.model_dump() for user in users_page.items],
+        "support": {
+            "url": "https://contentcaddy.io?utm_source=reqres&utm_medium=json&utm_campaign=referral",
+            "text": "Tired of writing endless social media content? Let Content Caddy generate it for you.",
+        },
+    }
 
 
 if __name__ == "__main__":

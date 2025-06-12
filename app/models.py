@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import List, Optional
 from datetime import datetime
+from typing import Optional
 
 
 class User(BaseModel):
@@ -30,28 +30,6 @@ class Support(BaseModel):
     text: str
 
 
-class UsersListResponse(BaseModel):
-    """Ответ со списком пользователей"""
-
-    page: int
-    per_page: int
-    total: int
-    total_pages: int
-    data: List[User]
-    support: Support
-
-
-class ResourcesListResponse(BaseModel):
-    """Ответ со списком ресурсов"""
-
-    page: int
-    per_page: int
-    total: int
-    total_pages: int
-    data: List[Resource]
-    support: Support
-
-
 class SingleUserResponse(BaseModel):
     """Ответ с одним пользователем"""
 
@@ -66,7 +44,6 @@ class SingleResourceResponse(BaseModel):
     support: Support
 
 
-# CRUD модели
 class CreateUserRequest(BaseModel):
     """Запрос на создание пользователя"""
 
@@ -98,41 +75,6 @@ class UpdateUserResponse(BaseModel):
     updatedAt: datetime
 
 
-# Auth модели
-class RegisterRequest(BaseModel):
-    """Запрос на регистрацию"""
-
-    email: str
-    password: str
-
-
-class RegisterResponse(BaseModel):
-    """Ответ при регистрации"""
-
-    id: int
-    token: str
-
-
-class LoginRequest(BaseModel):
-    """Запрос на логин"""
-
-    email: str
-    password: str
-
-
-class LoginResponse(BaseModel):
-    """Ответ при логине"""
-
-    token: str
-
-
-class ErrorResponse(BaseModel):
-    """Модель ошибки"""
-
-    error: str
-
-
-# Health Check модель
 class AppStatus(BaseModel):
     """Статус приложения"""
 

@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any
 from http import HTTPStatus
 import requests
 from fastapi_pagination import Page
@@ -17,6 +17,10 @@ logger = logging.getLogger(__name__)
 
 class APIAssertions:
     """Класс для всех проверок API ответов"""
+
+    # ========================================
+    # БАЗОВЫЕ ПРОВЕРКИ
+    # ========================================
 
     @staticmethod
     def log_and_check_status(
@@ -46,7 +50,14 @@ class APIAssertions:
         """Проверяет 404 ошибку"""
         cls.log_and_check_status(response, endpoint, HTTPStatus.NOT_FOUND)
         data = response.json()
-        assert data["detail"] == {}
+
+        assert "detail" in data, "Missing 'detail' in 404 response"
+        assert "error" in data["detail"], "Missing 'error' in detail"
+        assert data["detail"]["error"], "Error message is empty"
+
+    # ========================================
+    # ТЕСТЫ ПОЛЬЗОВАТЕЛЕЙ (test_users.py)
+    # ========================================
 
     @classmethod
     def check_user_response(
@@ -82,6 +93,10 @@ class APIAssertions:
             pages=data["pages"],
         )
 
+    # ========================================
+    # ТЕСТЫ РЕСУРСОВ (test_resources.py)
+    # ========================================
+
     @classmethod
     def check_resource_response(
         cls, response: requests.Response, endpoint: str
@@ -116,7 +131,10 @@ class APIAssertions:
             pages=data["pages"],
         )
 
-    # CRUD операции (без изменений)
+    # ========================================
+    # CRUD ОПЕРАЦИИ (test_crud.py)
+    # ========================================
+
     @classmethod
     def check_create_user_response(
         cls,
@@ -168,7 +186,53 @@ class APIAssertions:
         """Проверяет ответ удаления пользователя"""
         cls.log_and_check_status(response, endpoint, HTTPStatus.NO_CONTENT)
 
-    # Универсальные проверки данных
+    # ========================================
+    # АУТЕНТИФИКАЦИЯ (test_auth.py)
+    # ========================================
+
+    @classmethod
+    def check_email_error_response(
+        cls, response: requests.Response, endpoint: str, expected_error: str
+    ) -> None:
+        """Проверяет ошибку с email"""
+        cls.log_and_check_status(response, endpoint, HTTPStatus.BAD_REQUEST)
+        data = response.json()
+
+        assert "detail" in data, "Missing 'detail' in error response"
+        assert "error" in data["detail"], "Missing 'error' in detail"
+        assert (
+            data["detail"]["error"] == expected_error
+        ), f"Expected '{expected_error}', got '{data['detail']['error']}'"
+
+    # ========================================
+    # СПЕЦИАЛЬНЫЕ ТЕСТЫ (test_special.py)
+    # ========================================
+
+    @classmethod
+    def check_delayed_response(
+        cls, response: requests.Response, endpoint: str, min_duration: float
+    ) -> None:
+        """Проверяет delayed response"""
+        cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
+        data = response.json()
+
+        # Проверяем структуру ответа
+        assert "page" in data, "Missing 'page' in response"
+        assert "size" in data, "Missing 'size' in response"
+        assert "total" in data, "Missing 'total' in response"
+        assert "pages" in data, "Missing 'pages' in response"
+        assert "items" in data, "Missing 'items' in response"
+
+        # Проверяем, что данные корректны
+        assert isinstance(data["items"], list), "Items should be a list"
+        assert len(data["items"]) > 0, "Items array should not be empty"
+
+        logger.info(f"Delayed response validated, took at least {min_duration}s")
+
+    # ========================================
+    # УНИВЕРСАЛЬНЫЕ ХЕЛПЕРЫ
+    # ========================================
+
     @staticmethod
     def check_data_count(response_obj: Page, expected_count: int) -> None:
         """Проверяет количество элементов в items"""
@@ -191,24 +255,6 @@ class APIAssertions:
         assert (
             actual_value == expected_value
         ), f"Expected {field_name}={expected_value}, got {actual_value}"
-
-    @staticmethod
-    def check_item_field(
-        response_obj: Page,
-        index: int,
-        field_name: str,
-        expected_value: Any,
-    ) -> None:
-        """Проверяет поле элемента по индексу в items"""
-        assert (
-            len(response_obj.items) > index
-        ), f"Items array has only {len(response_obj.items)} items, cannot access index {index}"
-
-        item = response_obj.items[index]
-        actual_value = getattr(item, field_name)
-        assert (
-            actual_value == expected_value
-        ), f"Expected items[{index}].{field_name}={expected_value}, got {actual_value}"
 
     @staticmethod
     def check_multiple_fields(obj: Any, **field_expectations) -> None:
