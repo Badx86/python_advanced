@@ -192,14 +192,14 @@ def find_resource_by_id(resource_id: int) -> Resource | None:
     )
 
 
-@app.get("/status")
+@app.get("/status", tags=["System"])
 def get_status() -> AppStatus:
     """Проверка статуса приложения"""
     logger.info("Health check requested")
     return AppStatus(users=bool(users_data), resources=bool(resources_data))
 
 
-@app.get("/api/users")
+@app.get("/api/users", tags=["Users"])
 def get_users(
     page: int = Query(1, ge=1), size: int = Query(6, ge=1, le=50, alias="per_page")
 ) -> Page[User]:
@@ -210,7 +210,7 @@ def get_users(
     return users_page
 
 
-@app.get("/api/users/{user_id}")
+@app.get("/api/users/{user_id}", tags=["Users"])
 def get_single_user(user_id: int) -> Dict[str, Any]:
     """Получить пользователя по ID"""
     logger.info(f"Getting single user: user_id={user_id}")
@@ -232,7 +232,7 @@ def get_single_user(user_id: int) -> Dict[str, Any]:
     }
 
 
-@app.get("/api/unknown")
+@app.get("/api/unknown", tags=["Resources"])
 def get_resources(
     page: int = Query(1, ge=1), size: int = Query(6, ge=1, le=50, alias="per_page")
 ) -> Page[Resource]:
@@ -243,7 +243,7 @@ def get_resources(
     return resources_page
 
 
-@app.get("/api/unknown/{resource_id}")
+@app.get("/api/unknown/{resource_id}", tags=["Resources"])
 def get_single_resource(resource_id: int) -> Dict[str, Any]:
     """Получить ресурс по ID"""
     logger.info(f"Getting single resource: resource_id={resource_id}")
@@ -265,7 +265,7 @@ def get_single_resource(resource_id: int) -> Dict[str, Any]:
     }
 
 
-@app.post("/api/users", status_code=HTTPStatus.CREATED)
+@app.post("/api/users", status_code=HTTPStatus.CREATED, tags=["Users"])
 def create_user(user_data: CreateUserRequest) -> CreateUserResponse:
     """Создать нового пользователя"""
     logger.info(f"Creating user: name={user_data.name}, job={user_data.job}")
@@ -277,7 +277,7 @@ def create_user(user_data: CreateUserRequest) -> CreateUserResponse:
     )
 
 
-@app.put("/api/users/{user_id}")
+@app.put("/api/users/{user_id}", tags=["Users"])
 def update_user_put(user_id: int, user_data: UpdateUserRequest) -> UpdateUserResponse:
     """Полное обновление пользователя"""
     logger.info(
@@ -290,7 +290,7 @@ def update_user_put(user_id: int, user_data: UpdateUserRequest) -> UpdateUserRes
     )
 
 
-@app.patch("/api/users/{user_id}")
+@app.patch("/api/users/{user_id}", tags=["Users"])
 def update_user_patch(user_id: int, user_data: UpdateUserRequest) -> UpdateUserResponse:
     """Частичное обновление пользователя"""
     logger.info(
@@ -303,13 +303,13 @@ def update_user_patch(user_id: int, user_data: UpdateUserRequest) -> UpdateUserR
     )
 
 
-@app.delete("/api/users/{user_id}", status_code=HTTPStatus.NO_CONTENT)
+@app.delete("/api/users/{user_id}", status_code=HTTPStatus.NO_CONTENT, tags=["Users"])
 def delete_user(user_id: int) -> None:
     """Удалить пользователя"""
     logger.info(f"Deleting user {user_id}")
 
 
-@app.post("/api/register", status_code=HTTPStatus.CREATED)
+@app.post("/api/register", status_code=HTTPStatus.CREATED, tags=["Authentication"])
 def register_user(user_data: dict) -> dict:
     """Регистрация пользователя"""
     email = user_data.get("email")
@@ -348,7 +348,7 @@ def register_user(user_data: dict) -> dict:
     return {"id": user_id, "token": token}
 
 
-@app.post("/api/login")
+@app.post("/api/login", tags=["Authentication"])
 def login_user(user_data: dict) -> dict:
     """Вход пользователя"""
     email = user_data.get("email")
@@ -386,7 +386,7 @@ def login_user(user_data: dict) -> dict:
     return {"token": token}
 
 
-@app.get("/api/users")
+@app.get("/api/users", tags=["Users"])
 def get_users_with_delay(
     page: int = Query(1, ge=1),
     size: int = Query(6, ge=1, le=50, alias="per_page"),
