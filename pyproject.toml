@@ -17,6 +17,9 @@ mimesis = "^18.0.0"
 python-dotenv = "^1.1.0"
 fastapi-pagination = "^0.13.2"
 email-validator = "^2.2.0"
+psycopg2-binary = "^2.9.10"
+sqlalchemy = "^2.0.41"
+sqlmodel = "^0.0.24"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
