@@ -86,28 +86,37 @@ poetry run pytest tests/test_auth.py -v
 
 ```
 ├── app/
-│   ├── main.py              # FastAPI сервер
-│   └── models.py            # Pydantic модели для валидации
+│   ├── data/
+│   │   ├── users.json           # Тестовые данные пользователей
+│   │   └── resources.json       # Тестовые данные ресурсов
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── auth.py              # Эндпоинты аутентификации
+│   │   ├── resources.py         # Эндпоинты ресурсов
+│   │   ├── system.py            # Системные эндпоинты
+│   │   └── users.py             # Эндпоинты пользователей
+│   ├── main.py                  # FastAPI приложение и настройка роутов
+│   └── models.py                # Pydantic модели для валидации
 ├── tests/
-│   ├── test_auth.py         # Тесты аутентификации
-│   ├── test_crud.py         # CRUD операции
-│   ├── test_resources.py    # Тесты ресурсов
-│   ├── test_smoke.py        # Smoke тесты
-│   ├── test_special.py      # Специальные тесты (delayed response)
-│   ├── test_users.py        # Тесты пользователей
-│   ├── conftest.py          # Pytest фикстуры
-│   └── assertions.py        # Хелперы для проверок в тестах
-├── pyproject.toml           # Poetry конфигурация и зависимости
-├── poetry.lock              # Закрепленные версии зависимостей
-├── .env                     # Переменные окружения
-├── .gitignore              # Git ignore файл
-├── api.log                 # Логи API (генерируется автоматически)
-└── README.md               # Документация проекта
+│   ├── test_auth.py             # Тесты аутентификации (с email валидацией)
+│   ├── test_crud.py             # CRUD операции
+│   ├── test_resources.py        # Тесты ресурсов
+│   ├── test_smoke.py            # Smoke тесты
+│   ├── test_special.py          # Специальные тесты (delayed response)
+│   ├── test_users.py            # Тесты пользователей
+│   ├── conftest.py              # Pytest фикстуры
+│   └── assertions.py            # Хелперы для проверок в тестах
+├── pyproject.toml               # Poetry конфигурация и зависимости
+├── poetry.lock                  # Закрепленные версии зависимостей
+├── .env                         # Переменные окружения
+├── .gitignore                   # Git ignore файл
+├── api.log                      # Логи API (генерируется автоматически)
+└── README.md                    # Документация проекта
 ```
 
 ## Тесты
 
-**Всего: ~40 тестов** разбитых по функциональным областям
+**Всего: ~40 тестов** разбитых по функциональным областям.
 
 ### Покрытие:
 
@@ -120,6 +129,7 @@ poetry run pytest tests/test_auth.py -v
 
 ## Особенности
 
+- **Модульная архитектура** - роуты разделены по функциональным областям
 - **Автоматическая проверка** доступности сервиса перед запуском тестов
 - **Email валидация** с использованием `email-validator`
 - **Delayed response** для тестирования с задержкой
