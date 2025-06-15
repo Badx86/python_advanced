@@ -21,8 +21,12 @@ class TestSmoke:
         api.log_and_check_status(response, "/status")
 
         status = response.json()
-        assert status["users"] is True, "Users data not loaded"
-        assert status["resources"] is True, "Resources data not loaded"
+
+        assert status["status"] in ["healthy", "unhealthy"], "Invalid status value"
+        assert status["data"]["users"]["loaded"] is True, "Users data not loaded"
+        assert (
+            status["data"]["resources"]["loaded"] is True
+        ), "Resources data not loaded"
         logger.info("All application data loaded successfully")
 
     def test_main_endpoints_accessible(self, api_client) -> None:

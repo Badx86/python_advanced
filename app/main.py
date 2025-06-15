@@ -1,11 +1,18 @@
-from app.routes import users, resources, auth, system
 from dotenv import load_dotenv
-from fastapi import FastAPI
-import logging
 import os
+import sys
 
-# Загружаем переменные окружения
-load_dotenv()
+# Добавляем корневую папку в PYTHONPATH
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+load_dotenv(".env")
+
+from app.database.engine import create_db_and_tables
+from app.database.seed import seed_all_data
+from app.routes import users, resources, auth, system
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
+import logging
 
 # Получаем настройки из .env
 HOST = os.getenv("HOST", "0.0.0.0")
@@ -23,10 +30,28 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Управление жизненным циклом приложения"""
+    # Startup
+    logger.info("Starting application...")
+    create_db_and_tables()
+    logger.info("Database initialized successfully")
+
+    # Загружаем тестовые данные если БД пустая
+    seed_all_data()
+
+    yield
+    # Shutdown
+    logger.info("Shutting down application...")
+
+
 app = FastAPI(
     title="FastAPI Reqres Clone",
     description="Микросервис-клон Reqres API для тестирования",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Подключаем роуты

@@ -1,57 +1,67 @@
-from pydantic import BaseModel
+from sqlmodel import Field, SQLModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 
 
-class User(BaseModel):
-    """Модель пользователя"""
+# ================================
+# ТАБЛИЦЫ БАЗЫ ДАННЫХ
+# ================================
 
-    id: int
+
+class User(SQLModel, table=True):
+    """Модель пользователя для БД"""
+
+    id: int | None = Field(default=None, primary_key=True)
     email: str
     first_name: str
     last_name: str
     avatar: str
 
 
-class Resource(BaseModel):
-    """Модель ресурса"""
+class Resource(SQLModel, table=True):
+    """Модель ресурса для БД"""
 
-    id: int
+    id: int | None = Field(default=None, primary_key=True)
     name: str
     year: int
     color: str
     pantone_value: str
 
 
-class Support(BaseModel):
+# ================================
+# МОДЕЛИ ДЛЯ API
+# ================================
+
+
+class Support(SQLModel):
     """Модель блока поддержки"""
 
     url: str
     text: str
 
 
-class SingleUserResponse(BaseModel):
+class SingleUserResponse(SQLModel):
     """Ответ с одним пользователем"""
 
     data: User
     support: Support
 
 
-class SingleResourceResponse(BaseModel):
+class SingleResourceResponse(SQLModel):
     """Ответ с одним ресурсом"""
 
     data: Resource
     support: Support
 
 
-class CreateUserRequest(BaseModel):
+class CreateUserRequest(SQLModel):
     """Запрос на создание пользователя"""
 
     name: str
     job: str
 
 
-class CreateUserResponse(BaseModel):
+class CreateUserResponse(SQLModel):
     """Ответ при создании пользователя"""
 
     name: str
@@ -60,14 +70,14 @@ class CreateUserResponse(BaseModel):
     createdAt: datetime
 
 
-class UpdateUserRequest(BaseModel):
+class UpdateUserRequest(SQLModel):
     """Запрос на обновление пользователя"""
 
     name: Optional[str] = None
     job: Optional[str] = None
 
 
-class UpdateUserResponse(BaseModel):
+class UpdateUserResponse(SQLModel):
     """Ответ при обновлении пользователя"""
 
     name: Optional[str] = None
@@ -75,8 +85,21 @@ class UpdateUserResponse(BaseModel):
     updatedAt: datetime
 
 
-class AppStatus(BaseModel):
-    """Статус приложения"""
+# ================================
+# СИСТЕМНЫЙ СТАТУС
+# ================================
 
-    users: bool
-    resources: bool
+
+class HealthStatus(SQLModel):
+    """Статус здоровья приложения"""
+
+    status: str  # "healthy" | "unhealthy"
+    timestamp: str  # ISO timestamp
+    version: str  # версия приложения
+    database: Dict[
+        str, Any
+    ]  # {"status": "connected", "type": "postgresql", "users_count": 12}
+    data: Dict[
+        str, Dict[str, Any]
+    ]  # {"users": {"loaded": true, "count": 12}, "resources": {...}}
+    services: Dict[str, str]  # {"api": "running", "database": "postgresql"}

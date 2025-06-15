@@ -36,14 +36,34 @@ class APIAssertions:
 
     @staticmethod
     def check_pagination_structure(
-        data: Dict[str, Any], page: int, per_page: int, total: int, items_count: int
+        data: Dict[str, Any],
+        page: int,
+        per_page: int,
+        expected_total: int = None,
+        items_count: int = None,
     ) -> None:
         """Проверяет структуру пагинации ответа"""
         assert data["page"] == page
         assert data["size"] == per_page
-        assert data["total"] == total
-        assert data["pages"] == ((total + per_page - 1) // per_page)
-        assert len(data["items"]) == items_count
+
+        # Проверяем total только если передан expected_total
+        if expected_total is not None:
+            assert data["total"] == expected_total
+        else:
+            assert isinstance(data["total"], int) and data["total"] >= 0
+
+        # Вычисляем pages на основе реального total
+        actual_total = data["total"]
+        expected_pages = (
+            ((actual_total + per_page - 1) // per_page) if actual_total > 0 else 1
+        )
+        assert data["pages"] == expected_pages
+
+        # Проверяем количество items если передано
+        if items_count is not None:
+            assert len(data["items"]) == items_count
+        else:
+            assert len(data["items"]) <= per_page
 
     @classmethod
     def check_404_error(cls, response: requests.Response, endpoint: str) -> None:
@@ -76,12 +96,12 @@ class APIAssertions:
         page: int = 1,
         per_page: int = 6,
     ) -> Page[User]:
-        """Проверяет ответ со списком пользователей"""
+        """Проверяет ответ со списком пользователей (без жесткой привязки к количеству)"""
         cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
         data = response.json()
 
-        # Проверяем структуру пагинации
-        cls.check_pagination_structure(data, page, per_page, 12, len(data["items"]))
+        # Проверяем структуру пагинации БЕЗ ожидаемого total
+        cls.check_pagination_structure(data, page, per_page)
 
         # Возвращаем Page[User] (создаем из JSON)
         users = [User(**user_data) for user_data in data["items"]]
@@ -114,11 +134,11 @@ class APIAssertions:
         page: int = 1,
         per_page: int = 6,
     ) -> Page[Resource]:
-        """Проверяет ответ со списком ресурсов"""
+        """Проверяет ответ со списком ресурсов (ресурсы статичные - 12 штук)"""
         cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
         data = response.json()
 
-        # Проверяем структуру пагинации
+        # Проверяем структуру пагинации для ресурсов с ожидаемым total=12
         cls.check_pagination_structure(data, page, per_page, 12, len(data["items"]))
 
         # Возвращаем Page[Resource]
@@ -154,9 +174,7 @@ class APIAssertions:
         assert create_response.createdAt is not None
 
         user_id = int(create_response.id)
-        assert (
-            100 <= user_id <= 9999
-        ), f"ID должен быть в диапазоне 100-9999, получен: {user_id}"
+        assert user_id > 0, f"ID должен быть положительным числом, получен: {user_id}"
 
         return create_response
 

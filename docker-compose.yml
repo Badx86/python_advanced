@@ -1,0 +1,53 @@
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:15
+    container_name: fastapi_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # FastAPI application
+  app:
+    build: .
+    container_name: fastapi_app
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_ENGINE: postgresql+psycopg2://postgres:example@db:5432/postgres
+      DATABASE_POOL_SIZE: 10
+      API_URL: http://localhost:8000
+      HOST: 0.0.0.0
+      PORT: 8000
+      APP_VERSION: 1.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    working_dir: /app
+
+  # Adminer for database management (optional)
+  adminer:
+    image: adminer:latest
+    container_name: fastapi_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
