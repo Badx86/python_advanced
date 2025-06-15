@@ -41,3 +41,14 @@ class TestResources:
 
         api.check_multiple_fields(resources_response.items[0], id=7, name="sand dollar")
         logger.info("Page 2 resources work, schema valid")
+
+    def test_resources_no_duplicates(self, api_client) -> None:
+        """Тест уникальности ID ресурсов"""
+        response = api_client.get("/api/unknown", params={"page": 1, "per_page": 12})
+        resources_page = api.check_resources_list_response(
+            response, "/api/unknown", page=1, per_page=12
+        )
+
+        # Проверяем уникальность ID
+        api.check_unique_ids(resources_page.items, "resource")
+        logger.info(f"All {len(resources_page.items)} resource IDs are unique")

@@ -133,20 +133,25 @@ def update_user_put(user_id: int, user_data: UpdateUserRequest) -> UpdateUserRes
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="Invalid user ID"
         )
 
-    # !БАГ как в reqres - исправить c 200 yf 404!
-    updated_at = datetime.now()
+    from app.database.users import get_user, update_user as db_update_user
 
-    # Пытаемся обновить в БД (если пользователь существует)
+    existing_user = get_user(user_id)
+    if not existing_user:
+        logger.warning(f"User {user_id} not found for update")
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail={"error": f"User {user_id} not found"},
+        )
+
+    # Обновляем пользователя в БД
     if user_data.name:
-
-        from app.database.users import update_user as db_update_user
-
         name_parts = user_data.name.split()
         first_name = name_parts[0] if name_parts else user_data.name
         last_name = name_parts[-1] if len(name_parts) > 1 else ""
 
         db_update_user(user_id=user_id, first_name=first_name, last_name=last_name)
 
+    updated_at = datetime.now()
     logger.info(f"Updated user {user_id}")
     return UpdateUserResponse(
         name=user_data.name, job=user_data.job, updatedAt=updated_at
@@ -166,20 +171,25 @@ def update_user_patch(user_id: int, user_data: UpdateUserRequest) -> UpdateUserR
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="Invalid user ID"
         )
 
-    # !БАГ как в reqres - исправить c 200 yf 404!
-    updated_at = datetime.now()
+    from app.database.users import get_user, update_user as db_update_user
 
-    # Частичное обновление в БД (если пользователь существует)
+    existing_user = get_user(user_id)
+    if not existing_user:
+        logger.warning(f"User {user_id} not found for update")
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail={"error": f"User {user_id} not found"},
+        )
+
+    # Частичное обновление в БД
     if user_data.name:
-
-        from app.database.users import update_user as db_update_user
-
         name_parts = user_data.name.split()
         first_name = name_parts[0] if name_parts else user_data.name
         last_name = name_parts[-1] if len(name_parts) > 1 else ""
 
         db_update_user(user_id=user_id, first_name=first_name, last_name=last_name)
 
+    updated_at = datetime.now()
     logger.info(f"Patched user {user_id}")
     return UpdateUserResponse(
         name=user_data.name, job=user_data.job, updatedAt=updated_at
@@ -204,11 +214,11 @@ def delete_user(user_id: int) -> None:
     # Удаляем из БД
     deleted = db_delete_user(user_id)
 
-    if deleted:
-        logger.info(f"User {user_id} deleted successfully")
-    else:
-        logger.warning(
-            f"User {user_id} not found for deletion, but returning 204 for API compatibility"
+    if not deleted:
+        logger.warning(f"User {user_id} not found for deletion")
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail={"error": f"User {user_id} not found"},
         )
 
-    # !БАГ как в reqres - исправить c 200 yf 404!
+    logger.info(f"User {user_id} deleted successfully")

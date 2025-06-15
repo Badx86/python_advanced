@@ -252,27 +252,12 @@ class APIAssertions:
     # ========================================
 
     @staticmethod
-    def check_data_count(response_obj: Page, expected_count: int) -> None:
-        """Проверяет количество элементов в items"""
-        actual_count = len(response_obj.items)
-        assert (
-            actual_count == expected_count
-        ), f"Expected {expected_count} items, got {actual_count}"
+    def check_unique_ids(items_list, item_name: str = "items") -> None:
+        """Проверяет уникальность ID в списке объектов"""
+        ids = [item.id for item in items_list]
+        unique_ids = set(ids)
 
-    @staticmethod
-    def check_first_item_field(
-        response_obj: Page,
-        field_name: str,
-        expected_value: Any,
-    ) -> None:
-        """Проверяет поле первого элемента в items"""
-        assert len(response_obj.items) > 0, "Items array is empty"
-
-        first_item = response_obj.items[0]
-        actual_value = getattr(first_item, field_name)
-        assert (
-            actual_value == expected_value
-        ), f"Expected {field_name}={expected_value}, got {actual_value}"
+        assert len(ids) == len(unique_ids), f"Found duplicate {item_name} IDs: {ids}"
 
     @staticmethod
     def check_multiple_fields(obj: Any, **field_expectations) -> None:
