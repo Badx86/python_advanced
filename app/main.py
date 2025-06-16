@@ -19,8 +19,12 @@ HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", "8000"))
 
 # Настройка логгера
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+# Для включения DB логов: SHOW_DB_LOGS=true + LOG_LEVEL=DEBUG в .env
+show_db = os.getenv("SHOW_DB_LOGS", "false").lower() == "true"
+
 logging.basicConfig(
-    level=logging.INFO,
+    level=getattr(logging, log_level),
     format="%(asctime)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
@@ -28,6 +32,11 @@ logging.basicConfig(
         logging.StreamHandler(),
     ],
 )
+
+# Настраиваем DB логи
+if show_db:
+    logging.getLogger("app").setLevel(logging.DEBUG)
+
 logger = logging.getLogger(__name__)
 
 

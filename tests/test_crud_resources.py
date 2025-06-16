@@ -23,16 +23,17 @@ def generate_random_resource():
 
 @pytest.mark.crud
 class TestResourcesCRUD:
-    """Тесты CRUD операций для ресурсов"""
+    """Тесты CRUD операций для ресурсов с проверкой БД"""
 
     def test_create_resource(self, api_client) -> None:
-        """Тест создания ресурса"""
+        """Тест создания ресурса (API + БД)"""
         resource_data = generate_random_resource()
         logger.info(f"Creating resource with data: {resource_data}")
 
         response = api_client.post("/api/unknown", json=resource_data)
+        # Теперь check_create_resource_response автоматически проверяет БД!
         api.check_create_resource_response(response, "/api/unknown", resource_data)
-        logger.info("Resource created successfully")
+        logger.info("Resource created and verified in database successfully")
 
     def test_read_resource(self, api_client) -> None:
         """Тест чтения случайного ресурса"""
@@ -55,7 +56,7 @@ class TestResourcesCRUD:
             logger.warning("No resources found in database for read test")
 
     def test_update_resource_put(self, api_client) -> None:
-        """Тест полного обновления ресурса"""
+        """Тест полного обновления ресурса (API + БД)"""
         # Создаем ресурс
         resource_data = generate_random_resource()
         create_response = api_client.post("/api/unknown", json=resource_data)
@@ -69,13 +70,16 @@ class TestResourcesCRUD:
         logger.info(f"Updating resource {resource_id} with data: {updated_data}")
 
         response = api_client.put(f"/api/unknown/{resource_id}", json=updated_data)
+        # Теперь check_update_resource_response автоматически проверяет БД!
         api.check_update_resource_response(
-            response, f"/api/unknown/{resource_id}", updated_data
+            response, f"/api/unknown/{resource_id}", updated_data, resource_id
         )
-        logger.info(f"Resource {resource_id} updated successfully with PUT")
+        logger.info(
+            f"Resource {resource_id} updated and verified in database successfully"
+        )
 
     def test_update_resource_patch(self, api_client) -> None:
-        """Тест частичного обновления ресурса"""
+        """Тест частичного обновления ресурса (API + БД)"""
         # Создаем ресурс
         resource_data = generate_random_resource()
         create_response = api_client.post("/api/unknown", json=resource_data)
@@ -89,13 +93,16 @@ class TestResourcesCRUD:
         logger.info(f"Patching resource {resource_id} with data: {updated_data}")
 
         response = api_client.patch(f"/api/unknown/{resource_id}", json=updated_data)
+        # Проверяем API + БД
         api.check_update_resource_response(
-            response, f"/api/unknown/{resource_id}", updated_data
+            response, f"/api/unknown/{resource_id}", updated_data, resource_id
         )
-        logger.info(f"Resource {resource_id} updated successfully with PATCH")
+        logger.info(
+            f"Resource {resource_id} patched and verified in database successfully"
+        )
 
     def test_delete_resource(self, api_client) -> None:
-        """Тест удаления ресурса"""
+        """Тест удаления ресурса (API + БД)"""
         # Создаем ресурс
         resource_data = generate_random_resource()
         create_response = api_client.post("/api/unknown", json=resource_data)
@@ -106,8 +113,13 @@ class TestResourcesCRUD:
 
         # Удаляем его
         response = api_client.delete(f"/api/unknown/{resource_id}")
-        api.check_delete_resource_response(response, f"/api/unknown/{resource_id}")
-        logger.info(f"Resource {resource_id} deleted successfully")
+        # Теперь check_delete_resource_response автоматически проверяет БД!
+        api.check_delete_resource_response(
+            response, f"/api/unknown/{resource_id}", resource_id
+        )
+        logger.info(
+            f"Resource {resource_id} deleted and verified removed from database"
+        )
 
     def test_update_nonexistent_resource(self, api_client) -> None:
         """Тест обновления несуществующего ресурса"""
@@ -125,7 +137,7 @@ class TestResourcesCRUD:
         logger.info("Non-existent resource DELETE correctly failed with 404")
 
     def test_create_and_delete_flow(self, api_client) -> None:
-        """Тест полного цикла: создание -> проверка -> удаление"""
+        """Тест полного цикла: создание -> проверка -> удаление (с БД проверками)"""
         # Создаем ресурс
         resource_data = generate_random_resource()
         create_response = api_client.post("/api/unknown", json=resource_data)
@@ -134,18 +146,51 @@ class TestResourcesCRUD:
         )
         resource_id = int(created_resource["id"])
 
-        # Проверяем что ресурс существует
+        # Проверяем что ресурс существует в БД
+        api.check_resource_in_database(resource_id, resource_data)
+
+        # Проверяем что ресурс доступен через API
         get_response = api_client.get(f"/api/unknown/{resource_id}")
         api.check_resource_response(get_response, f"/api/unknown/{resource_id}")
 
         # Удаляем ресурс
         delete_response = api_client.delete(f"/api/unknown/{resource_id}")
         api.check_delete_resource_response(
-            delete_response, f"/api/unknown/{resource_id}"
+            delete_response, f"/api/unknown/{resource_id}", resource_id
         )
 
-        # Проверяем что ресурс удален
+        # Проверяем что ресурс удален из API
         get_after_delete = api_client.get(f"/api/unknown/{resource_id}")
         api.check_404_error(get_after_delete, f"/api/unknown/{resource_id}")
 
-        logger.info(f"Full CRUD cycle completed for resource {resource_id}")
+        logger.info(
+            f"Full CRUD cycle with database verification completed for resource {resource_id}"
+        )
+
+    def test_multiple_resources_crud(self, api_client) -> None:
+        """Тест создания и удаления нескольких ресурсов"""
+        created_resources = []
+
+        # Создаем 3 ресурса
+        for i in range(3):
+            resource_data = generate_random_resource()
+            response = api_client.post("/api/unknown", json=resource_data)
+            created_resource = api.check_create_resource_response(
+                response, "/api/unknown", resource_data
+            )
+            created_resources.append((int(created_resource["id"]), resource_data))
+            logger.info(f"Created resource {i + 1}/3 with ID {created_resource['id']}")
+
+        # Проверяем что все существуют в БД
+        for resource_id, resource_data in created_resources:
+            api.check_resource_in_database(resource_id, resource_data)
+
+        # Удаляем все созданные ресурсы
+        for resource_id, _ in created_resources:
+            response = api_client.delete(f"/api/unknown/{resource_id}")
+            api.check_delete_resource_response(
+                response, f"/api/unknown/{resource_id}", resource_id
+            )
+            logger.info(f"Deleted resource {resource_id}")
+
+        logger.info("Multiple resources CRUD test completed successfully")
