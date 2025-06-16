@@ -1,6 +1,7 @@
 from sqlmodel import Field, SQLModel
 from datetime import datetime
 from typing import Optional, Dict, Any
+from pydantic import HttpUrl
 
 
 # ================================
@@ -36,7 +37,7 @@ class Resource(SQLModel, table=True):
 class Support(SQLModel):
     """Модель блока поддержки"""
 
-    url: str
+    url: HttpUrl  # Валидация URL
     text: str
 
 
