@@ -20,23 +20,25 @@ def get_resources(
     page: int = Query(1, ge=1), size: int = Query(6, ge=1, le=50, alias="per_page")
 ):
     """Получить список ресурсов с пагинацией"""
-    logger.info(f"Getting resources list: page={page}, per_page={size}")
+    logger.info(f"[API] Getting resources list: page={page}, per_page={size}")
 
     from app.database.resources import get_resources_paginated
 
     resources_page = get_resources_paginated(page=page, size=size)
-    logger.info(f"Returning {len(resources_page.items)} resources for page {page}")
+    logger.info(
+        f"[API] Returning {len(resources_page.items)} resources for page {page}"
+    )
     return resources_page
 
 
 @router.get("/api/unknown/{resource_id}", tags=["Resources"])
 def get_single_resource(resource_id: int) -> Dict[str, Any]:
     """Получить ресурс по ID"""
-    logger.info(f"Getting single resource: resource_id={resource_id}")
+    logger.info(f"[API] Getting single resource: resource_id={resource_id}")
 
     # Валидация ID
     if resource_id < 1:
-        logger.warning(f"Invalid resource ID: {resource_id}")
+        logger.warning(f"[API] Invalid resource ID: {resource_id}")
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="Invalid resource ID"
         )
@@ -45,13 +47,13 @@ def get_single_resource(resource_id: int) -> Dict[str, Any]:
 
     resource = get_resource(resource_id)
     if not resource:
-        logger.warning(f"Resource {resource_id} not found")
+        logger.warning(f"[API] Resource {resource_id} not found")
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail={"error": f"Resource {resource_id} not found"},
         )
 
-    logger.info(f"Found resource: {resource.name} ({resource.year})")
+    logger.info(f"[API] Found resource: {resource.name} ({resource.year})")
     return {
         "data": resource.model_dump(),
         "support": {
@@ -64,7 +66,7 @@ def get_single_resource(resource_id: int) -> Dict[str, Any]:
 @router.post("/api/unknown", status_code=HTTPStatus.CREATED, tags=["Resources"])
 def create_resource(resource_data: CreateResourceRequest) -> CreateResourceResponse:
     """Создать новый ресурс"""
-    logger.info(f"Creating resource: {resource_data.name} ({resource_data.year})")
+    logger.info(f"[API] Creating resource: {resource_data.name} ({resource_data.year})")
 
     # Валидация данных
     if not resource_data.name or not resource_data.name.strip():
@@ -85,7 +87,7 @@ def create_resource(resource_data: CreateResourceRequest) -> CreateResourceRespo
     )
 
     if not db_resource:
-        logger.error(f"Failed to create resource in database")
+        logger.error(f"[API] Failed to create resource in database")
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Failed to create resource",
@@ -93,7 +95,7 @@ def create_resource(resource_data: CreateResourceRequest) -> CreateResourceRespo
 
     # Возвращаем ответ в формате API
     created_at = datetime.now()
-    logger.info(f"Created resource with ID: {db_resource.id}")
+    logger.info(f"[API] Created resource with ID: {db_resource.id}")
     return CreateResourceResponse(
         name=resource_data.name,
         year=resource_data.year,
@@ -109,7 +111,7 @@ def update_resource_put(
     resource_id: int, resource_data: UpdateResourceRequest
 ) -> UpdateResourceResponse:
     """Полное обновление ресурса"""
-    logger.info(f"PUT updating resource {resource_id}")
+    logger.info(f"[API] PUT updating resource {resource_id}")
 
     # Валидация ID
     if resource_id < 1:
@@ -125,7 +127,7 @@ def update_resource_put(
 
     existing_resource = get_resource(resource_id)
     if not existing_resource:
-        logger.warning(f"Resource {resource_id} not found for update")
+        logger.warning(f"[API] Resource {resource_id} not found for update")
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail={"error": f"Resource {resource_id} not found"},
@@ -141,7 +143,7 @@ def update_resource_put(
     )
 
     updated_at = datetime.now()
-    logger.info(f"Updated resource {resource_id}")
+    logger.info(f"[API] Updated resource {resource_id}")
     return UpdateResourceResponse(
         name=resource_data.name,
         year=resource_data.year,
@@ -156,7 +158,7 @@ def update_resource_patch(
     resource_id: int, resource_data: UpdateResourceRequest
 ) -> UpdateResourceResponse:
     """Частичное обновление ресурса"""
-    logger.info(f"PATCH updating resource {resource_id}")
+    logger.info(f"[API] PATCH updating resource {resource_id}")
 
     # Валидация ID
     if resource_id < 1:
@@ -172,7 +174,7 @@ def update_resource_patch(
 
     existing_resource = get_resource(resource_id)
     if not existing_resource:
-        logger.warning(f"Resource {resource_id} not found for update")
+        logger.warning(f"[API] Resource {resource_id} not found for update")
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail={"error": f"Resource {resource_id} not found"},
@@ -188,7 +190,7 @@ def update_resource_patch(
     )
 
     updated_at = datetime.now()
-    logger.info(f"Patched resource {resource_id}")
+    logger.info(f"[API] Patched resource {resource_id}")
     return UpdateResourceResponse(
         name=resource_data.name,
         year=resource_data.year,
@@ -203,7 +205,7 @@ def update_resource_patch(
 )
 def delete_resource(resource_id: int) -> None:
     """Удалить ресурс"""
-    logger.info(f"Deleting resource {resource_id}")
+    logger.info(f"[API] Deleting resource {resource_id}")
 
     # Валидация ID
     if resource_id < 1:
@@ -216,11 +218,12 @@ def delete_resource(resource_id: int) -> None:
     # Удаляем из БД
     deleted = db_delete_resource(resource_id)
 
+    # Корректное поведение - 404 если ресурса не было
     if not deleted:
-        logger.warning(f"Resource {resource_id} not found for deletion")
+        logger.warning(f"[API] Resource {resource_id} not found for deletion")
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail={"error": f"Resource {resource_id} not found"},
         )
 
-    logger.info(f"Resource {resource_id} deleted successfully")
+    logger.info(f"[API] Resource {resource_id} deleted successfully")

@@ -14,12 +14,12 @@ def get_resource(resource_id: int) -> Optional[Resource]:
         with Session(engine) as session:
             resource = session.get(Resource, resource_id)
             if resource:
-                logger.info(f"Found resource: {resource.name} ({resource.year})")
+                logger.debug(f"[DB] Found resource: {resource.name} ({resource.year})")
             else:
-                logger.warning(f"Resource {resource_id} not found in database")
+                logger.debug(f"[DB] Resource {resource_id} not found in database")
             return resource
     except Exception as e:
-        logger.error(f"Error getting resource {resource_id}: {e}")
+        logger.error(f"[DB] Error getting resource {resource_id}: {e}")
         return None
 
 
@@ -38,7 +38,7 @@ def get_resources_paginated(page: int = 1, size: int = 6) -> Page[Resource]:
             # Подсчет общего количества страниц
             total_pages = (total_count + size - 1) // size
 
-            logger.info(f"Retrieved {len(resources)} resources for page {page}")
+            logger.debug(f"[DB] Retrieved {len(resources)} resources for page {page}")
 
             return Page(
                 items=resources,
@@ -48,7 +48,7 @@ def get_resources_paginated(page: int = 1, size: int = 6) -> Page[Resource]:
                 pages=total_pages,
             )
     except Exception as e:
-        logger.error(f"Error getting resources page {page}: {e}")
+        logger.error(f"[DB] Error getting resources page {page}: {e}")
         # Возвращаем пустую страницу в случае ошибки
         return Page(items=[], page=page, size=size, total=0, pages=0)
 
@@ -66,12 +66,12 @@ def create_resource(
             session.commit()
             session.refresh(new_resource)
 
-            logger.info(
-                f"Created resource: {new_resource.name} (ID: {new_resource.id})"
+            logger.debug(
+                f"[DB] Created resource: {new_resource.name} (ID: {new_resource.id})"
             )
             return new_resource
     except Exception as e:
-        logger.error(f"Error creating resource: {e}")
+        logger.error(f"[DB] Error creating resource: {e}")
         return None
 
 
@@ -87,7 +87,7 @@ def update_resource(
         with Session(engine) as session:
             resource: Optional[Resource] = session.get(Resource, resource_id)
             if not resource:
-                logger.warning(f"Resource {resource_id} not found for update")
+                logger.debug(f"[DB] Resource {resource_id} not found for update")
                 return None
 
             # Обновляем только переданные поля
@@ -104,10 +104,10 @@ def update_resource(
             session.commit()
             session.refresh(resource)
 
-            logger.info(f"Updated resource {resource_id}: {resource.name}")
+            logger.debug(f"[DB] Updated resource {resource_id}: {resource.name}")
             return resource
     except Exception as e:
-        logger.error(f"Error updating resource {resource_id}: {e}")
+        logger.error(f"[DB] Error updating resource {resource_id}: {e}")
         return None
 
 
@@ -117,16 +117,16 @@ def delete_resource(resource_id: int) -> bool:
         with Session(engine) as session:
             resource = session.get(Resource, resource_id)
             if not resource:
-                logger.warning(f"Resource {resource_id} not found for deletion")
+                logger.debug(f"[DB] Resource {resource_id} not found for deletion")
                 return False
 
             session.delete(resource)
             session.commit()
 
-            logger.info(f"Deleted resource {resource_id}: {resource.name}")
+            logger.debug(f"[DB] Deleted resource {resource_id}: {resource.name}")
             return True
     except Exception as e:
-        logger.error(f"Error deleting resource {resource_id}: {e}")
+        logger.error(f"[DB] Error deleting resource {resource_id}: {e}")
         return False
 
 
@@ -137,5 +137,5 @@ def get_resources_count() -> int:
             count = session.exec(select(func.count(Resource.id))).one()
             return count
     except Exception as e:
-        logger.error(f"Error getting resources count: {e}")
+        logger.error(f"[DB] Error getting resources count: {e}")
         return 0

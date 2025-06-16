@@ -14,12 +14,12 @@ def get_user(user_id: int) -> Optional[User]:
         with Session(engine) as session:
             user = session.get(User, user_id)
             if user:
-                logger.info(f"Found user: {user.first_name} {user.last_name}")
+                logger.debug(f"[DB] Found user: {user.first_name} {user.last_name}")
             else:
-                logger.warning(f"User {user_id} not found in database")
+                logger.debug(f"[DB] User {user_id} not found in database")
             return user
     except Exception as e:
-        logger.error(f"Error getting user {user_id}: {e}")
+        logger.error(f"[DB] Error getting user {user_id}: {e}")
         return None
 
 
@@ -38,13 +38,13 @@ def get_users_paginated(page: int = 1, size: int = 6) -> Page[User]:
             # Подсчет общего количества страниц
             total_pages = (total_count + size - 1) // size
 
-            logger.info(f"Retrieved {len(users)} users for page {page}")
+            logger.debug(f"[DB] Retrieved {len(users)} users for page {page}")
 
             return Page(
                 items=users, page=page, size=size, total=total_count, pages=total_pages
             )
     except Exception as e:
-        logger.error(f"Error getting users page {page}: {e}")
+        logger.error(f"[DB] Error getting users page {page}: {e}")
         # Возвращаем пустую страницу в случае ошибки
         return Page(items=[], page=page, size=size, total=0, pages=0)
 
@@ -55,10 +55,10 @@ def get_all_users() -> Iterable[User]:
         with Session(engine) as session:
             statement = select(User)
             users = session.exec(statement).all()
-            logger.info(f"Retrieved {len(list(users))} total users")
+            logger.debug(f"[DB] Retrieved {len(list(users))} total users")
             return users
     except Exception as e:
-        logger.error(f"Error getting all users: {e}")
+        logger.error(f"[DB] Error getting all users: {e}")
         return []
 
 
@@ -75,12 +75,12 @@ def create_user(
             session.commit()
             session.refresh(new_user)
 
-            logger.info(
-                f"Created user: {new_user.first_name} {new_user.last_name} (ID: {new_user.id})"
+            logger.debug(
+                f"[DB] Created user: {new_user.first_name} {new_user.last_name} (ID: {new_user.id})"
             )
             return new_user
     except Exception as e:
-        logger.error(f"Error creating user: {e}")
+        logger.error(f"[DB] Error creating user: {e}")
         return None
 
 
@@ -96,7 +96,7 @@ def update_user(
         with Session(engine) as session:
             user: Optional[User] = session.get(User, user_id)
             if not user:
-                logger.warning(f"User {user_id} not found for update")
+                logger.debug(f"[DB] User {user_id} not found for update")
                 return None
 
             # Обновляем только переданные поля
@@ -113,10 +113,12 @@ def update_user(
             session.commit()
             session.refresh(user)
 
-            logger.info(f"Updated user {user_id}: {user.first_name} {user.last_name}")
+            logger.debug(
+                f"[DB] Updated user {user_id}: {user.first_name} {user.last_name}"
+            )
             return user
     except Exception as e:
-        logger.error(f"Error updating user {user_id}: {e}")
+        logger.error(f"[DB] Error updating user {user_id}: {e}")
         return None
 
 
@@ -126,16 +128,18 @@ def delete_user(user_id: int) -> bool:
         with Session(engine) as session:
             user = session.get(User, user_id)
             if not user:
-                logger.warning(f"User {user_id} not found for deletion")
+                logger.debug(f"[DB] User {user_id} not found for deletion")
                 return False
 
             session.delete(user)
             session.commit()
 
-            logger.info(f"Deleted user {user_id}: {user.first_name} {user.last_name}")
+            logger.debug(
+                f"[DB] Deleted user {user_id}: {user.first_name} {user.last_name}"
+            )
             return True
     except Exception as e:
-        logger.error(f"Error deleting user {user_id}: {e}")
+        logger.error(f"[DB] Error deleting user {user_id}: {e}")
         return False
 
 
@@ -146,7 +150,7 @@ def user_exists(user_id: int) -> bool:
             user = session.get(User, user_id)
             return user is not None
     except Exception as e:
-        logger.error(f"Error checking user existence {user_id}: {e}")
+        logger.error(f"[DB] Error checking user existence {user_id}: {e}")
         return False
 
 
@@ -157,5 +161,5 @@ def get_users_count() -> int:
             count = session.exec(select(func.count(User.id))).one()
             return count
     except Exception as e:
-        logger.error(f"Error getting users count: {e}")
+        logger.error(f"[DB] Error getting users count: {e}")
         return 0
