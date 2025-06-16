@@ -194,6 +194,7 @@ psql -h localhost -U postgres -d postgres
 │   ├── test_smoke.py            # Smoke тесты
 │   ├── test_special.py          # Специальные тесты (delayed response)
 │   ├── test_users.py            # Тесты пользователей
+│   ├── test_validation.py       # Валидация
 │   ├── conftest.py              # Pytest фикстуры и API клиент
 │   └── assertions.py            # Хелперы для проверок в тестах
 ├── docker-compose.yml           # Docker инфраструктура
