@@ -138,8 +138,8 @@ class APIAssertions:
         cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
         data = response.json()
 
-        # Проверяем структуру пагинации для ресурсов с ожидаемым total=12
-        cls.check_pagination_structure(data, page, per_page, 12, len(data["items"]))
+        # Проверяем структуру пагинации для ресурсов
+        cls.check_pagination_structure(data, page, per_page)
 
         # Возвращаем Page[Resource]
         resources = [Resource(**resource_data) for resource_data in data["items"]]
@@ -152,7 +152,7 @@ class APIAssertions:
         )
 
     # ========================================
-    # CRUD ОПЕРАЦИИ (test_crud.py)
+    # CRUD ОПЕРАЦИИ (test_crud_users.py)
     # ========================================
 
     @classmethod
@@ -202,6 +202,63 @@ class APIAssertions:
         cls, response: requests.Response, endpoint: str
     ) -> None:
         """Проверяет ответ удаления пользователя"""
+        cls.log_and_check_status(response, endpoint, HTTPStatus.NO_CONTENT)
+
+    # ========================================
+    # CRUD РЕСУРСОВ (test_crud_resources.py)
+    # ========================================
+
+    @classmethod
+    def check_create_resource_response(
+        cls,
+        response: requests.Response,
+        endpoint: str,
+        expected_resource: dict,
+    ) -> dict:
+        """Проверяет ответ создания ресурса"""
+        cls.log_and_check_status(response, endpoint, HTTPStatus.CREATED)
+
+        data = response.json()
+
+        assert data["name"] == expected_resource["name"]
+        assert data["year"] == expected_resource["year"]
+        assert data["color"] == expected_resource["color"]
+        assert data["pantone_value"] == expected_resource["pantone_value"]
+        assert "id" in data and data["id"] is not None
+        assert "createdAt" in data and data["createdAt"] is not None
+
+        resource_id = int(data["id"])
+        assert (
+            resource_id > 0
+        ), f"ID должен быть положительным числом, получен: {resource_id}"
+
+        return data
+
+    @classmethod
+    def check_update_resource_response(
+        cls,
+        response: requests.Response,
+        endpoint: str,
+        expected_resource: dict,
+    ) -> dict:
+        """Проверяет ответ обновления ресурса (PUT/PATCH)"""
+        cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
+
+        data = response.json()
+
+        assert data["name"] == expected_resource["name"]
+        assert data["year"] == expected_resource["year"]
+        assert data["color"] == expected_resource["color"]
+        assert data["pantone_value"] == expected_resource["pantone_value"]
+        assert "updatedAt" in data and data["updatedAt"] is not None
+
+        return data
+
+    @classmethod
+    def check_delete_resource_response(
+        cls, response: requests.Response, endpoint: str
+    ) -> None:
+        """Проверяет ответ удаления ресурса"""
         cls.log_and_check_status(response, endpoint, HTTPStatus.NO_CONTENT)
 
     # ========================================

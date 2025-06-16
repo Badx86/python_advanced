@@ -25,11 +25,12 @@ class TestResources:
         api.check_resource_response(response, "/api/unknown/2")
         logger.info("Resource 2 found, schema valid")
 
-    def test_single_resource_not_found(self, api_client) -> None:
+    @pytest.mark.parametrize("resource_id", [999999, 888888, 777777])
+    def test_single_resource_not_found(self, api_client, resource_id) -> None:
         """Тест получения несуществующего ресурса"""
-        response = api_client.get("/api/unknown/23")
-        api.check_404_error(response, "/api/unknown/23")
-        logger.info("Resource 23 not found (404)")
+        response = api_client.get(f"/api/unknown/{resource_id}")
+        api.check_404_error(response, f"/api/unknown/{resource_id}")
+        logger.info(f"Resource {resource_id} not found (404)")
 
     @pytest.mark.pagination
     def test_resources_page_2(self, api_client) -> None:

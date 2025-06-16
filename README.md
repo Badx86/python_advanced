@@ -131,8 +131,8 @@ psql -h localhost -U postgres -d postgres
 
 При первом запуске приложение автоматически:
 1. Создает таблицы в PostgreSQL (User, Resource)
-2. Загружает 12 тестовых пользователей из `app/data/users.json` в базу данных
-3. Ресурсы на данный момент читаются из `app/data/resources.json` (без БД)
+2. Загружает 12 тестовых пользователей из `app/data/users.json` в БД
+3. Загружает 12 тестовых ресурсов из `app/data/resources.json` в БД
 
 ## API
 
@@ -161,6 +161,10 @@ psql -h localhost -U postgres -d postgres
 **Ресурсы:**
 - `GET /api/unknown` - Список ресурсов (из JSON файла)
 - `GET /api/unknown/{id}` - Получить ресурс по ID
+- `POST /api/unknown` - Создать ресурс (сохраняется в БД)
+- `PUT /api/unknown/{id}` - Полное обновление ресурса
+- `PATCH /api/unknown/{id}` - Частичное обновление ресурса
+- `DELETE /api/unknown/{id}` - Удалить ресурс (из БД)
 
 ## Структура проекта
 
@@ -172,7 +176,8 @@ psql -h localhost -U postgres -d postgres
 │   ├── database/
 │   │   ├── engine.py            # Настройка SQLModel и PostgreSQL
 │   │   ├── seed.py              # Загрузка seed данных в БД
-│   │   └── users.py             # CRUD операции для пользователей
+│   │   ├── users.py             # CRUD операции для пользователей
+│   │   └── resources.py         # CRUD операции для реусрсов
 │   ├── routes/
 │   │   ├── __init__.py
 │   │   ├── auth.py              # Эндпоинты аутентификации
@@ -183,7 +188,8 @@ psql -h localhost -U postgres -d postgres
 │   └── models.py                # SQLModel модели для БД и API
 ├── tests/
 │   ├── test_auth.py             # Тесты аутентификации (email валидация)
-│   ├── test_crud.py             # CRUD операции с реальной БД
+│   ├── test_crud_users.py       # CRUD операции с users
+│   ├── test_crud_resources.py   # CRUD операции с resources
 │   ├── test_resources.py        # Тесты ресурсов
 │   ├── test_smoke.py            # Smoke тесты
 │   ├── test_special.py          # Специальные тесты (delayed response)
@@ -208,7 +214,7 @@ psql -h localhost -U postgres -d postgres
 
 - **Smoke тесты** - доступность сервиса, статус приложения
 - **Аутентификация** - регистрация/логин с email валидацией  
-- **CRUD операции** - создание/обновление/удаление пользователей в БД
+- **CRUD операции** - создание/обновление/удаление пользователей и ресурсов в БД
 - **Пользователи** - получение, пагинация, уникальность ID
 - **Ресурсы** - получение, пагинация ресурсов (из JSON)
 - **Специальные** - delayed response с измерением времени

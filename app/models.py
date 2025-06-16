@@ -85,6 +85,45 @@ class UpdateUserResponse(SQLModel):
     updatedAt: datetime
 
 
+class CreateResourceRequest(SQLModel):
+    """Запрос на создание ресурса"""
+
+    name: str
+    year: int
+    color: str
+    pantone_value: str
+
+
+class CreateResourceResponse(SQLModel):
+    """Ответ при создании ресурса"""
+
+    name: str
+    year: int
+    color: str
+    pantone_value: str
+    id: str
+    createdAt: datetime
+
+
+class UpdateResourceRequest(SQLModel):
+    """Запрос на обновление ресурса"""
+
+    name: Optional[str] = None
+    year: Optional[int] = None
+    color: Optional[str] = None
+    pantone_value: Optional[str] = None
+
+
+class UpdateResourceResponse(SQLModel):
+    """Ответ при обновлении ресурса"""
+
+    name: Optional[str] = None
+    year: Optional[int] = None
+    color: Optional[str] = None
+    pantone_value: Optional[str] = None
+    updatedAt: datetime
+
+
 # ================================
 # СИСТЕМНЫЙ СТАТУС
 # ================================
