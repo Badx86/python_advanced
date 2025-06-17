@@ -1,0 +1,2 @@
+INFO     tests.assertions:assertions.py:32 POST POST /api/users - Status: 422
+INFO     tests.test_validation:test_validation.py:28 User creation correctly failed without 'name' field (422)

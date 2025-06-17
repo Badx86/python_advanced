@@ -1,0 +1,8 @@
+INFO     tests.assertions:assertions.py:32 POST /api/users - Status: 201
+INFO     tests.assertions:assertions.py:108 User 17 verified in database: alonzo 
+INFO     tests.assertions:assertions.py:108 User 17 verified in database: alonzo 
+INFO     tests.assertions:assertions.py:32 GET /api/users/17 - Status: 200
+INFO     tests.assertions:assertions.py:32 DELETE /api/users/17 - Status: 204
+INFO     tests.assertions:assertions.py:123 User 17 confirmed deleted from database
+INFO     tests.assertions:assertions.py:32 GET /api/users/17 - Status: 404
+INFO     tests.test_crud_users:test_crud_users.py:170 Full CRUD cycle with database verification completed for user 17

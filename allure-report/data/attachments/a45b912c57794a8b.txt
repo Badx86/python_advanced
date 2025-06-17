@@ -1,0 +1,5 @@
+INFO     tests.test_crud_resources:test_crud_resources.py:31 Creating resource with data: {'name': 'cyan', 'year': 2022, 'color': '#77c962', 'pantone_value': 'DISPLAY-261'}
+INFO     tests.assertions:assertions.py:32 POST /api/unknown - Status: 201
+INFO     app.database.engine:engine.py:20 Database engine created with pool_size=10
+INFO     tests.assertions:assertions.py:191 Resource 13 verified in database: cyan (2022)
+INFO     tests.test_crud_resources:test_crud_resources.py:36 Resource created and verified in database successfully
