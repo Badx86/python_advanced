@@ -20,6 +20,7 @@ email-validator = "^2.2.0"
 psycopg2-binary = "^2.9.10"
 sqlalchemy = "^2.0.41"
 sqlmodel = "^0.0.24"
+allure-pytest = "^2.14.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
@@ -34,7 +35,7 @@ build-backend = "poetry.core.masonry.api"
 testpaths = ["tests"]
 log_cli = false
 log_cli_level = "INFO"
-addopts = "--tb=short --strict-markers"
+addopts = "--tb=short --strict-markers --alluredir=allure-results"
 
 markers = [
     "smoke: Smoke tests for basic functionality",
@@ -43,3 +44,7 @@ markers = [
     "pagination: Pagination related tests",
     "slow: Tests that take longer to run"
 ]
+
+[tool.allure]
+results_directory = "allure-results"
+report_directory = "allure-report"
