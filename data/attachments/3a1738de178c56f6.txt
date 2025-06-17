@@ -1,0 +1,4 @@
+Resource ID: 6
+Name: blue turquoise
+Year: 2005
+Color: #53B0AE

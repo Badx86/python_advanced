@@ -1,5 +1,0 @@
-ID: 14
-Name: cyan
-Year: 2027
-Color: #9c29f2
-Pantone: VIOLATION-954

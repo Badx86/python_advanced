@@ -1,5 +1,0 @@
-UPDATED:
-Name: blue
-Year: 2023
-Color: #d941f6
-Pantone: PHOTOGRAPHY-472

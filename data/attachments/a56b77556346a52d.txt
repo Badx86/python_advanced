@@ -1,0 +1,5 @@
+ID: 20
+Name: white
+Year: 2023
+Color: #6ddc70
+Pantone: PLATINUM-808

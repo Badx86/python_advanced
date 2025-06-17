@@ -1,0 +1,5 @@
+ID: 19
+Name: purple
+Year: 2026
+Color: #41dd4c
+Pantone: HER-195

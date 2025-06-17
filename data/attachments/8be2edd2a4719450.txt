@@ -1,5 +1,0 @@
-ID: 19
-Name: magenta
-Year: 2025
-Color: #29cc16
-Pantone: GREG-470

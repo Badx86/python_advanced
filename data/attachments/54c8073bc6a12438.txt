@@ -1,5 +1,0 @@
-ID: 16
-Name: white
-Year: 2028
-Color: #49ebe8
-Pantone: ALEXANDER-636

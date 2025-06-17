@@ -1,5 +1,0 @@
-ID: 13
-Name: black
-Year: 2024
-Color: #aed6a0
-Pantone: DVDS-132

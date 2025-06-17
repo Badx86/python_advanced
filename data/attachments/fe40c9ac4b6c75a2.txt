@@ -1,5 +1,0 @@
-ID: 15
-Email: tama@example.com
-First Name: tama
-Last Name: 
-Avatar: https://reqres.in/img/faces/3-image.jpg
