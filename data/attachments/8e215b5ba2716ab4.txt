@@ -1,0 +1,4 @@
+Method: DELETE
+URL: /api/users/16
+Expected: 204
+Actual: 204

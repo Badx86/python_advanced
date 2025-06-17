@@ -1,7 +1,0 @@
-INFO     tests.assertions:assertions.py:32 POST /api/users - Status: 201
-INFO     tests.assertions:assertions.py:108 User 15 verified in database: reatha 
-INFO     tests.assertions:assertions.py:108 User 15 verified in database: reatha 
-INFO     tests.test_crud_users:test_crud_users.py:98 Patching user 15 with data: {'name': 'wallace', 'job': 'production manager'}
-INFO     tests.assertions:assertions.py:32 PATCH /api/users/15 - Status: 200
-INFO     tests.assertions:assertions.py:158 User 15 updated in database: wallace 
-INFO     tests.test_crud_users:test_crud_users.py:110 User 15 patched and verified in database successfully

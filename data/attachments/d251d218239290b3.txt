@@ -1,0 +1,4 @@
+Method: GET
+URL: /api/unknown/17
+Expected: 404
+Actual: 404

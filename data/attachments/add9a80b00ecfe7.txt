@@ -1,0 +1,4 @@
+Resource ID: 2
+Name: fuchsia rose
+Year: 2001
+Color: #C74375

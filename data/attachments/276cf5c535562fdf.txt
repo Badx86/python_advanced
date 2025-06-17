@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:32 GET /api/users - Status: 200
-INFO     tests.test_smoke:test_smoke.py:49 Service returns valid data structure

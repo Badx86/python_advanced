@@ -1,0 +1,1 @@
+{"detail":[{"type":"missing","loc":["body","job"],"msg":"Field required","input":{"name":"testuser"}}]}

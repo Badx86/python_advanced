@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:32 GET /api/users - Status: 200
-INFO     tests.test_users:test_users.py:43 All 12 user IDs are unique

@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:32 GET /api/users?page=1 - Status: 200
-INFO     tests.test_users:test_users.py:20 Page 1 works, got 6 users, total: 15

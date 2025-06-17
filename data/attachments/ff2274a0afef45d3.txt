@@ -1,0 +1,4 @@
+INFO     tests.assertions:assertions.py:36 POST /api/users - Status: 201
+INFO     tests.assertions:assertions.py:156 User 18 verified in database: TestUser 
+INFO     tests.assertions:assertions.py:36 GET /api/users/18 - Status: 200
+INFO     tests.test_users:test_users.py:87 Created and verified user 18

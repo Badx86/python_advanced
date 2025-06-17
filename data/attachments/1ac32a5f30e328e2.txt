@@ -1,0 +1,5 @@
+ID: 20
+Name: cyan
+Year: 2026
+Color: #0b5d4e
+Pantone: SAFARI-887

@@ -1,0 +1,4 @@
+Method: PUT
+URL: /api/users/14
+Expected: 200
+Actual: 200

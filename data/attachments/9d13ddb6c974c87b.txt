@@ -1,0 +1,5 @@
+ID: 13
+Name: white
+Year: 2027
+Color: #34d1ce
+Pantone: DETERMINED-377

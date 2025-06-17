@@ -1,0 +1,5 @@
+UPDATED:
+Name: yellow
+Year: 2025
+Color: #edc082
+Pantone: KNOWING-956

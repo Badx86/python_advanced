@@ -1,0 +1,5 @@
+ID: 19
+Name: orange
+Year: 2026
+Color: #2b733d
+Pantone: GUARDIAN-392

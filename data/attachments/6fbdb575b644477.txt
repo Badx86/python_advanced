@@ -1,0 +1,2 @@
+INFO     tests.assertions:assertions.py:36 GET /api/unknown/888888 - Status: 404
+INFO     tests.test_resources:test_resources.py:57 Resource 888888 not found (404)

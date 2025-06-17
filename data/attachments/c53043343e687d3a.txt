@@ -1,4 +1,0 @@
-INFO     tests.assertions:assertions.py:32 GET /api/users - Status: 200
-INFO     tests.test_smoke:test_smoke.py:39 Endpoint /api/users is accessible
-INFO     tests.assertions:assertions.py:32 GET /api/unknown - Status: 200
-INFO     tests.test_smoke:test_smoke.py:39 Endpoint /api/unknown is accessible

@@ -1,0 +1,5 @@
+ID: 16
+Name: magenta
+Year: 2030
+Color: #eec41f
+Pantone: HARRY-858
