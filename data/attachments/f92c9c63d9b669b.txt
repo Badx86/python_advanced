@@ -1,5 +1,0 @@
-ID: 19
-Name: green
-Year: 2028
-Color: #dbe1b3
-Pantone: FREQUENTLY-525

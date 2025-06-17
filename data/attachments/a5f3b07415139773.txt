@@ -1,5 +1,0 @@
-ID: 20
-Name: pink
-Year: 2026
-Color: #7bd015
-Pantone: DETAILS-652

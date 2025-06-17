@@ -1,5 +1,0 @@
-ID: 15
-Name: black
-Year: 2029
-Color: #ceaff0
-Pantone: SEEING-713

@@ -1,0 +1,5 @@
+ID: 15
+Name: blue
+Year: 2021
+Color: #9a185a
+Pantone: DEPENDS-482

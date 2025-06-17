@@ -1,5 +1,0 @@
-ID: 17
-Email: pasquale@example.com
-First Name: pasquale
-Last Name: 
-Avatar: https://reqres.in/img/faces/1-image.jpg

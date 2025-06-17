@@ -1,5 +1,0 @@
-UPDATED:
-Name: magenta
-Year: 2027
-Color: #efa4ee
-Pantone: SON-607

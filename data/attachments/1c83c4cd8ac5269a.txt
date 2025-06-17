@@ -1,0 +1,5 @@
+UPDATED:
+Name: blue
+Year: 2020
+Color: #99b277
+Pantone: VOTING-943

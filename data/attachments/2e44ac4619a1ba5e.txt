@@ -1,2 +1,0 @@
-Name: dia
-Job: hospital orderly

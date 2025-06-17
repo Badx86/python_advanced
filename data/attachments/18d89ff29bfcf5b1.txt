@@ -1,0 +1,5 @@
+ID: 18
+Name: red
+Year: 2028
+Color: #e85893
+Pantone: MICE-828

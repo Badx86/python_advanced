@@ -1,5 +1,0 @@
-ID: 14
-Name: magenta
-Year: 2024
-Color: #9b084b
-Pantone: INSPIRED-200

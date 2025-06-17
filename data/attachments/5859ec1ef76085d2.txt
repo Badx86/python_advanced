@@ -1,5 +1,0 @@
-ID: 17
-Name: purple
-Year: 2026
-Color: #0563cd
-Pantone: GLOSSARY-746
