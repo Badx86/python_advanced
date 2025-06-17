@@ -19,7 +19,7 @@ def generate_random_user():
 @allure.epic("CRUD Operations")
 @allure.feature("User Management")
 @pytest.mark.crud
-class TestCRUD:
+class TestUsersCRUD:
     """Тесты для создания, обновления, удаления с проверкой БД"""
 
     @allure.story("Create User")
