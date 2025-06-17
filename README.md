@@ -1,5 +1,4 @@
-[![Python package](https://img.shields.io/badge/Python%20package-passing-brightgreen)](https://github.com/Badx86/python_advanced)
-[![Allure Report](https://img.shields.io/badge/Allure%20Report-deployed-yellow)](https://Badx86.github.io/python_advanced/)
+[![Allure Report](https://img.shields.io/badge/Allure%20Report-deployed-brightgreen)](https://Badx86.github.io/python_advanced/)
 [![Python](https://img.shields.io/badge/python-3.11+-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)](https://www.postgresql.org/)
