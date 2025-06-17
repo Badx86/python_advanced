@@ -1,3 +1,4 @@
+import allure
 import logging
 import pytest
 import random
@@ -15,22 +16,35 @@ def generate_random_user():
     return {"name": person.first_name().lower(), "job": person.occupation().lower()}
 
 
+@allure.epic("FastAPI CRUD Operations")
+@allure.feature("User Management")
 @pytest.mark.crud
 class TestCRUD:
     """Тесты для создания, обновления, удаления с проверкой БД"""
 
+    @allure.story("Create User")
+    @allure.title("Create new user via API")
+    @allure.description(
+        "Test creating a new user through API endpoint and verify it exists in database"
+    )
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "database", "create", "user")
     def test_create_user(self, api_client) -> None:
         """Тест создания пользователя (API + БД)"""
         user_data = generate_random_user()
         logger.info(f"Creating user with data: {user_data}")
 
         response = api_client.post("/api/users", json=user_data)
-        # Теперь check_create_user_response автоматически проверяет БД!
         api.check_create_user_response(
             response, "/api/users", user_data["name"], user_data["job"]
         )
         logger.info("User created and verified in database successfully")
 
+    @allure.story("Read User")
+    @allure.title("Read existing user by ID")
+    @allure.description("Test reading a random existing user from the database")
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.tag("api", "read", "user")
     def test_read_user(self, api_client) -> None:
         """Тест чтения случайного пользователя"""
         # Получаем список пользователей
@@ -40,7 +54,6 @@ class TestCRUD:
         )
 
         if users_page.items:
-            # Выбираем случайного пользователя из списка
             random_user = random.choice(users_page.items)
             user_id = random_user.id
 
@@ -51,10 +64,18 @@ class TestCRUD:
         else:
             logger.warning("No users found in database for read test")
 
+    @allure.story("Update User")
+    @allure.title("Update user with PUT method")
+    @allure.description(
+        "Test complete user update using PUT method and verify changes in database"
+    )
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "database", "update", "put", "user")
     def test_update_user_put(self, api_client) -> None:
         """Тест полного обновления пользователя (API + БД)"""
-        # Создаем пользователя
         user_data = generate_random_user()
+
+        # Создаем пользователя
         create_response = api_client.post("/api/users", json=user_data)
         created_user = api.check_create_user_response(
             create_response, "/api/users", user_data["name"], user_data["job"]
@@ -69,7 +90,6 @@ class TestCRUD:
         logger.info(f"Updating user {user_id} with data: {updated_data}")
 
         response = api_client.put(f"/api/users/{user_id}", json=updated_data)
-        # Теперь check_update_user_response автоматически проверяет БД!
         api.check_update_user_response(
             response,
             f"/api/users/{user_id}",
@@ -80,10 +100,18 @@ class TestCRUD:
         )
         logger.info(f"User {user_id} updated and verified in database successfully")
 
+    @allure.story("Update User")
+    @allure.title("Update user with PATCH method")
+    @allure.description(
+        "Test partial user update using PATCH method and verify changes in database"
+    )
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.tag("api", "database", "update", "patch", "user")
     def test_update_user_patch(self, api_client) -> None:
         """Тест частичного обновления пользователя (API + БД)"""
-        # Создаем пользователя
         user_data = generate_random_user()
+
+        # Создаем пользователя
         create_response = api_client.post("/api/users", json=user_data)
         created_user = api.check_create_user_response(
             create_response, "/api/users", user_data["name"], user_data["job"]
@@ -98,7 +126,6 @@ class TestCRUD:
         logger.info(f"Patching user {user_id} with data: {updated_data}")
 
         response = api_client.patch(f"/api/users/{user_id}", json=updated_data)
-        # Проверяем API + БД
         api.check_update_user_response(
             response,
             f"/api/users/{user_id}",
@@ -109,10 +136,16 @@ class TestCRUD:
         )
         logger.info(f"User {user_id} patched and verified in database successfully")
 
+    @allure.story("Delete User")
+    @allure.title("Delete user from system")
+    @allure.description("Test user deletion via API and verify removal from database")
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "database", "delete", "user")
     def test_delete_user(self, api_client) -> None:
         """Тест удаления пользователя (API + БД)"""
-        # Создаем пользователя
         user_data = generate_random_user()
+
+        # Создаем пользователя
         create_response = api_client.post("/api/users", json=user_data)
         created_user = api.check_create_user_response(
             create_response, "/api/users", user_data["name"], user_data["job"]
@@ -121,10 +154,14 @@ class TestCRUD:
 
         # Удаляем его
         response = api_client.delete(f"/api/users/{user_id}")
-        # Теперь check_delete_user_response автоматически проверяет БД!
         api.check_delete_user_response(response, f"/api/users/{user_id}", user_id)
         logger.info(f"User {user_id} deleted and verified removed from database")
 
+    @allure.story("Error Handling")
+    @allure.title("Update non-existent user")
+    @allure.description("Test updating a user that doesn't exist - should return 404")
+    @allure.severity(allure.severity_level.MINOR)
+    @allure.tag("api", "error-handling", "404", "user")
     def test_update_nonexistent_user(self, api_client) -> None:
         """Тест обновления несуществующего пользователя"""
         updated_data = generate_random_user()
@@ -134,16 +171,29 @@ class TestCRUD:
         api.check_404_error(response, "/api/users/999999")
         logger.info("Non-existent user correctly failed with 404")
 
+    @allure.story("Error Handling")
+    @allure.title("Delete non-existent user")
+    @allure.description("Test deleting a user that doesn't exist - should return 404")
+    @allure.severity(allure.severity_level.MINOR)
+    @allure.tag("api", "error-handling", "404", "user")
     def test_delete_nonexistent_user(self, api_client) -> None:
         """Тест удаления несуществующего пользователя"""
         response = api_client.delete("/api/users/999999")
         api.check_404_error(response, "/api/users/999999")
         logger.info("Non-existent user DELETE correctly failed with 404")
 
+    @allure.story("Integration Tests")
+    @allure.title("Full CRUD cycle for user")
+    @allure.description(
+        "Test complete user lifecycle: create → read → update → delete with database verification"
+    )
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "database", "integration", "full-cycle", "user")
     def test_create_and_delete_flow(self, api_client) -> None:
         """Тест полного цикла: создание -> проверка -> удаление (с БД проверками)"""
-        # Создаем пользователя
         user_data = generate_random_user()
+
+        # Создаем пользователя
         create_response = api_client.post("/api/users", json=user_data)
         created_user = api.check_create_user_response(
             create_response, "/api/users", user_data["name"], user_data["job"]

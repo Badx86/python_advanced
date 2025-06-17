@@ -1,3 +1,4 @@
+import allure
 import logging
 import pytest
 import random
@@ -21,20 +22,33 @@ def generate_random_resource():
     }
 
 
+@allure.epic("FastAPI CRUD Operations")
+@allure.feature("Resource Management")
 @pytest.mark.crud
 class TestResourcesCRUD:
     """Тесты CRUD операций для ресурсов с проверкой БД"""
 
+    @allure.story("Create Resource")
+    @allure.title("Create new resource via API")
+    @allure.description(
+        "Test creating a new resource through API endpoint and verify it exists in database"
+    )
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "database", "create", "resource")
     def test_create_resource(self, api_client) -> None:
         """Тест создания ресурса (API + БД)"""
         resource_data = generate_random_resource()
         logger.info(f"Creating resource with data: {resource_data}")
 
         response = api_client.post("/api/unknown", json=resource_data)
-        # Теперь check_create_resource_response автоматически проверяет БД!
         api.check_create_resource_response(response, "/api/unknown", resource_data)
         logger.info("Resource created and verified in database successfully")
 
+    @allure.story("Read Resource")
+    @allure.title("Read existing resource by ID")
+    @allure.description("Test reading a random existing resource from the database")
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.tag("api", "read", "resource")
     def test_read_resource(self, api_client) -> None:
         """Тест чтения случайного ресурса"""
         # Получаем список ресурсов
@@ -55,6 +69,13 @@ class TestResourcesCRUD:
         else:
             logger.warning("No resources found in database for read test")
 
+    @allure.story("Update Resource")
+    @allure.title("Update resource with PUT method")
+    @allure.description(
+        "Test complete resource update using PUT method and verify changes in database"
+    )
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "database", "update", "put", "resource")
     def test_update_resource_put(self, api_client) -> None:
         """Тест полного обновления ресурса (API + БД)"""
         # Создаем ресурс
@@ -70,7 +91,6 @@ class TestResourcesCRUD:
         logger.info(f"Updating resource {resource_id} with data: {updated_data}")
 
         response = api_client.put(f"/api/unknown/{resource_id}", json=updated_data)
-        # Теперь check_update_resource_response автоматически проверяет БД!
         api.check_update_resource_response(
             response, f"/api/unknown/{resource_id}", updated_data, resource_id
         )
@@ -78,6 +98,13 @@ class TestResourcesCRUD:
             f"Resource {resource_id} updated and verified in database successfully"
         )
 
+    @allure.story("Update Resource")
+    @allure.title("Update resource with PATCH method")
+    @allure.description(
+        "Test partial resource update using PATCH method and verify changes in database"
+    )
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.tag("api", "database", "update", "patch", "resource")
     def test_update_resource_patch(self, api_client) -> None:
         """Тест частичного обновления ресурса (API + БД)"""
         # Создаем ресурс
@@ -93,7 +120,6 @@ class TestResourcesCRUD:
         logger.info(f"Patching resource {resource_id} with data: {updated_data}")
 
         response = api_client.patch(f"/api/unknown/{resource_id}", json=updated_data)
-        # Проверяем API + БД
         api.check_update_resource_response(
             response, f"/api/unknown/{resource_id}", updated_data, resource_id
         )
@@ -101,6 +127,13 @@ class TestResourcesCRUD:
             f"Resource {resource_id} patched and verified in database successfully"
         )
 
+    @allure.story("Delete Resource")
+    @allure.title("Delete resource from system")
+    @allure.description(
+        "Test resource deletion via API and verify removal from database"
+    )
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "database", "delete", "resource")
     def test_delete_resource(self, api_client) -> None:
         """Тест удаления ресурса (API + БД)"""
         # Создаем ресурс
@@ -113,7 +146,6 @@ class TestResourcesCRUD:
 
         # Удаляем его
         response = api_client.delete(f"/api/unknown/{resource_id}")
-        # Теперь check_delete_resource_response автоматически проверяет БД!
         api.check_delete_resource_response(
             response, f"/api/unknown/{resource_id}", resource_id
         )
@@ -121,6 +153,13 @@ class TestResourcesCRUD:
             f"Resource {resource_id} deleted and verified removed from database"
         )
 
+    @allure.story("Error Handling")
+    @allure.title("Update non-existent resource")
+    @allure.description(
+        "Test updating a resource that doesn't exist - should return 404"
+    )
+    @allure.severity(allure.severity_level.MINOR)
+    @allure.tag("api", "error-handling", "404", "resource")
     def test_update_nonexistent_resource(self, api_client) -> None:
         """Тест обновления несуществующего ресурса"""
         updated_data = generate_random_resource()
@@ -130,12 +169,26 @@ class TestResourcesCRUD:
         api.check_404_error(response, "/api/unknown/999999")
         logger.info("Non-existent resource correctly failed with 404")
 
+    @allure.story("Error Handling")
+    @allure.title("Delete non-existent resource")
+    @allure.description(
+        "Test deleting a resource that doesn't exist - should return 404"
+    )
+    @allure.severity(allure.severity_level.MINOR)
+    @allure.tag("api", "error-handling", "404", "resource")
     def test_delete_nonexistent_resource(self, api_client) -> None:
         """Тест удаления несуществующего ресурса"""
         response = api_client.delete("/api/unknown/999999")
         api.check_404_error(response, "/api/unknown/999999")
         logger.info("Non-existent resource DELETE correctly failed with 404")
 
+    @allure.story("Integration Tests")
+    @allure.title("Full CRUD cycle for resource")
+    @allure.description(
+        "Test complete resource lifecycle: create → read → update → delete with database verification"
+    )
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "database", "integration", "full-cycle", "resource")
     def test_create_and_delete_flow(self, api_client) -> None:
         """Тест полного цикла: создание -> проверка -> удаление (с БД проверками)"""
         # Создаем ресурс
@@ -167,6 +220,11 @@ class TestResourcesCRUD:
             f"Full CRUD cycle with database verification completed for resource {resource_id}"
         )
 
+    @allure.story("Bulk Operations")
+    @allure.title("Multiple resources CRUD operations")
+    @allure.description("Test creating and deleting multiple resources in sequence")
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.tag("api", "database", "bulk", "resource")
     def test_multiple_resources_crud(self, api_client) -> None:
         """Тест создания и удаления нескольких ресурсов"""
         created_resources = []

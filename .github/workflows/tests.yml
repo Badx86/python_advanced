@@ -63,7 +63,7 @@ jobs:
           HOST: 0.0.0.0
           PORT: 8000
 
-      - name: 🧪 Run tests with Allure
+      - name: 🧪 Run tests
         run: |
           poetry run pytest tests/ -v \
             --alluredir=allure-results \
