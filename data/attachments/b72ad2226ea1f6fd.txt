@@ -1,0 +1,5 @@
+ID: 19
+Name: beige
+Year: 2028
+Color: #2cea13
+Pantone: OCCASION-262

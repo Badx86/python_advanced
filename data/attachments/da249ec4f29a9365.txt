@@ -1,0 +1,5 @@
+ID: 18
+Name: blue
+Year: 2020
+Color: #8bbc69
+Pantone: INCREASED-428

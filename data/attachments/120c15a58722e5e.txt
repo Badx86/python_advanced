@@ -1,5 +1,0 @@
-ID: 17
-Name: orange
-Year: 2027
-Color: #6046f3
-Pantone: COMPUTER-191

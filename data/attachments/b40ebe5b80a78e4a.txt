@@ -1,0 +1,5 @@
+ID: 14
+Name: magenta
+Year: 2021
+Color: #1dc79c
+Pantone: EDGE-298

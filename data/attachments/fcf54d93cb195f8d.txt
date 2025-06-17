@@ -1,5 +1,0 @@
-ID: 14
-Name: blue
-Year: 2029
-Color: #1d5c4a
-Pantone: CAREERS-335

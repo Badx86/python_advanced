@@ -1,0 +1,5 @@
+ID: 17
+Name: red
+Year: 2026
+Color: #577c0e
+Pantone: GLORY-598

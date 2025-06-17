@@ -1,0 +1,5 @@
+ID: 20
+Name: white
+Year: 2025
+Color: #10e965
+Pantone: INTERRACIAL-103

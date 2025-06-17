@@ -1,0 +1,3 @@
+User ID: 7
+Email: michael.lawson@reqres.in
+Name: Michael Lawson

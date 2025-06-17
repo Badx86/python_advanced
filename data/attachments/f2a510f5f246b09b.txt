@@ -1,5 +1,0 @@
-UPDATED:
-Name: purple
-Year: 2025
-Color: #b48632
-Pantone: COMFORT-648
