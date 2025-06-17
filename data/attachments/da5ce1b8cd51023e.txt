@@ -1,5 +1,0 @@
-ID: 18
-Name: green
-Year: 2023
-Color: #d72003
-Pantone: SPECS-396

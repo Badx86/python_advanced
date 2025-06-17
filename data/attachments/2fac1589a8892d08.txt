@@ -1,0 +1,5 @@
+ID: 14
+Email: maynard@example.com
+First Name: maynard
+Last Name: 
+Avatar: https://reqres.in/img/faces/12-image.jpg

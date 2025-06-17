@@ -1,5 +1,0 @@
-UPDATED:
-Name: white
-Year: 2028
-Color: #dcea00
-Pantone: SIGNALS-313

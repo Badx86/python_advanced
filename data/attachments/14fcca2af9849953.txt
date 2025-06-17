@@ -1,5 +1,0 @@
-UPDATED:
-Name: magenta
-Year: 2028
-Color: #dfac43
-Pantone: PRICES-512

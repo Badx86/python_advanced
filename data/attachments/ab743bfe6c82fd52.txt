@@ -1,0 +1,5 @@
+ID: 13
+Name: magenta
+Year: 2024
+Color: #cbf85c
+Pantone: CONVENIENT-107

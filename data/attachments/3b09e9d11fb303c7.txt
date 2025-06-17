@@ -1,2 +1,0 @@
-Name: alex
-Job: project worker

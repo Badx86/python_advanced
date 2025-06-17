@@ -1,5 +1,0 @@
-ID: 14
-Name: pink
-Year: 2020
-Color: #7b2c58
-Pantone: STILL-289

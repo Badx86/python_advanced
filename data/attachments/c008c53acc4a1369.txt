@@ -1,5 +1,0 @@
-ID: 19
-Name: magenta
-Year: 2024
-Color: #a0ff01
-Pantone: BUILDER-989

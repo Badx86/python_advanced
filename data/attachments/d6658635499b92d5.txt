@@ -1,5 +1,0 @@
-ID: 13
-Name: black
-Year: 2029
-Color: #63b241
-Pantone: STYLES-998

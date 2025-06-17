@@ -1,5 +1,0 @@
-ID: 16
-Name: beige
-Year: 2028
-Color: #d9ab67
-Pantone: ADMISSIONS-796

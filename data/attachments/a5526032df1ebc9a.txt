@@ -1,0 +1,5 @@
+UPDATED:
+Name: purple
+Year: 2030
+Color: #1ffe21
+Pantone: GREECE-328
