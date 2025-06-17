@@ -1,5 +1,0 @@
-INFO     tests.assertions:assertions.py:32 POST /api/unknown - Status: 201
-INFO     tests.assertions:assertions.py:191 Resource 16 verified in database: purple (2028)
-INFO     tests.assertions:assertions.py:32 DELETE /api/unknown/16 - Status: 204
-INFO     tests.assertions:assertions.py:206 Resource 16 confirmed deleted from database
-INFO     tests.test_crud_resources:test_crud_resources.py:120 Resource 16 deleted and verified removed from database
