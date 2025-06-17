@@ -51,7 +51,7 @@ jobs:
 
       - name: 📋 Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-ansi
+        run: poetry install --no-interaction --no-ansi --no-root
 
       - name: 🚀 Start FastAPI server
         run: |
