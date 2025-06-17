@@ -1,0 +1,4 @@
+Resource ID: 1
+Name: cerulean
+Year: 2000
+Color: #98B2D1

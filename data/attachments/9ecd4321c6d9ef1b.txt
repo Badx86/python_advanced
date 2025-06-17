@@ -1,0 +1,4 @@
+Resource ID: 17
+Name: magenta
+Year: 2020
+Color: #eb54c8

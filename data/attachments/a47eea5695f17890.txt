@@ -1,5 +1,0 @@
-ID: 14
-Name: yellow
-Year: 2030
-Color: #e4b1cc
-Pantone: POLAND-341

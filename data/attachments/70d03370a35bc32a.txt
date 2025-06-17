@@ -1,5 +1,0 @@
-UPDATED:
-Name: blue
-Year: 2022
-Color: #8c96e5
-Pantone: FRUIT-153

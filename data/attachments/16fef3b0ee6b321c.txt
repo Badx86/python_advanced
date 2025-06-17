@@ -1,5 +1,0 @@
-ID: 15
-Name: orange
-Year: 2021
-Color: #717f35
-Pantone: NIKON-161

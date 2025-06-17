@@ -1,4 +1,0 @@
-Resource ID: 17
-Name: red
-Year: 2027
-Color: #c91361

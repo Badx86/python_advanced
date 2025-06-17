@@ -1,0 +1,4 @@
+Method: GET
+URL: /api/users/8
+Expected: 200
+Actual: 200

@@ -1,4 +1,0 @@
-Resource ID: 12
-Name: honeysuckle
-Year: 2011
-Color: #D94F70

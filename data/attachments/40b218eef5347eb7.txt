@@ -1,3 +1,0 @@
-User ID: 17
-Email: hubert@example.com
-Name: hubert 
