@@ -22,7 +22,7 @@ def generate_random_resource():
     }
 
 
-@allure.epic("FastAPI CRUD Operations")
+@allure.epic("CRUD Operations")
 @allure.feature("Resource Management")
 @pytest.mark.crud
 class TestResourcesCRUD:

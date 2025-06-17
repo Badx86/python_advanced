@@ -16,7 +16,7 @@ def generate_random_user():
     return {"name": person.first_name().lower(), "job": person.occupation().lower()}
 
 
-@allure.epic("FastAPI CRUD Operations")
+@allure.epic("CRUD Operations")
 @allure.feature("User Management")
 @pytest.mark.crud
 class TestCRUD:
