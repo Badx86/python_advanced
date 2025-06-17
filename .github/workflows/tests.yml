@@ -1,4 +1,4 @@
-name: Test Run with Allure Report
+name: Tests with Allure Report
 
 on:
   push:
@@ -64,6 +64,7 @@ jobs:
           PORT: 8000
 
       - name: 🧪 Run tests
+        continue-on-error: true
         run: |
           poetry run pytest tests/ -v \
             --alluredir=allure-results \

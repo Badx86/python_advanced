@@ -283,6 +283,44 @@ class APIAssertions:
             )
             logger.info(f"Resource {resource_id} confirmed deleted from database")
 
+    @staticmethod
+    def check_resource_updated_in_database(
+        resource_id: int, expected_data: dict
+    ) -> Resource:
+        """Проверяет что ресурс обновился в БД"""
+        with allure.step(f"Verify resource {resource_id} is updated in database"):
+            from app.database.resources import get_resource
+
+            updated_resource = get_resource(resource_id)
+            assert (
+                updated_resource is not None
+            ), f"Resource {resource_id} not found after update"
+
+            assert (
+                updated_resource.name == expected_data["name"]
+            ), f"DB name not updated: '{updated_resource.name}' != '{expected_data['name']}'"
+            assert (
+                updated_resource.year == expected_data["year"]
+            ), f"DB year not updated: {updated_resource.year} != {expected_data['year']}"
+            assert (
+                updated_resource.color == expected_data["color"]
+            ), f"DB color not updated: '{updated_resource.color}' != '{expected_data['color']}'"
+            assert (
+                updated_resource.pantone_value == expected_data["pantone_value"]
+            ), f"DB pantone_value not updated: '{updated_resource.pantone_value}' != '{expected_data['pantone_value']}'"
+
+            # Attachment с изменениями
+            allure.attach(
+                f"UPDATED:\nName: {updated_resource.name}\nYear: {updated_resource.year}\nColor: {updated_resource.color}\nPantone: {updated_resource.pantone_value}",
+                "Resource Update Comparison",
+                allure.attachment_type.TEXT,
+            )
+
+            logger.info(
+                f"Resource {resource_id} updated in database: {updated_resource.name} ({updated_resource.year})"
+            )
+            return updated_resource
+
     # ========================================
     # CRUD ОПЕРАЦИИ (test_crud_users.py)
     # ========================================
@@ -399,6 +437,13 @@ class APIAssertions:
         expected_resource: dict,
     ) -> dict:
         """Проверяет ответ создания ресурса (API + БД)"""
+        with allure.step(
+            f"Send POST request to create resource: {expected_resource['name']}"
+        ):
+            allure.attach(
+                str(expected_resource), "Resource Data", allure.attachment_type.JSON
+            )
+
         with allure.step("Verify resource creation API response"):
             # 1. API проверка
             cls.log_and_check_status(response, endpoint, HTTPStatus.CREATED)
@@ -416,14 +461,73 @@ class APIAssertions:
                 resource_id > 0
             ), f"ID должен быть положительным числом, получен: {resource_id}"
 
+            allure.attach(
+                f"Created resource ID: {resource_id}",
+                "Resource ID",
+                allure.attachment_type.TEXT,
+            )
+
         with allure.step("Verify resource exists in database"):
             # 2. БД проверка
             cls.check_resource_in_database(resource_id, expected_resource)
 
         return data
 
+    @classmethod
+    def check_update_resource_response(
+        cls,
+        response: requests.Response,
+        endpoint: str,
+        expected_resource: dict,
+        resource_id: int,
+    ) -> dict:
+        """Проверяет ответ обновления ресурса (API + БД)"""
+        with allure.step(f"Send PUT/PATCH request to update resource {resource_id}"):
+            allure.attach(
+                f"Resource ID: {resource_id}\nNew Data: {expected_resource}",
+                "Update Data",
+                allure.attachment_type.JSON,
+            )
+
+        with allure.step("Verify resource update API response"):
+            # 1. API проверка
+            cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
+            data = response.json()
+
+            assert data["name"] == expected_resource["name"]
+            assert data["year"] == expected_resource["year"]
+            assert data["color"] == expected_resource["color"]
+            assert data["pantone_value"] == expected_resource["pantone_value"]
+            assert "updatedAt" in data and data["updatedAt"] is not None
+
+        with allure.step("Verify resource changes in database"):
+            # 2. БД проверка
+            cls.check_resource_updated_in_database(resource_id, expected_resource)
+
+        return data
+
+    @classmethod
+    def check_delete_resource_response(
+        cls, response: requests.Response, endpoint: str, resource_id: int
+    ) -> None:
+        """Проверяет ответ удаления ресурса (API + БД)"""
+        with allure.step(f"Send DELETE request for resource {resource_id}"):
+            allure.attach(
+                f"Resource ID: {resource_id}",
+                "Delete Target",
+                allure.attachment_type.TEXT,
+            )
+
+        with allure.step("Verify resource deletion API response"):
+            # 1. API проверка
+            cls.log_and_check_status(response, endpoint, HTTPStatus.NO_CONTENT)
+
+        with allure.step("Verify resource removed from database"):
+            # 2. БД проверка
+            cls.check_resource_not_in_database(resource_id)
+
     # ========================================
-    # ТЕСТЫ ПОЛЬЗОВАТЕЛЕЙ (test_users.py)
+    # ТЕСТЫ ПОЛЬЗОВАТЕЛЕЙ И РЕСУРСОВ (test_users.py, test_resources.py)
     # ========================================
 
     @classmethod
@@ -444,6 +548,23 @@ class APIAssertions:
             return user_response
 
     @classmethod
+    def check_resource_response(
+        cls, response: requests.Response, endpoint: str
+    ) -> SingleResourceResponse:
+        """Проверяет ответ с одним ресурсом"""
+        with allure.step("Verify single resource API response"):
+            cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
+            resource_response = SingleResourceResponse(**response.json())
+
+            allure.attach(
+                f"Resource ID: {resource_response.data.id}\nName: {resource_response.data.name}\nYear: {resource_response.data.year}\nColor: {resource_response.data.color}",
+                "Retrieved Resource Data",
+                allure.attachment_type.TEXT,
+            )
+
+            return resource_response
+
+    @classmethod
     def check_users_list_response(
         cls,
         response: requests.Response,
@@ -461,13 +582,44 @@ class APIAssertions:
             users = [User(**user_data) for user_data in data["items"]]
 
             allure.attach(
-                f"Total users: {data['total']}\nPage: {page}\nPer page: {per_page}\nReturned: {len(users)}",
+                f"Total users: {data['total']}\nPage: {page}\nPer Page: {per_page}\nReturned: {len(users)}",
                 "Users List Summary",
                 allure.attachment_type.TEXT,
             )
 
             return Page(
                 items=users,
+                page=data["page"],
+                size=data["size"],
+                total=data["total"],
+                pages=data["pages"],
+            )
+
+    @classmethod
+    def check_resources_list_response(
+        cls,
+        response: requests.Response,
+        endpoint: str,
+        page: int = 1,
+        per_page: int = 6,
+    ) -> Page[Resource]:
+        """Проверяет ответ со списком ресурсов"""
+        with allure.step("Verify resources list API response"):
+            cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
+            data = response.json()
+
+            cls.check_pagination_structure(data, page, per_page)
+
+            resources = [Resource(**resource_data) for resource_data in data["items"]]
+
+            allure.attach(
+                f"Total resources: {data['total']}\nPage: {page}\nPer Page: {per_page}\nReturned: {len(resources)}",
+                "Resources List Summary",
+                allure.attachment_type.TEXT,
+            )
+
+            return Page(
+                items=resources,
                 page=data["page"],
                 size=data["size"],
                 total=data["total"],
