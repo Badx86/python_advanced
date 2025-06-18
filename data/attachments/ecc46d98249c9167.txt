@@ -1,5 +1,0 @@
-ID: 13
-Name: purple
-Year: 2024
-Color: #f98e71
-Pantone: RELATION-600

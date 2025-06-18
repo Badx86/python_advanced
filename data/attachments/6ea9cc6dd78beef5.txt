@@ -1,0 +1,5 @@
+ID: 14
+Name: pink
+Year: 2030
+Color: #dce4e1
+Pantone: KIND-824

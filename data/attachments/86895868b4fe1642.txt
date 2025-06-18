@@ -1,0 +1,5 @@
+ID: 15
+Name: cyan
+Year: 2025
+Color: #2bbb45
+Pantone: SIGN-178

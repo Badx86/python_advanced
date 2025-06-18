@@ -1,5 +1,0 @@
-ID: 19
-Name: yellow
-Year: 2022
-Color: #98e275
-Pantone: STEERING-484

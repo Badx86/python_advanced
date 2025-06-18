@@ -1,5 +1,0 @@
-ID: 17
-Name: red
-Year: 2029
-Color: #eee8cd
-Pantone: PEE-463

@@ -1,5 +1,0 @@
-ID: 15
-Name: red
-Year: 2025
-Color: #dc0caf
-Pantone: TISSUE-570

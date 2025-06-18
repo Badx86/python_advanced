@@ -1,0 +1,5 @@
+ID: 13
+Email: dalton@example.com
+First Name: dalton
+Last Name: 
+Avatar: https://reqres.in/img/faces/9-image.jpg

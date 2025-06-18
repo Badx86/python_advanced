@@ -1,0 +1,5 @@
+INFO     tests.assertions:assertions.py:36 POST /api/users - Status: 201
+INFO     tests.assertions:assertions.py:156 User 16 verified in database: howard 
+INFO     tests.assertions:assertions.py:36 DELETE /api/users/16 - Status: 204
+INFO     tests.assertions:assertions.py:177 User 16 confirmed deleted from database
+INFO     tests.test_crud_users:test_crud_users.py:158 User 16 deleted and verified removed from database

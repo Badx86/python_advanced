@@ -1,5 +1,0 @@
-ID: 16
-Name: yellow
-Year: 2023
-Color: #f9f56b
-Pantone: BROADCAST-994

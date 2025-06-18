@@ -1,5 +1,0 @@
-UPDATED:
-Name: brown
-Year: 2024
-Color: #876663
-Pantone: VERSUS-860

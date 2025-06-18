@@ -1,4 +1,0 @@
-Resource ID: 5
-Name: tigerlily
-Year: 2004
-Color: #E2583E
