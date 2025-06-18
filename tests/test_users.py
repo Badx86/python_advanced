@@ -7,18 +7,11 @@ from tests.assertions import api
 logger = logging.getLogger(__name__)
 
 
-@allure.epic("API Endpoint Testing")
 @allure.feature("User API Endpoints")
 class TestUsers:
     """Тесты для пользователей"""
 
-    @allure.story("User List Pagination")
     @allure.title("Get users list - first page")
-    @allure.description(
-        "Test retrieving first page of users with pagination parameters"
-    )
-    @allure.severity(allure.severity_level.NORMAL)
-    @allure.tag("api", "pagination", "users", "list")
     @pytest.mark.pagination
     def test_list_users_page_1(self, api_client) -> None:
         """Тест первой страницы"""
@@ -31,13 +24,7 @@ class TestUsers:
             f"Page 1 works, got {len(users_page.items)} users, total: {users_page.total}"
         )
 
-    @allure.story("User List Pagination")
     @allure.title("Get users list - second page")
-    @allure.description(
-        "Test retrieving second page of users with pagination parameters"
-    )
-    @allure.severity(allure.severity_level.NORMAL)
-    @allure.tag("api", "pagination", "users", "list")
     @pytest.mark.pagination
     def test_list_users_page_2(self, api_client) -> None:
         """Тест второй страницы"""
@@ -48,11 +35,7 @@ class TestUsers:
 
         logger.info(f"Page 2 works, got {len(users_page.items)} users")
 
-    @allure.story("Data Integrity")
     @allure.title("Verify unique user IDs")
-    @allure.description("Test that all user IDs in the list are unique - no duplicates")
-    @allure.severity(allure.severity_level.NORMAL)
-    @allure.tag("api", "data-integrity", "users", "validation")
     def test_users_no_duplicates(self, api_client) -> None:
         """Тест уникальности ID пользователей"""
         response = api_client.get("/api/users", params={"page": 1, "size": 12})
@@ -64,11 +47,7 @@ class TestUsers:
         api.check_unique_ids(users_page.items, "user")
         logger.info(f"All {len(users_page.items)} user IDs are unique")
 
-    @allure.story("Single User Retrieval")
     @allure.title("Get single user by ID")
-    @allure.description("Test retrieving a single user by ID after creating them first")
-    @allure.severity(allure.severity_level.NORMAL)
-    @allure.tag("api", "users", "single", "read")
     def test_single_user_exists(self, api_client) -> None:
         """Тест получения существующего пользователя"""
         # Сначала создаем пользователя для теста
@@ -86,11 +65,7 @@ class TestUsers:
         api.check_user_response(response, f"/api/users/{user_id}")
         logger.info(f"Created and verified user {user_id}")
 
-    @allure.story("Error Handling")
     @allure.title("Get non-existent user by ID")
-    @allure.description("Test retrieving users with non-existent IDs should return 404")
-    @allure.severity(allure.severity_level.MINOR)
-    @allure.tag("api", "error-handling", "404", "users")
     @pytest.mark.parametrize("user_id", [1000000, 999999, 888888])
     def test_single_user_not_found(self, api_client, user_id) -> None:
         """Тест получения несуществующего пользователя"""
@@ -98,13 +73,7 @@ class TestUsers:
         api.check_404_error(response, f"/api/users/{user_id}")
         logger.info(f"User {user_id} not found (404)")
 
-    @allure.story("Input Validation")
     @allure.title("Get user with invalid ID")
-    @allure.description(
-        "Test retrieving users with invalid IDs (negative, zero) should return 422"
-    )
-    @allure.severity(allure.severity_level.MINOR)
-    @allure.tag("api", "validation", "422", "users", "negative")
     @pytest.mark.parametrize("user_id", [0, -1, -999])
     def test_single_user_invalid_id(self, api_client, user_id) -> None:
         """Тест невалидного ID пользователя"""
@@ -114,13 +83,7 @@ class TestUsers:
         )
         logger.info(f"Invalid user ID {user_id} correctly rejected (422)")
 
-    @allure.story("Dynamic User Retrieval")
     @allure.title("Get any existing user from list")
-    @allure.description(
-        "Test retrieving any existing user by selecting one from the users list"
-    )
-    @allure.severity(allure.severity_level.NORMAL)
-    @allure.tag("api", "users", "dynamic", "read")
     def test_dynamic_user_exists(self, api_client) -> None:
         """Тест получения любого существующего пользователя"""
         # Получаем список пользователей
