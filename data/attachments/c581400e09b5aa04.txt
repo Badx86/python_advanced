@@ -1,5 +1,0 @@
-UPDATED:
-Name: purple
-Year: 2030
-Color: #ffdeda
-Pantone: MICE-891

@@ -1,0 +1,5 @@
+UPDATED:
+Name: yellow
+Year: 2025
+Color: #5bd3ab
+Pantone: ADD-598

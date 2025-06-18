@@ -1,5 +1,0 @@
-UPDATED:
-Name: blue
-Year: 2030
-Color: #ec85fc
-Pantone: APPLY-705

@@ -1,5 +1,0 @@
-ID: 15
-Name: cyan
-Year: 2020
-Color: #c593c1
-Pantone: BIRMINGHAM-836
