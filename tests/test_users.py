@@ -22,7 +22,7 @@ class TestUsers:
     @pytest.mark.pagination
     def test_list_users_page_1(self, api_client) -> None:
         """Тест первой страницы"""
-        response = api_client.get("/api/users", params={"page": 1, "per_page": 6})
+        response = api_client.get("/api/users", params={"page": 1, "size": 6})
         users_page = api.check_users_list_response(
             response, "/api/users?page=1", page=1, per_page=6
         )
@@ -41,7 +41,7 @@ class TestUsers:
     @pytest.mark.pagination
     def test_list_users_page_2(self, api_client) -> None:
         """Тест второй страницы"""
-        response = api_client.get("/api/users", params={"page": 2, "per_page": 6})
+        response = api_client.get("/api/users", params={"page": 2, "size": 6})
         users_page = api.check_users_list_response(
             response, "/api/users?page=2", page=2, per_page=6
         )
@@ -55,7 +55,7 @@ class TestUsers:
     @allure.tag("api", "data-integrity", "users", "validation")
     def test_users_no_duplicates(self, api_client) -> None:
         """Тест уникальности ID пользователей"""
-        response = api_client.get("/api/users", params={"page": 1, "per_page": 12})
+        response = api_client.get("/api/users", params={"page": 1, "size": 12})
         users_page = api.check_users_list_response(
             response, "/api/users", page=1, per_page=12
         )
@@ -124,7 +124,7 @@ class TestUsers:
     def test_dynamic_user_exists(self, api_client) -> None:
         """Тест получения любого существующего пользователя"""
         # Получаем список пользователей
-        response = api_client.get("/api/users", params={"page": 1, "per_page": 1})
+        response = api_client.get("/api/users", params={"page": 1, "size": 1})
         users_page = api.check_users_list_response(
             response, "/api/users", page=1, per_page=1
         )

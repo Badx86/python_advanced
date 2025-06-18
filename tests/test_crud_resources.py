@@ -52,7 +52,7 @@ class TestResourcesCRUD:
     def test_read_resource(self, api_client) -> None:
         """Тест чтения случайного ресурса"""
         # Получаем список ресурсов
-        response = api_client.get("/api/unknown", params={"page": 1, "per_page": 50})
+        response = api_client.get("/api/unknown", params={"page": 1, "size": 50})
         resources_page = api.check_resources_list_response(
             response, "/api/unknown", page=1, per_page=50
         )

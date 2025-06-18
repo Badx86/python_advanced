@@ -2,7 +2,11 @@ import logging
 from datetime import datetime
 from http import HTTPStatus
 from typing import Dict, Any
-from fastapi import APIRouter, HTTPException, Query
+from app.database.resources import get_resources_paginated
+from app.models import Resource
+from fastapi import Depends
+from fastapi_pagination import Page, Params
+from fastapi import APIRouter, HTTPException
 from app.models import (
     CreateResourceRequest,
     CreateResourceResponse,
@@ -16,18 +20,15 @@ router = APIRouter()
 
 
 @router.get("/api/unknown", tags=["Resources"])
-def get_resources(
-    page: int = Query(1, ge=1), size: int = Query(6, ge=1, le=50, alias="per_page")
-):
-    """Получить список ресурсов с пагинацией"""
-    logger.info(f"[API] Getting resources list: page={page}, per_page={size}")
+def get_resources(params: Params = Depends()) -> Page[Resource]:
+    logger.info(f"[API] Getting resources list: page={params.page}, size={params.size}")
 
-    from app.database.resources import get_resources_paginated
+    resources_page = get_resources_paginated(page=params.page, size=params.size)
 
-    resources_page = get_resources_paginated(page=page, size=size)
     logger.info(
-        f"[API] Returning {len(resources_page.items)} resources for page {page}"
+        f"[API] Returning {len(resources_page.items)} resources for page={params.page}"
     )
+
     return resources_page
 
 

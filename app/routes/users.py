@@ -4,6 +4,9 @@ import time
 from datetime import datetime
 from http import HTTPStatus
 from typing import Dict, Any
+from fastapi import Depends
+from fastapi_pagination import Params, Page
+from app.models import User
 from fastapi import APIRouter, HTTPException, Query
 from app.models import (
     CreateUserRequest,
@@ -19,13 +22,12 @@ router = APIRouter()
 
 @router.get("/api/users", tags=["Users"])
 def get_users_with_delay(
-    page: int = Query(1, ge=1),
-    size: int = Query(6, ge=1, le=50, alias="per_page"),
+    params: Params = Depends(),
     delay: int = Query(0, ge=0, le=10),
-):
+) -> Page[User]:
     """Получить список пользователей с пагинацией и опциональной задержкой"""
     logger.info(
-        f"[API] Getting users list: page={page}, per_page={size}, delay={delay}"
+        f"[API] Getting users list: page={params.page}, size={params.size}, delay={delay}"
     )
 
     # Добавляем задержку если указана
@@ -36,8 +38,8 @@ def get_users_with_delay(
     from app.database.users import get_users_paginated
 
     # Получаем пользователей из БД с пагинацией
-    users_page = get_users_paginated(page=page, size=size)
-    logger.info(f"[API] Returning {len(users_page.items)} users for page {page}")
+    users_page = get_users_paginated(page=params.page, size=params.size)
+    logger.info(f"[API] Returning {len(users_page.items)} users for page {params.page}")
     return users_page
 
 

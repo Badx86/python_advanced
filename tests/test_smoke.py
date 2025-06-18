@@ -71,7 +71,7 @@ class TestSmoke:
     @allure.tag("smoke", "data-structure", "validation")
     def test_service_info(self, api_client) -> None:
         """Сервис возвращает корректную информацию"""
-        response = api_client.get("/api/users", params={"per_page": 1})
+        response = api_client.get("/api/users", params={"size": 1})
         api.log_and_check_status(response, "/api/users")
 
         data = response.json()

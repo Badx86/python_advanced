@@ -7,6 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 load_dotenv(".env")
 
+from fastapi_pagination import add_pagination
 from app.database.engine import create_db_and_tables
 from app.database.seed import seed_all_data
 from app.routes import users, resources, auth, system
@@ -62,6 +63,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+add_pagination(app)
 
 # Подключаем роуты
 app.include_router(system.router)

@@ -25,7 +25,9 @@ class TestSpecial:
         """Тест задержанного ответа"""
         start_time = time.time()
 
-        response = api_client.get("/api/users", params={"delay": delay_seconds})
+        response = api_client.get(
+            "/api/users", params={"delay": delay_seconds, "size": 6}
+        )
         actual_duration = time.time() - start_time
 
         api.check_delayed_response(

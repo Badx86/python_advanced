@@ -1,6 +1,7 @@
+from fastapi_pagination.ext.sqlalchemy import paginate
 from typing import Iterable, Optional
 from sqlmodel import Session, select, func
-from fastapi_pagination import Page
+from fastapi_pagination import Page, Params
 from app.database.engine import engine
 from app.models import User
 import logging
@@ -27,25 +28,17 @@ def get_users_paginated(page: int = 1, size: int = 6) -> Page[User]:
     """Получить список пользователей с пагинацией"""
     try:
         with Session(engine) as session:
-            # Подсчет общего количества пользователей
-            total_count = session.exec(select(func.count(User.id))).one()
+            query = select(User).order_by(User.id)
 
-            # Получение пользователей для текущей страницы
-            offset = (page - 1) * size
-            statement = select(User).offset(offset).limit(size)
-            users = session.exec(statement).all()
+            # Создаем params объект для fastapi-pagination
+            params = Params(page=page, size=size)
+            result = paginate(session, query, params)
 
-            # Подсчет общего количества страниц
-            total_pages = (total_count + size - 1) // size
+            logger.debug(f"[DB] Retrieved {len(result.items)} users for page {page}")
+            return result
 
-            logger.debug(f"[DB] Retrieved {len(users)} users for page {page}")
-
-            return Page(
-                items=users, page=page, size=size, total=total_count, pages=total_pages
-            )
     except Exception as e:
         logger.error(f"[DB] Error getting users page {page}: {e}")
-        # Возвращаем пустую страницу в случае ошибки
         return Page(items=[], page=page, size=size, total=0, pages=0)
 
 

@@ -21,7 +21,7 @@ class TestResources:
     @pytest.mark.pagination
     def test_list_resources(self, api_client) -> None:
         """Тест списка ресурсов"""
-        response = api_client.get("/api/unknown", params={"page": 1, "per_page": 6})
+        response = api_client.get("/api/unknown", params={"page": 1, "size": 6})
         resources_response = api.check_resources_list_response(response, "/api/unknown")
 
         api.check_multiple_fields(
@@ -66,7 +66,7 @@ class TestResources:
     @pytest.mark.pagination
     def test_resources_page_2(self, api_client) -> None:
         """Тест второй страницы ресурсов"""
-        response = api_client.get("/api/unknown", params={"page": 2, "per_page": 6})
+        response = api_client.get("/api/unknown", params={"page": 2, "size": 6})
         resources_response = api.check_resources_list_response(
             response, "/api/unknown?page=2", page=2
         )
@@ -83,7 +83,7 @@ class TestResources:
     @allure.tag("api", "data-integrity", "resources", "validation")
     def test_resources_no_duplicates(self, api_client) -> None:
         """Тест уникальности ID ресурсов"""
-        response = api_client.get("/api/unknown", params={"page": 1, "per_page": 12})
+        response = api_client.get("/api/unknown", params={"page": 1, "size": 12})
         resources_page = api.check_resources_list_response(
             response, "/api/unknown", page=1, per_page=12
         )
