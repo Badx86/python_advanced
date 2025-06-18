@@ -1,0 +1,2 @@
+INFO     tests.assertions:assertions.py:36 GET /api/unknown?page=2 - Status: 200
+INFO     tests.test_resources:test_resources.py:50 Page 2 resources work, schema valid

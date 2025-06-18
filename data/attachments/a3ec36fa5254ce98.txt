@@ -1,5 +1,0 @@
-UPDATED:
-Name: cyan
-Year: 2028
-Color: #359410
-Pantone: TITLES-893

@@ -1,0 +1,6 @@
+INFO     tests.assertions:assertions.py:36 POST /api/unknown - Status: 201
+INFO     tests.assertions:assertions.py:263 Resource 14 verified in database: cyan (2025)
+INFO     tests.test_crud_resources:test_crud_resources.py:74 Updating resource 14 with data: {'name': 'red', 'year': 2021, 'color': '#744164', 'pantone_value': 'FEATURING-396'}
+INFO     tests.assertions:assertions.py:36 PUT /api/unknown/14 - Status: 200
+INFO     tests.assertions:assertions.py:319 Resource 14 updated in database: red (2021)
+INFO     tests.test_crud_resources:test_crud_resources.py:80 Resource 14 updated and verified in database successfully

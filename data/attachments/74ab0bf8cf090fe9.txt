@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:36 GET /api/users/0 - Status: 422
-INFO     tests.test_users:test_users.py:115 Invalid user ID 0 correctly rejected (422)

@@ -1,0 +1,5 @@
+ID: 20
+Name: red
+Year: 2024
+Color: #2badd3
+Pantone: EXPANSION-893

@@ -1,0 +1,2 @@
+INFO     tests.assertions:assertions.py:36 POST /api/login - Status: 400
+INFO     tests.test_auth:test_auth.py:87 Login correctly failed for missing email

@@ -1,4 +1,0 @@
-Resource ID: 17
-Name: orange
-Year: 2021
-Color: #1dcecd

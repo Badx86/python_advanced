@@ -1,4 +1,0 @@
-Resource ID: 9
-Name: blue iris
-Year: 2008
-Color: #5A5B9F

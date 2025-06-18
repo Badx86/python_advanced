@@ -1,0 +1,5 @@
+ID: 18
+Name: green
+Year: 2025
+Color: #f2c82f
+Pantone: CATEGORIES-169

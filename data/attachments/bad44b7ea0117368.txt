@@ -1,5 +1,0 @@
-ID: 19
-Name: cyan
-Year: 2025
-Color: #457351
-Pantone: BASS-222

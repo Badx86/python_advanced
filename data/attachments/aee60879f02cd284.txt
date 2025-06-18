@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:36 POST POST /api/users - Status: 422
-INFO     tests.test_validation:test_validation.py:62 User creation correctly failed without 'job' field (422)

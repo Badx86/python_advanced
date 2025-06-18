@@ -1,5 +1,0 @@
-UPDATED:
-Name: orange
-Year: 2024
-Color: #8482f4
-Pantone: DONATIONS-202

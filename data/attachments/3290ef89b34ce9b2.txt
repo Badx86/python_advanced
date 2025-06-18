@@ -1,5 +1,0 @@
-ID: 16
-Name: magenta
-Year: 2030
-Color: #694fcf
-Pantone: DREAMS-665

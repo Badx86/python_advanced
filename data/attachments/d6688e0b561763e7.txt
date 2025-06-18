@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:36 POST POST /api/users/1 - Status: 405
-INFO     tests.test_validation:test_validation.py:28 Method POST correctly rejected on GET endpoint with 405

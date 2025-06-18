@@ -1,5 +1,0 @@
-ID: 17
-Email: mafalda@example.com
-First Name: mafalda
-Last Name: 
-Avatar: https://reqres.in/img/faces/4-image.jpg
