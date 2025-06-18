@@ -4,11 +4,11 @@ import logging
 from datetime import datetime, timezone
 from typing import Tuple
 from fastapi import APIRouter
-from app.models import HealthStatus
-from app.database.users import get_users_count
+from sqlmodel import Session, select, func
+from app.models import HealthStatus, User, Resource
+from app.database.engine import engine
 
 logger = logging.getLogger(__name__)
-
 router = APIRouter()
 
 # Загружаем данные из JSON для проверки статуса ресурсов
@@ -47,10 +47,11 @@ def get_database_type() -> str:
 
 
 def check_database_connection() -> Tuple[bool, int]:
-    """Проверяет подключение к БД"""
+    """Проверяет подключение к БД и возвращает количество пользователей"""
     try:
-        users_count = get_users_count()
-        return True, users_count
+        with Session(engine) as session:
+            users_count = session.exec(select(func.count(User.id))).one()
+            return True, users_count
     except Exception as e:
         logger.error(f"Database connection failed: {e}")
         return False, 0

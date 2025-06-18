@@ -213,15 +213,13 @@ psql -h localhost -U postgres -d postgres
 │   │   └── resources.json       # Тестовые данные ресурсов
 │   ├── database/
 │   │   ├── engine.py            # Настройка SQLModel и PostgreSQL
-│   │   ├── seed.py              # Загрузка seed данных в БД
-│   │   ├── users.py             # CRUD операции для пользователей
-│   │   └── resources.py         # CRUD операции для ресурсов
+│   │   └── seed.py              # Загрузка seed данных в БД
 │   ├── routes/
 │   │   ├── __init__.py
 │   │   ├── auth.py              # Эндпоинты аутентификации
-│   │   ├── resources.py         # Эндпоинты ресурсов
+│   │   ├── resources.py         # Эндпоинты ресурсов (прямая работа с БД)
 │   │   ├── system.py            # Системные эндпоинты (healthcheck)
-│   │   └── users.py             # Эндпоинты пользователей
+│   │   └── users.py             # Эндпоинты пользователей (прямая работа с БД)
 │   ├── main.py                  # FastAPI приложение и настройка
 │   ├── exceptions.py            # Унифицированные исключения
 │   └── models.py                # SQLModel модели для БД и API

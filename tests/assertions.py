@@ -4,16 +4,45 @@ from typing import Dict, Any
 from http import HTTPStatus
 import requests
 from fastapi_pagination import Page
+from sqlmodel import Session
 from app.models import (
     SingleUserResponse,
     SingleResourceResponse,
-    CreateUserResponse,
-    UpdateUserResponse,
+    UserResponse,
     User,
     Resource,
 )
 
 logger = logging.getLogger(__name__)
+
+
+# ========================================
+# ХЕЛПЕРЫ ДЛЯ РАБОТЫ С БД (вместо database layer)
+# ========================================
+
+
+def get_user_from_db(user_id: int) -> User | None:
+    """Получить пользователя из БД"""
+    try:
+        from app.database.engine import engine
+
+        with Session(engine) as session:
+            return session.get(User, user_id)
+    except Exception as e:
+        logger.error(f"Error getting user {user_id}: {e}")
+        return None
+
+
+def get_resource_from_db(resource_id: int) -> Resource | None:
+    """Получить ресурс из БД"""
+    try:
+        from app.database.engine import engine
+
+        with Session(engine) as session:
+            return session.get(Resource, resource_id)
+    except Exception as e:
+        logger.error(f"Error getting resource {resource_id}: {e}")
+        return None
 
 
 class APIAssertions:
@@ -122,9 +151,7 @@ class APIAssertions:
     def check_user_in_database(user_id: int, expected_name: str = None) -> User:
         """Проверяет что пользователь существует в БД"""
         with allure.step(f"Query database for user {user_id}"):
-            from app.database.users import get_user
-
-            db_user = get_user(user_id)
+            db_user = get_user_from_db(user_id)
             assert db_user is not None, f"User {user_id} not found in database"
 
         with allure.step("Validate user data in database"):
@@ -162,9 +189,7 @@ class APIAssertions:
     def check_user_not_in_database(user_id: int) -> None:
         """Проверяет что пользователь НЕ существует в БД"""
         with allure.step(f"Verify user {user_id} is deleted from database"):
-            from app.database.users import get_user
-
-            db_user = get_user(user_id)
+            db_user = get_user_from_db(user_id)
             assert (
                 db_user is None
             ), f"User {user_id} should be deleted but still exists in database"
@@ -182,9 +207,7 @@ class APIAssertions:
     ) -> User:
         """Проверяет что пользователь обновился в БД"""
         with allure.step(f"Verify user {user_id} is updated in database"):
-            from app.database.users import get_user
-
-            updated_user = get_user(user_id)
+            updated_user = get_user_from_db(user_id)
             assert updated_user is not None, f"User {user_id} not found after update"
 
             # Проверяем что имя обновилось
@@ -232,9 +255,7 @@ class APIAssertions:
     ) -> Resource:
         """Проверяет что ресурс существует в БД"""
         with allure.step(f"Verify resource {resource_id} exists in database"):
-            from app.database.resources import get_resource
-
-            db_resource = get_resource(resource_id)
+            db_resource = get_resource_from_db(resource_id)
             assert (
                 db_resource is not None
             ), f"Resource {resource_id} not found in database"
@@ -269,9 +290,7 @@ class APIAssertions:
     def check_resource_not_in_database(resource_id: int) -> None:
         """Проверяет что ресурс НЕ существует в БД"""
         with allure.step(f"Verify resource {resource_id} is deleted from database"):
-            from app.database.resources import get_resource
-
-            db_resource = get_resource(resource_id)
+            db_resource = get_resource_from_db(resource_id)
             assert (
                 db_resource is None
             ), f"Resource {resource_id} should be deleted but still exists in database"
@@ -289,9 +308,7 @@ class APIAssertions:
     ) -> Resource:
         """Проверяет что ресурс обновился в БД"""
         with allure.step(f"Verify resource {resource_id} is updated in database"):
-            from app.database.resources import get_resource
-
-            updated_resource = get_resource(resource_id)
+            updated_resource = get_resource_from_db(resource_id)
             assert (
                 updated_resource is not None
             ), f"Resource {resource_id} not found after update"
@@ -332,7 +349,7 @@ class APIAssertions:
         endpoint: str,
         expected_name: str,
         expected_job: str,
-    ) -> CreateUserResponse:
+    ) -> UserResponse:
         """Проверяет ответ создания пользователя (API + БД)"""
         with allure.step(f"Send POST request to create user: {expected_name}"):
             allure.attach(
@@ -344,7 +361,7 @@ class APIAssertions:
         with allure.step("Verify user creation API response"):
             # 1. API проверка
             cls.log_and_check_status(response, endpoint, HTTPStatus.CREATED)
-            create_response = CreateUserResponse(**response.json())
+            create_response = UserResponse(**response.json())
 
             assert (
                 create_response.name == expected_name
@@ -379,7 +396,7 @@ class APIAssertions:
         expected_job: str,
         user_id: int,
         original_user: User,
-    ) -> UpdateUserResponse:
+    ) -> UserResponse:
         """Проверяет ответ обновления пользователя (API + БД)"""
         with allure.step(f"Send PUT/PATCH request to update user {user_id}"):
             allure.attach(
@@ -391,7 +408,7 @@ class APIAssertions:
         with allure.step("Verify user update API response"):
             # 1. API проверка
             cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
-            update_response = UpdateUserResponse(**response.json())
+            update_response = UserResponse(**response.json())
 
             assert (
                 update_response.name == expected_name

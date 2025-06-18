@@ -1,7 +1,7 @@
 from sqlmodel import Field, SQLModel
 from datetime import datetime
 from typing import Optional, Dict, Any
-from pydantic import HttpUrl
+from pydantic import HttpUrl, BaseModel
 
 
 # ================================
@@ -30,99 +30,88 @@ class Resource(SQLModel, table=True):
 
 
 # ================================
-# МОДЕЛИ ДЛЯ API
+# МОДЕЛИ ДЛЯ API ЗАПРОСОВ
+# ================================
+
+
+class UserCreate(BaseModel):
+    """Создание пользователя"""
+
+    name: str
+    job: str
+
+
+class UserUpdate(BaseModel):
+    """Обновление пользователя"""
+
+    name: Optional[str] = None
+    job: Optional[str] = None
+
+
+class ResourceCreate(BaseModel):
+    """Создание ресурса"""
+
+    name: str
+    year: int
+    color: str
+    pantone_value: str
+
+
+class ResourceUpdate(BaseModel):
+    """Обновление ресурса"""
+
+    name: Optional[str] = None
+    year: Optional[int] = None
+    color: Optional[str] = None
+    pantone_value: Optional[str] = None
+
+
+# ================================
+# МОДЕЛИ ДЛЯ API ОТВЕТОВ
 # ================================
 
 
 class Support(SQLModel):
     """Модель блока поддержки"""
 
-    url: HttpUrl  # Валидация URL
+    url: HttpUrl
     text: str
 
 
+class UserResponse(BaseModel):
+    """Универсальный ответ для создания/обновления пользователя"""
+
+    name: Optional[str] = None
+    job: Optional[str] = None
+    id: Optional[str] = None
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
+
+
+class ResourceResponse(BaseModel):
+    """Универсальный ответ для создания/обновления ресурса"""
+
+    name: Optional[str] = None
+    year: Optional[int] = None
+    color: Optional[str] = None
+    pantone_value: Optional[str] = None
+    id: Optional[str] = None
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
+
+
 class SingleUserResponse(SQLModel):
-    """Ответ с одним пользователем"""
+    """Ответ с одним пользователем (с support блоком)"""
 
     data: User
     support: Support
 
 
 class SingleResourceResponse(SQLModel):
-    """Ответ с одним ресурсом"""
+    """Ответ с одним ресурсом (с support блоком)"""
 
     data: Resource
     support: Support
-
-
-class CreateUserRequest(SQLModel):
-    """Запрос на создание пользователя"""
-
-    name: str
-    job: str
-
-
-class CreateUserResponse(SQLModel):
-    """Ответ при создании пользователя"""
-
-    name: str
-    job: str
-    id: str
-    createdAt: datetime
-
-
-class UpdateUserRequest(SQLModel):
-    """Запрос на обновление пользователя"""
-
-    name: Optional[str] = None
-    job: Optional[str] = None
-
-
-class UpdateUserResponse(SQLModel):
-    """Ответ при обновлении пользователя"""
-
-    name: Optional[str] = None
-    job: Optional[str] = None
-    updatedAt: datetime
-
-
-class CreateResourceRequest(SQLModel):
-    """Запрос на создание ресурса"""
-
-    name: str
-    year: int
-    color: str
-    pantone_value: str
-
-
-class CreateResourceResponse(SQLModel):
-    """Ответ при создании ресурса"""
-
-    name: str
-    year: int
-    color: str
-    pantone_value: str
-    id: str
-    createdAt: datetime
-
-
-class UpdateResourceRequest(SQLModel):
-    """Запрос на обновление ресурса"""
-
-    name: Optional[str] = None
-    year: Optional[int] = None
-    color: Optional[str] = None
-    pantone_value: Optional[str] = None
-
-
-class UpdateResourceResponse(SQLModel):
-    """Ответ при обновлении ресурса"""
-
-    name: Optional[str] = None
-    year: Optional[int] = None
-    color: Optional[str] = None
-    pantone_value: Optional[str] = None
-    updatedAt: datetime
 
 
 # ================================

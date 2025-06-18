@@ -1,23 +1,23 @@
-from app.exceptions import ResourceNotFoundError, ValidationError, InvalidIDError
-from app.database.resources import get_resources_paginated
+from fastapi import APIRouter, Depends
 from fastapi_pagination import Page, Params
-from app.database.engine import engine
-from app.models import Resource
-from fastapi import APIRouter
-from sqlmodel import Session
+from fastapi_pagination.ext.sqlalchemy import paginate
+from sqlmodel import Session, select
 from datetime import datetime
 from typing import Dict, Any
-from fastapi import Depends
 import logging
+
+from app.database.engine import engine
 from app.models import (
-    CreateResourceRequest,
-    CreateResourceResponse,
-    UpdateResourceRequest,
-    UpdateResourceResponse,
+    Resource,
+    ResourceCreate,
+    ResourceUpdate,
+    ResourceResponse,
+    SingleResourceResponse,
+    Support,
 )
+from app.exceptions import ResourceNotFoundError, ValidationError, InvalidIDError
 
 logger = logging.getLogger(__name__)
-
 router = APIRouter()
 
 
@@ -25,38 +25,37 @@ router = APIRouter()
 def get_resources(params: Params = Depends()) -> Page[Resource]:
     """Получить список ресурсов с пагинацией"""
 
-    # Создаем session и передаем в database функцию
+    # Работаем напрямую с БД
     with Session(engine) as session:
-        resources_page = get_resources_paginated(session)
-
-    return resources_page
+        query = select(Resource).order_by(Resource.id)
+        return paginate(session, query)
 
 
 @router.get("/api/unknown/{resource_id}", tags=["Resources"])
-def get_single_resource(resource_id: int) -> Dict[str, Any]:
+def get_single_resource(resource_id: int) -> SingleResourceResponse:
     """Получить ресурс по ID"""
 
     # Валидация ID
     if resource_id < 1:
         raise InvalidIDError("resource ID")
 
-    from app.database.resources import get_resource
+    # Получаем ресурс из БД
+    with Session(engine) as session:
+        resource = session.get(Resource, resource_id)
+        if not resource:
+            raise ResourceNotFoundError(resource_id)
 
-    resource = get_resource(resource_id)
-    if not resource:
-        raise ResourceNotFoundError(resource_id)
-
-    return {
-        "data": resource.model_dump(),
-        "support": {
-            "url": "https://contentcaddy.io?utm_source=reqres&utm_medium=json&utm_campaign=referral",
-            "text": "Tired of writing endless social media content? Let Content Caddy generate it for you.",
-        },
-    }
+    return SingleResourceResponse(
+        data=resource,
+        support=Support(
+            url="https://contentcaddy.io?utm_source=reqres&utm_medium=json&utm_campaign=referral",
+            text="Tired of writing endless social media content? Let Content Caddy generate it for you.",
+        ),
+    )
 
 
 @router.post("/api/unknown", status_code=201, tags=["Resources"])
-def create_resource(resource_data: CreateResourceRequest) -> CreateResourceResponse:
+def create_resource(resource_data: ResourceCreate) -> ResourceResponse:
     """Создать новый ресурс"""
 
     # Валидация данных
@@ -65,29 +64,28 @@ def create_resource(resource_data: CreateResourceRequest) -> CreateResourceRespo
     if resource_data.year < 1900 or resource_data.year > 2100:
         raise ValidationError("Invalid year")
 
-    from app.database.resources import create_resource as db_create_resource
-
     try:
-        # Сохраняем в БД
-        db_resource = db_create_resource(
-            name=resource_data.name,
-            year=resource_data.year,
-            color=resource_data.color,
-            pantone_value=resource_data.pantone_value,
-        )
+        # Сохраняем в БД напрямую
+        with Session(engine) as session:
+            db_resource = Resource(
+                name=resource_data.name,
+                year=resource_data.year,
+                color=resource_data.color,
+                pantone_value=resource_data.pantone_value,
+            )
 
-        if not db_resource:
-            raise ValidationError("Failed to create resource")
+            session.add(db_resource)
+            session.commit()
+            session.refresh(db_resource)
 
         # Возвращаем ответ в формате API
-        created_at = datetime.now()
-        return CreateResourceResponse(
+        return ResourceResponse(
             name=resource_data.name,
             year=resource_data.year,
             color=resource_data.color,
             pantone_value=resource_data.pantone_value,
             id=str(db_resource.id),
-            createdAt=created_at,
+            createdAt=datetime.now(),
         )
 
     except Exception as e:
@@ -97,43 +95,46 @@ def create_resource(resource_data: CreateResourceRequest) -> CreateResourceRespo
 
 @router.put("/api/unknown/{resource_id}", tags=["Resources"])
 def update_resource_put(
-    resource_id: int, resource_data: UpdateResourceRequest
-) -> UpdateResourceResponse:
+    resource_id: int, resource_data: ResourceUpdate
+) -> ResourceResponse:
     """Полное обновление ресурса"""
 
     # Валидация ID
     if resource_id < 1:
         raise InvalidIDError("resource ID")
 
-    # Проверяем существование ресурса
-    from app.database.resources import (
-        get_resource,
-        update_resource as db_update_resource,
-    )
-
-    existing_resource = get_resource(resource_id)
-    if not existing_resource:
-        raise ResourceNotFoundError(resource_id)
-
     try:
-        # Обновляем ресурс в БД
-        db_update_resource(
-            resource_id=resource_id,
-            name=resource_data.name,
-            year=resource_data.year,
-            color=resource_data.color,
-            pantone_value=resource_data.pantone_value,
+        with Session(engine) as session:
+            # Проверяем существование ресурса
+            resource = session.get(Resource, resource_id)
+            if not resource:
+                raise ResourceNotFoundError(resource_id)
+
+            # Обновляем ресурс в БД
+            if resource_data.name is not None:
+                resource.name = resource_data.name
+            if resource_data.year is not None:
+                resource.year = resource_data.year
+            if resource_data.color is not None:
+                resource.color = resource_data.color
+            if resource_data.pantone_value is not None:
+                resource.pantone_value = resource_data.pantone_value
+
+            session.add(resource)
+            session.commit()
+            session.refresh(resource)
+
+        return ResourceResponse(
+            name=resource_data.name or resource.name,
+            year=resource_data.year or resource.year,
+            color=resource_data.color or resource.color,
+            pantone_value=resource_data.pantone_value or resource.pantone_value,
+            id=str(resource.id),
+            updatedAt=datetime.now(),
         )
 
-        updated_at = datetime.now()
-        return UpdateResourceResponse(
-            name=resource_data.name,
-            year=resource_data.year,
-            color=resource_data.color,
-            pantone_value=resource_data.pantone_value,
-            updatedAt=updated_at,
-        )
-
+    except ResourceNotFoundError:
+        raise
     except Exception as e:
         logger.error(f"Failed to update resource {resource_id}: {e}")
         raise ValidationError("Failed to update resource")
@@ -141,43 +142,46 @@ def update_resource_put(
 
 @router.patch("/api/unknown/{resource_id}", tags=["Resources"])
 def update_resource_patch(
-    resource_id: int, resource_data: UpdateResourceRequest
-) -> UpdateResourceResponse:
+    resource_id: int, resource_data: ResourceUpdate
+) -> ResourceResponse:
     """Частичное обновление ресурса"""
 
     # Валидация ID
     if resource_id < 1:
         raise InvalidIDError("resource ID")
 
-    # Проверяем существование ресурса
-    from app.database.resources import (
-        get_resource,
-        update_resource as db_update_resource,
-    )
-
-    existing_resource = get_resource(resource_id)
-    if not existing_resource:
-        raise ResourceNotFoundError(resource_id)
-
     try:
-        # Частичное обновление в БД
-        db_update_resource(
-            resource_id=resource_id,
-            name=resource_data.name,
-            year=resource_data.year,
-            color=resource_data.color,
-            pantone_value=resource_data.pantone_value,
+        with Session(engine) as session:
+            # Проверяем существование ресурса
+            resource = session.get(Resource, resource_id)
+            if not resource:
+                raise ResourceNotFoundError(resource_id)
+
+            # Частичное обновление в БД
+            if resource_data.name is not None:
+                resource.name = resource_data.name
+            if resource_data.year is not None:
+                resource.year = resource_data.year
+            if resource_data.color is not None:
+                resource.color = resource_data.color
+            if resource_data.pantone_value is not None:
+                resource.pantone_value = resource_data.pantone_value
+
+            session.add(resource)
+            session.commit()
+            session.refresh(resource)
+
+        return ResourceResponse(
+            name=resource_data.name or resource.name,
+            year=resource_data.year or resource.year,
+            color=resource_data.color or resource.color,
+            pantone_value=resource_data.pantone_value or resource.pantone_value,
+            id=str(resource.id),
+            updatedAt=datetime.now(),
         )
 
-        updated_at = datetime.now()
-        return UpdateResourceResponse(
-            name=resource_data.name,
-            year=resource_data.year,
-            color=resource_data.color,
-            pantone_value=resource_data.pantone_value,
-            updatedAt=updated_at,
-        )
-
+    except ResourceNotFoundError:
+        raise
     except Exception as e:
         logger.error(f"Failed to update resource {resource_id}: {e}")
         raise ValidationError("Failed to update resource")
@@ -191,15 +195,14 @@ def delete_resource(resource_id: int) -> None:
     if resource_id < 1:
         raise InvalidIDError("resource ID")
 
-    from app.database.resources import delete_resource as db_delete_resource
-
     try:
-        # Удаляем из БД
-        deleted = db_delete_resource(resource_id)
+        with Session(engine) as session:
+            resource = session.get(Resource, resource_id)
+            if not resource:
+                raise ResourceNotFoundError(resource_id)
 
-        # Корректное поведение - 404 если ресурса не было
-        if not deleted:
-            raise ResourceNotFoundError(resource_id)
+            session.delete(resource)
+            session.commit()
 
     except ResourceNotFoundError:
         raise

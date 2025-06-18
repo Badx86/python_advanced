@@ -1,26 +1,25 @@
-from app.exceptions import UserNotFoundError, ValidationError, InvalidIDError
-from fastapi import APIRouter, HTTPException, Query
-from app.database.users import get_users_paginated
-from fastapi_pagination import Params, Page
-from app.database.engine import engine
-from app.models import User
+from fastapi import APIRouter, Query, Depends
+from fastapi_pagination import Page, Params
+from fastapi_pagination.ext.sqlalchemy import paginate
+from sqlmodel import Session, select, func
 from datetime import datetime
-from http import HTTPStatus
 from typing import Dict, Any
-from fastapi import Depends
-from sqlmodel import Session
 import logging
 import random
 import time
+
+from app.database.engine import engine
 from app.models import (
-    CreateUserRequest,
-    CreateUserResponse,
-    UpdateUserRequest,
-    UpdateUserResponse,
+    User,
+    UserCreate,
+    UserUpdate,
+    UserResponse,
+    SingleUserResponse,
+    Support,
 )
+from app.exceptions import UserNotFoundError, ValidationError, InvalidIDError
 
 logger = logging.getLogger(__name__)
-
 router = APIRouter()
 
 
@@ -35,39 +34,37 @@ def get_users_with_delay(
     if delay > 0:
         time.sleep(delay)
 
-    # Создаем session и передаем в database функцию
+    # Работаем напрямую с БД
     with Session(engine) as session:
-        users_page = get_users_paginated(session)
-
-    return users_page
+        query = select(User).order_by(User.id)
+        return paginate(session, query)
 
 
 @router.get("/api/users/{user_id}", tags=["Users"])
-def get_single_user(user_id: int) -> Dict[str, Any]:
+def get_single_user(user_id: int) -> SingleUserResponse:
     """Получить пользователя по ID"""
 
     # Валидация ID
     if user_id < 1:
         raise InvalidIDError("user ID")
 
-    from app.database.users import get_user
-
     # Получаем пользователя из БД
-    user = get_user(user_id)
-    if not user:
-        raise UserNotFoundError(user_id)
+    with Session(engine) as session:
+        user = session.get(User, user_id)
+        if not user:
+            raise UserNotFoundError(user_id)
 
-    return {
-        "data": user.model_dump(),
-        "support": {
-            "url": "https://contentcaddy.io?utm_source=reqres&utm_medium=json&utm_campaign=referral",
-            "text": "Tired of writing endless social media content? Let Content Caddy generate it for you.",
-        },
-    }
+    return SingleUserResponse(
+        data=user,
+        support=Support(
+            url="https://contentcaddy.io?utm_source=reqres&utm_medium=json&utm_campaign=referral",
+            text="Tired of writing endless social media content? Let Content Caddy generate it for you.",
+        ),
+    )
 
 
 @router.post("/api/users", status_code=201, tags=["Users"])
-def create_user(user_data: CreateUserRequest) -> CreateUserResponse:
+def create_user(user_data: UserCreate) -> UserResponse:
     """Создать нового пользователя"""
 
     # Валидация данных
@@ -80,31 +77,31 @@ def create_user(user_data: CreateUserRequest) -> CreateUserResponse:
     generated_email = f"{user_data.name.lower().replace(' ', '.')}@example.com"
     generated_avatar = f"https://reqres.in/img/faces/{random.randint(1, 12)}-image.jpg"
 
-    from app.database.users import create_user as db_create_user
-
     try:
-        # Сохраняем в БД
-        db_user = db_create_user(
-            email=generated_email,
-            first_name=(
-                user_data.name.split()[0] if user_data.name.split() else user_data.name
-            ),
-            last_name=(
-                user_data.name.split()[-1] if len(user_data.name.split()) > 1 else ""
-            ),
-            avatar=generated_avatar,
-        )
+        # Сохраняем в БД напрямую
+        with Session(engine) as session:
+            # Парсим имя
+            name_parts = user_data.name.split()
+            first_name = name_parts[0] if name_parts else user_data.name
+            last_name = name_parts[-1] if len(name_parts) > 1 else ""
 
-        if not db_user:
-            raise ValidationError("Failed to create user")
+            db_user = User(
+                email=generated_email,
+                first_name=first_name,
+                last_name=last_name,
+                avatar=generated_avatar,
+            )
 
-        # Возвращаем ответ в формате API (с реальным ID из БД)
-        created_at = datetime.now()
-        return CreateUserResponse(
+            session.add(db_user)
+            session.commit()
+            session.refresh(db_user)
+
+        # Возвращаем ответ в формате API
+        return UserResponse(
             name=user_data.name,
             job=user_data.job,
             id=str(db_user.id),
-            createdAt=created_at,
+            createdAt=datetime.now(),
         )
 
     except Exception as e:
@@ -113,68 +110,78 @@ def create_user(user_data: CreateUserRequest) -> CreateUserResponse:
 
 
 @router.put("/api/users/{user_id}", tags=["Users"])
-def update_user_put(user_id: int, user_data: UpdateUserRequest) -> UpdateUserResponse:
+def update_user_put(user_id: int, user_data: UserUpdate) -> UserResponse:
     """Полное обновление пользователя"""
 
     # Валидация ID
     if user_id < 1:
         raise InvalidIDError("user ID")
 
-    # Проверяем существование пользователя
-    from app.database.users import get_user, update_user as db_update_user
-
-    existing_user = get_user(user_id)
-    if not existing_user:
-        raise UserNotFoundError(user_id)
-
     try:
-        # Обновляем пользователя в БД
-        if user_data.name:
-            name_parts = user_data.name.split()
-            first_name = name_parts[0] if name_parts else user_data.name
-            last_name = name_parts[-1] if len(name_parts) > 1 else ""
+        with Session(engine) as session:
+            # Проверяем существование пользователя
+            user = session.get(User, user_id)
+            if not user:
+                raise UserNotFoundError(user_id)
 
-            db_update_user(user_id=user_id, first_name=first_name, last_name=last_name)
+            # Обновляем пользователя в БД
+            if user_data.name:
+                name_parts = user_data.name.split()
+                user.first_name = name_parts[0] if name_parts else user_data.name
+                user.last_name = name_parts[-1] if len(name_parts) > 1 else ""
 
-        updated_at = datetime.now()
-        return UpdateUserResponse(
-            name=user_data.name, job=user_data.job, updatedAt=updated_at
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+
+        return UserResponse(
+            name=user_data.name,
+            job=user_data.job,
+            id=str(user.id),
+            updatedAt=datetime.now(),
         )
 
+    except UserNotFoundError:
+        raise
     except Exception as e:
         logger.error(f"Failed to update user {user_id}: {e}")
         raise ValidationError("Failed to update user")
 
 
 @router.patch("/api/users/{user_id}", tags=["Users"])
-def update_user_patch(user_id: int, user_data: UpdateUserRequest) -> UpdateUserResponse:
+def update_user_patch(user_id: int, user_data: UserUpdate) -> UserResponse:
     """Частичное обновление пользователя"""
 
     # Валидация ID
     if user_id < 1:
         raise InvalidIDError("user ID")
 
-    # Проверяем существование пользователя
-    from app.database.users import get_user, update_user as db_update_user
-
-    existing_user = get_user(user_id)
-    if not existing_user:
-        raise UserNotFoundError(user_id)
-
     try:
-        # Частичное обновление в БД
-        if user_data.name:
-            name_parts = user_data.name.split()
-            first_name = name_parts[0] if name_parts else user_data.name
-            last_name = name_parts[-1] if len(name_parts) > 1 else ""
+        with Session(engine) as session:
+            # Проверяем существование пользователя
+            user = session.get(User, user_id)
+            if not user:
+                raise UserNotFoundError(user_id)
 
-            db_update_user(user_id=user_id, first_name=first_name, last_name=last_name)
+            # Частичное обновление в БД
+            if user_data.name:
+                name_parts = user_data.name.split()
+                user.first_name = name_parts[0] if name_parts else user_data.name
+                user.last_name = name_parts[-1] if len(name_parts) > 1 else ""
 
-        updated_at = datetime.now()
-        return UpdateUserResponse(
-            name=user_data.name, job=user_data.job, updatedAt=updated_at
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+
+        return UserResponse(
+            name=user_data.name,
+            job=user_data.job,
+            id=str(user.id),
+            updatedAt=datetime.now(),
         )
 
+    except UserNotFoundError:
+        raise
     except Exception as e:
         logger.error(f"Failed to update user {user_id}: {e}")
         raise ValidationError("Failed to update user")
@@ -188,15 +195,14 @@ def delete_user(user_id: int) -> None:
     if user_id < 1:
         raise InvalidIDError("user ID")
 
-    from app.database.users import delete_user as db_delete_user
-
     try:
-        # Удаляем из БД
-        deleted = db_delete_user(user_id)
+        with Session(engine) as session:
+            user = session.get(User, user_id)
+            if not user:
+                raise UserNotFoundError(user_id)
 
-        # Корректное поведение - 404 если пользователя не было
-        if not deleted:
-            raise UserNotFoundError(user_id)
+            session.delete(user)
+            session.commit()
 
     except UserNotFoundError:
         raise
