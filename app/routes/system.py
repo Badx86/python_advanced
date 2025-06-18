@@ -2,6 +2,7 @@ import os
 import json
 import logging
 from datetime import datetime, timezone
+from typing import Tuple
 from fastapi import APIRouter
 from app.models import HealthStatus
 from app.database.users import get_users_count
@@ -15,7 +16,7 @@ with open("app/data/resources.json", "r", encoding="utf-8") as f:
     resources_data = json.load(f)
 
 
-def get_app_version():
+def get_app_version() -> str:
     """Получает версию из pyproject.toml или переменной окружения"""
     version = os.getenv("APP_VERSION")
     if version:
@@ -27,11 +28,12 @@ def get_app_version():
         with open("pyproject.toml", "r") as f:
             data = toml.load(f)
             return data["tool"]["poetry"]["version"]
-    except:
+    except (ImportError, FileNotFoundError, KeyError) as e:
+        logger.error(f"Failed to get app version: {e}")
         return "unknown"
 
 
-def get_database_type():
+def get_database_type() -> str:
     """Определяет тип БД из connection string"""
     db_url = os.getenv("DATABASE_ENGINE", "")
     if "postgresql" in db_url:
@@ -44,10 +46,9 @@ def get_database_type():
         return "unknown"
 
 
-def check_database_connection():
+def check_database_connection() -> Tuple[bool, int]:
     """Проверяет подключение к БД"""
     try:
-        # Проверка подключения
         users_count = get_users_count()
         return True, users_count
     except Exception as e:
@@ -58,7 +59,6 @@ def check_database_connection():
 @router.get("/status", tags=["System"])
 def get_status() -> HealthStatus:
     """Проверка статуса приложения с подробной информацией"""
-    logger.info("Health check requested")
 
     # Получаем текущее время
     current_time = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -72,10 +72,6 @@ def get_status() -> HealthStatus:
 
     # Определяем общий статус
     overall_status = "healthy" if db_connected and resources_status else "unhealthy"
-
-    logger.info(
-        f"Status check: users={users_count} (db_connected: {db_connected}), resources={resources_count}"
-    )
 
     # Создаем структурированный ответ
     return HealthStatus(

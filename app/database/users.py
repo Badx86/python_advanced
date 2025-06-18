@@ -14,13 +14,9 @@ def get_user(user_id: int) -> Optional[User]:
     try:
         with Session(engine) as session:
             user = session.get(User, user_id)
-            if user:
-                logger.debug(f"[DB] Found user: {user.first_name} {user.last_name}")
-            else:
-                logger.debug(f"[DB] User {user_id} not found in database")
             return user
     except Exception as e:
-        logger.error(f"[DB] Error getting user {user_id}: {e}")
+        logger.error(f"Error getting user {user_id}: {e}")
         return None
 
 
@@ -29,12 +25,10 @@ def get_users_paginated(session: Session) -> Page[User]:
     try:
         query = select(User).order_by(User.id)
         result = paginate(session, query)
-
-        logger.debug(f"[DB] Retrieved {len(result.items)} users")
         return result
 
     except Exception as e:
-        logger.error(f"[DB] Error getting users: {e}")
+        logger.error(f"Error getting users: {e}")
         # В случае ошибки возвращаем пустую страницу
         return Page(items=[], page=1, size=6, total=0, pages=0)
 
@@ -45,10 +39,9 @@ def get_all_users() -> Iterable[User]:
         with Session(engine) as session:
             statement = select(User)
             users = session.exec(statement).all()
-            logger.debug(f"[DB] Retrieved {len(list(users))} total users")
             return users
     except Exception as e:
-        logger.error(f"[DB] Error getting all users: {e}")
+        logger.error(f"Error getting all users: {e}")
         return []
 
 
@@ -64,13 +57,9 @@ def create_user(
             session.add(new_user)
             session.commit()
             session.refresh(new_user)
-
-            logger.debug(
-                f"[DB] Created user: {new_user.first_name} {new_user.last_name} (ID: {new_user.id})"
-            )
             return new_user
     except Exception as e:
-        logger.error(f"[DB] Error creating user: {e}")
+        logger.error(f"Error creating user: {e}")
         return None
 
 
@@ -86,7 +75,6 @@ def update_user(
         with Session(engine) as session:
             user: Optional[User] = session.get(User, user_id)
             if not user:
-                logger.debug(f"[DB] User {user_id} not found for update")
                 return None
 
             # Обновляем только переданные поля
@@ -102,13 +90,9 @@ def update_user(
             session.add(user)
             session.commit()
             session.refresh(user)
-
-            logger.debug(
-                f"[DB] Updated user {user_id}: {user.first_name} {user.last_name}"
-            )
             return user
     except Exception as e:
-        logger.error(f"[DB] Error updating user {user_id}: {e}")
+        logger.error(f"Error updating user {user_id}: {e}")
         return None
 
 
@@ -118,18 +102,13 @@ def delete_user(user_id: int) -> bool:
         with Session(engine) as session:
             user = session.get(User, user_id)
             if not user:
-                logger.debug(f"[DB] User {user_id} not found for deletion")
                 return False
 
             session.delete(user)
             session.commit()
-
-            logger.debug(
-                f"[DB] Deleted user {user_id}: {user.first_name} {user.last_name}"
-            )
             return True
     except Exception as e:
-        logger.error(f"[DB] Error deleting user {user_id}: {e}")
+        logger.error(f"Error deleting user {user_id}: {e}")
         return False
 
 
@@ -140,7 +119,7 @@ def user_exists(user_id: int) -> bool:
             user = session.get(User, user_id)
             return user is not None
     except Exception as e:
-        logger.error(f"[DB] Error checking user existence {user_id}: {e}")
+        logger.error(f"Error checking user existence {user_id}: {e}")
         return False
 
 
@@ -151,5 +130,5 @@ def get_users_count() -> int:
             count = session.exec(select(func.count(User.id))).one()
             return count
     except Exception as e:
-        logger.error(f"[DB] Error getting users count: {e}")
+        logger.error(f"Error getting users count: {e}")
         return 0

@@ -17,17 +17,15 @@ try:
         pool_size=DATABASE_POOL_SIZE,
         echo=False,  # True для отладки SQL запросов
     )
-    logger.info(f"Database engine created with pool_size={DATABASE_POOL_SIZE}")
 except Exception as e:
     logger.error(f"Failed to create database engine: {e}")
     raise
 
 
-def create_db_and_tables():
+def create_db_and_tables() -> None:
     """Создает базу данных и таблицы, если они не существуют"""
     try:
         SQLModel.metadata.create_all(engine)
-        logger.info("Database tables created successfully")
     except Exception as e:
         logger.error(f"Failed to create database tables: {e}")
         raise

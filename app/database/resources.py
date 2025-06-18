@@ -1,9 +1,9 @@
-from typing import Optional
-from sqlmodel import Session, select, func
 from fastapi_pagination.ext.sqlalchemy import paginate
-from fastapi_pagination import Page, Params
+from fastapi_pagination import Page
+from sqlmodel import Session, select, func
 from app.database.engine import engine
 from app.models import Resource
+from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,13 +14,9 @@ def get_resource(resource_id: int) -> Optional[Resource]:
     try:
         with Session(engine) as session:
             resource = session.get(Resource, resource_id)
-            if resource:
-                logger.debug(f"[DB] Found resource: {resource.name} ({resource.year})")
-            else:
-                logger.debug(f"[DB] Resource {resource_id} not found in database")
             return resource
     except Exception as e:
-        logger.error(f"[DB] Error getting resource {resource_id}: {e}")
+        logger.error(f"Error getting resource {resource_id}: {e}")
         return None
 
 
@@ -29,12 +25,10 @@ def get_resources_paginated(session: Session) -> Page[Resource]:
     try:
         query = select(Resource).order_by(Resource.id)
         result = paginate(session, query)
-
-        logger.debug(f"[DB] Retrieved {len(result.items)} resources")
         return result
 
     except Exception as e:
-        logger.error(f"[DB] Error getting resources: {e}")
+        logger.error(f"Error getting resources: {e}")
         return Page(items=[], page=1, size=6, total=0, pages=0)
 
 
@@ -50,13 +44,9 @@ def create_resource(
             session.add(new_resource)
             session.commit()
             session.refresh(new_resource)
-
-            logger.debug(
-                f"[DB] Created resource: {new_resource.name} (ID: {new_resource.id})"
-            )
             return new_resource
     except Exception as e:
-        logger.error(f"[DB] Error creating resource: {e}")
+        logger.error(f"Error creating resource: {e}")
         return None
 
 
@@ -72,7 +62,6 @@ def update_resource(
         with Session(engine) as session:
             resource: Optional[Resource] = session.get(Resource, resource_id)
             if not resource:
-                logger.debug(f"[DB] Resource {resource_id} not found for update")
                 return None
 
             # Обновляем только переданные поля
@@ -88,11 +77,9 @@ def update_resource(
             session.add(resource)
             session.commit()
             session.refresh(resource)
-
-            logger.debug(f"[DB] Updated resource {resource_id}: {resource.name}")
             return resource
     except Exception as e:
-        logger.error(f"[DB] Error updating resource {resource_id}: {e}")
+        logger.error(f"Error updating resource {resource_id}: {e}")
         return None
 
 
@@ -102,16 +89,13 @@ def delete_resource(resource_id: int) -> bool:
         with Session(engine) as session:
             resource = session.get(Resource, resource_id)
             if not resource:
-                logger.debug(f"[DB] Resource {resource_id} not found for deletion")
                 return False
 
             session.delete(resource)
             session.commit()
-
-            logger.debug(f"[DB] Deleted resource {resource_id}: {resource.name}")
             return True
     except Exception as e:
-        logger.error(f"[DB] Error deleting resource {resource_id}: {e}")
+        logger.error(f"Error deleting resource {resource_id}: {e}")
         return False
 
 
@@ -122,5 +106,5 @@ def get_resources_count() -> int:
             count = session.exec(select(func.count(Resource.id))).one()
             return count
     except Exception as e:
-        logger.error(f"[DB] Error getting resources count: {e}")
+        logger.error(f"Error getting resources count: {e}")
         return 0

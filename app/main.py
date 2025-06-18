@@ -1,3 +1,4 @@
+from typing import AsyncGenerator
 from dotenv import load_dotenv
 import os
 import sys
@@ -42,24 +43,27 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Управление жизненным циклом приложения"""
     # Startup
     logger.info("Starting application...")
-    create_db_and_tables()
-    logger.info("Database initialized successfully")
 
-    # Загружаем тестовые данные если БД пустая
-    seed_all_data()
+    try:
+        create_db_and_tables()
+        seed_all_data()
+    except Exception as e:
+        logger.error(f"Failed to initialize application: {e}")
+        raise
 
     yield
+
     # Shutdown
     logger.info("Shutting down application...")
 
 
 app = FastAPI(
-    title="FastAPI Reqres Clone",
-    description="Микросервис-клон Reqres API для тестирования",
+    title="FastAPI Reqres",
+    description="Микросервис Reqres API для тестирования",
     version="1.0.0",
     lifespan=lifespan,
 )

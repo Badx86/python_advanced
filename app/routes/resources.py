@@ -1,14 +1,14 @@
-import logging
-from datetime import datetime
-from http import HTTPStatus
-from typing import Dict, Any
+from app.exceptions import ResourceNotFoundError, ValidationError, InvalidIDError
 from app.database.resources import get_resources_paginated
-from app.database.engine import engine
-from sqlmodel import Session
-from app.models import Resource
-from fastapi import Depends
 from fastapi_pagination import Page, Params
-from fastapi import APIRouter, HTTPException
+from app.database.engine import engine
+from app.models import Resource
+from fastapi import APIRouter
+from sqlmodel import Session
+from datetime import datetime
+from typing import Dict, Any
+from fastapi import Depends
+import logging
 from app.models import (
     CreateResourceRequest,
     CreateResourceResponse,
@@ -24,15 +24,10 @@ router = APIRouter()
 @router.get("/api/unknown", tags=["Resources"])
 def get_resources(params: Params = Depends()) -> Page[Resource]:
     """Получить список ресурсов с пагинацией"""
-    logger.info(f"[API] Getting resources list: page={params.page}, size={params.size}")
 
     # Создаем session и передаем в database функцию
     with Session(engine) as session:
         resources_page = get_resources_paginated(session)
-
-    logger.info(
-        f"[API] Returning {len(resources_page.items)} resources for page={params.page}"
-    )
 
     return resources_page
 
@@ -40,26 +35,17 @@ def get_resources(params: Params = Depends()) -> Page[Resource]:
 @router.get("/api/unknown/{resource_id}", tags=["Resources"])
 def get_single_resource(resource_id: int) -> Dict[str, Any]:
     """Получить ресурс по ID"""
-    logger.info(f"[API] Getting single resource: resource_id={resource_id}")
 
     # Валидация ID
     if resource_id < 1:
-        logger.warning(f"[API] Invalid resource ID: {resource_id}")
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="Invalid resource ID"
-        )
+        raise InvalidIDError("resource ID")
 
     from app.database.resources import get_resource
 
     resource = get_resource(resource_id)
     if not resource:
-        logger.warning(f"[API] Resource {resource_id} not found")
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail={"error": f"Resource {resource_id} not found"},
-        )
+        raise ResourceNotFoundError(resource_id)
 
-    logger.info(f"[API] Found resource: {resource.name} ({resource.year})")
     return {
         "data": resource.model_dump(),
         "support": {
@@ -69,47 +55,44 @@ def get_single_resource(resource_id: int) -> Dict[str, Any]:
     }
 
 
-@router.post("/api/unknown", status_code=HTTPStatus.CREATED, tags=["Resources"])
+@router.post("/api/unknown", status_code=201, tags=["Resources"])
 def create_resource(resource_data: CreateResourceRequest) -> CreateResourceResponse:
     """Создать новый ресурс"""
-    logger.info(f"[API] Creating resource: {resource_data.name} ({resource_data.year})")
 
     # Валидация данных
     if not resource_data.name or not resource_data.name.strip():
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail="Name is required"
-        )
+        raise ValidationError("Name is required")
     if resource_data.year < 1900 or resource_data.year > 2100:
-        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Invalid year")
+        raise ValidationError("Invalid year")
 
     from app.database.resources import create_resource as db_create_resource
 
-    # Сохраняем в БД
-    db_resource = db_create_resource(
-        name=resource_data.name,
-        year=resource_data.year,
-        color=resource_data.color,
-        pantone_value=resource_data.pantone_value,
-    )
-
-    if not db_resource:
-        logger.error(f"[API] Failed to create resource in database")
-        raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail="Failed to create resource",
+    try:
+        # Сохраняем в БД
+        db_resource = db_create_resource(
+            name=resource_data.name,
+            year=resource_data.year,
+            color=resource_data.color,
+            pantone_value=resource_data.pantone_value,
         )
 
-    # Возвращаем ответ в формате API
-    created_at = datetime.now()
-    logger.info(f"[API] Created resource with ID: {db_resource.id}")
-    return CreateResourceResponse(
-        name=resource_data.name,
-        year=resource_data.year,
-        color=resource_data.color,
-        pantone_value=resource_data.pantone_value,
-        id=str(db_resource.id),
-        createdAt=created_at,
-    )
+        if not db_resource:
+            raise ValidationError("Failed to create resource")
+
+        # Возвращаем ответ в формате API
+        created_at = datetime.now()
+        return CreateResourceResponse(
+            name=resource_data.name,
+            year=resource_data.year,
+            color=resource_data.color,
+            pantone_value=resource_data.pantone_value,
+            id=str(db_resource.id),
+            createdAt=created_at,
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to create resource: {e}")
+        raise ValidationError("Failed to create resource")
 
 
 @router.put("/api/unknown/{resource_id}", tags=["Resources"])
@@ -117,13 +100,10 @@ def update_resource_put(
     resource_id: int, resource_data: UpdateResourceRequest
 ) -> UpdateResourceResponse:
     """Полное обновление ресурса"""
-    logger.info(f"[API] PUT updating resource {resource_id}")
 
     # Валидация ID
     if resource_id < 1:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="Invalid resource ID"
-        )
+        raise InvalidIDError("resource ID")
 
     # Проверяем существование ресурса
     from app.database.resources import (
@@ -133,30 +113,30 @@ def update_resource_put(
 
     existing_resource = get_resource(resource_id)
     if not existing_resource:
-        logger.warning(f"[API] Resource {resource_id} not found for update")
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail={"error": f"Resource {resource_id} not found"},
+        raise ResourceNotFoundError(resource_id)
+
+    try:
+        # Обновляем ресурс в БД
+        db_update_resource(
+            resource_id=resource_id,
+            name=resource_data.name,
+            year=resource_data.year,
+            color=resource_data.color,
+            pantone_value=resource_data.pantone_value,
         )
 
-    # Обновляем ресурс в БД
-    db_update_resource(
-        resource_id=resource_id,
-        name=resource_data.name,
-        year=resource_data.year,
-        color=resource_data.color,
-        pantone_value=resource_data.pantone_value,
-    )
+        updated_at = datetime.now()
+        return UpdateResourceResponse(
+            name=resource_data.name,
+            year=resource_data.year,
+            color=resource_data.color,
+            pantone_value=resource_data.pantone_value,
+            updatedAt=updated_at,
+        )
 
-    updated_at = datetime.now()
-    logger.info(f"[API] Updated resource {resource_id}")
-    return UpdateResourceResponse(
-        name=resource_data.name,
-        year=resource_data.year,
-        color=resource_data.color,
-        pantone_value=resource_data.pantone_value,
-        updatedAt=updated_at,
-    )
+    except Exception as e:
+        logger.error(f"Failed to update resource {resource_id}: {e}")
+        raise ValidationError("Failed to update resource")
 
 
 @router.patch("/api/unknown/{resource_id}", tags=["Resources"])
@@ -164,13 +144,10 @@ def update_resource_patch(
     resource_id: int, resource_data: UpdateResourceRequest
 ) -> UpdateResourceResponse:
     """Частичное обновление ресурса"""
-    logger.info(f"[API] PATCH updating resource {resource_id}")
 
     # Валидация ID
     if resource_id < 1:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="Invalid resource ID"
-        )
+        raise InvalidIDError("resource ID")
 
     # Проверяем существование ресурса
     from app.database.resources import (
@@ -180,56 +157,52 @@ def update_resource_patch(
 
     existing_resource = get_resource(resource_id)
     if not existing_resource:
-        logger.warning(f"[API] Resource {resource_id} not found for update")
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail={"error": f"Resource {resource_id} not found"},
+        raise ResourceNotFoundError(resource_id)
+
+    try:
+        # Частичное обновление в БД
+        db_update_resource(
+            resource_id=resource_id,
+            name=resource_data.name,
+            year=resource_data.year,
+            color=resource_data.color,
+            pantone_value=resource_data.pantone_value,
         )
 
-    # Частичное обновление в БД
-    db_update_resource(
-        resource_id=resource_id,
-        name=resource_data.name,
-        year=resource_data.year,
-        color=resource_data.color,
-        pantone_value=resource_data.pantone_value,
-    )
+        updated_at = datetime.now()
+        return UpdateResourceResponse(
+            name=resource_data.name,
+            year=resource_data.year,
+            color=resource_data.color,
+            pantone_value=resource_data.pantone_value,
+            updatedAt=updated_at,
+        )
 
-    updated_at = datetime.now()
-    logger.info(f"[API] Patched resource {resource_id}")
-    return UpdateResourceResponse(
-        name=resource_data.name,
-        year=resource_data.year,
-        color=resource_data.color,
-        pantone_value=resource_data.pantone_value,
-        updatedAt=updated_at,
-    )
+    except Exception as e:
+        logger.error(f"Failed to update resource {resource_id}: {e}")
+        raise ValidationError("Failed to update resource")
 
 
-@router.delete(
-    "/api/unknown/{resource_id}", status_code=HTTPStatus.NO_CONTENT, tags=["Resources"]
-)
+@router.delete("/api/unknown/{resource_id}", status_code=204, tags=["Resources"])
 def delete_resource(resource_id: int) -> None:
     """Удалить ресурс"""
-    logger.info(f"[API] Deleting resource {resource_id}")
 
     # Валидация ID
     if resource_id < 1:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="Invalid resource ID"
-        )
+        raise InvalidIDError("resource ID")
 
     from app.database.resources import delete_resource as db_delete_resource
 
-    # Удаляем из БД
-    deleted = db_delete_resource(resource_id)
+    try:
+        # Удаляем из БД
+        deleted = db_delete_resource(resource_id)
 
-    # Корректное поведение - 404 если ресурса не было
-    if not deleted:
-        logger.warning(f"[API] Resource {resource_id} not found for deletion")
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail={"error": f"Resource {resource_id} not found"},
-        )
+        # Корректное поведение - 404 если ресурса не было
+        if not deleted:
+            raise ResourceNotFoundError(resource_id)
 
-    logger.info(f"[API] Resource {resource_id} deleted successfully")
+    except ResourceNotFoundError:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to delete resource {resource_id}: {e}")
+        raise ValidationError("Failed to delete resource")
