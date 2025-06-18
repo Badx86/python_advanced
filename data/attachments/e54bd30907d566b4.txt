@@ -1,5 +1,0 @@
-ID: 20
-Name: red
-Year: 2020
-Color: #cf75df
-Pantone: FOTOS-281

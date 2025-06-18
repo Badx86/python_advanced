@@ -1,0 +1,5 @@
+ID: 14
+Email: taina@example.com
+First Name: taina
+Last Name: 
+Avatar: https://reqres.in/img/faces/6-image.jpg

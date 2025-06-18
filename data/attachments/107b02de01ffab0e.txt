@@ -1,0 +1,5 @@
+UPDATED:
+Name: magenta
+Year: 2023
+Color: #d7605b
+Pantone: RISK-795

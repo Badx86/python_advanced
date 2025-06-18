@@ -1,5 +1,0 @@
-ID: 16
-Name: green
-Year: 2026
-Color: #4130ff
-Pantone: REVIEWER-485

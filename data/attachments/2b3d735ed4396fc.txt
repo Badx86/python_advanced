@@ -1,5 +1,0 @@
-ID: 15
-Name: blue
-Year: 2020
-Color: #254f9b
-Pantone: SPAM-479

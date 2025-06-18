@@ -1,5 +1,0 @@
-UPDATED:
-Name: green
-Year: 2025
-Color: #be7564
-Pantone: CLOCK-961

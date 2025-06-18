@@ -1,2 +1,0 @@
-Name: rubin
-Job: recovery vehicle coordinator
