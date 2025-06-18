@@ -24,22 +24,18 @@ def get_resource(resource_id: int) -> Optional[Resource]:
         return None
 
 
-def get_resources_paginated(page: int = 1, size: int = 6) -> Page[Resource]:
+def get_resources_paginated(session: Session) -> Page[Resource]:
+    """Получить список ресурсов с пагинацией"""
     try:
-        with Session(engine) as session:
-            query = select(Resource).order_by(Resource.id)
+        query = select(Resource).order_by(Resource.id)
+        result = paginate(session, query)
 
-            params = Params(page=page, size=size)
-            result = paginate(session, query, params)
-
-            logger.debug(
-                f"[DB] Retrieved {len(result.items)} resources for page {page}"
-            )
-            return result
+        logger.debug(f"[DB] Retrieved {len(result.items)} resources")
+        return result
 
     except Exception as e:
-        logger.error(f"[DB] Error getting resources page {page}: {e}")
-        return Page(items=[], page=page, size=size, total=0, pages=0)
+        logger.error(f"[DB] Error getting resources: {e}")
+        return Page(items=[], page=1, size=6, total=0, pages=0)
 
 
 def create_resource(

@@ -1,13 +1,16 @@
-import logging
-import random
-import time
+from fastapi import APIRouter, HTTPException, Query
+from app.database.users import get_users_paginated
+from fastapi_pagination import Params, Page
+from app.database.engine import engine
+from app.models import User
 from datetime import datetime
 from http import HTTPStatus
 from typing import Dict, Any
 from fastapi import Depends
-from fastapi_pagination import Params, Page
-from app.models import User
-from fastapi import APIRouter, HTTPException, Query
+from sqlmodel import Session
+import logging
+import random
+import time
 from app.models import (
     CreateUserRequest,
     CreateUserResponse,
@@ -35,10 +38,10 @@ def get_users_with_delay(
         logger.info(f"[API] Applying delay: {delay} seconds")
         time.sleep(delay)
 
-    from app.database.users import get_users_paginated
+    # Создаем session и передаем в database функцию
+    with Session(engine) as session:
+        users_page = get_users_paginated(session)
 
-    # Получаем пользователей из БД с пагинацией
-    users_page = get_users_paginated(page=params.page, size=params.size)
     logger.info(f"[API] Returning {len(users_page.items)} users for page {params.page}")
     return users_page
 

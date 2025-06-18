@@ -3,6 +3,8 @@ from datetime import datetime
 from http import HTTPStatus
 from typing import Dict, Any
 from app.database.resources import get_resources_paginated
+from app.database.engine import engine
+from sqlmodel import Session
 from app.models import Resource
 from fastapi import Depends
 from fastapi_pagination import Page, Params
@@ -21,9 +23,12 @@ router = APIRouter()
 
 @router.get("/api/unknown", tags=["Resources"])
 def get_resources(params: Params = Depends()) -> Page[Resource]:
+    """Получить список ресурсов с пагинацией"""
     logger.info(f"[API] Getting resources list: page={params.page}, size={params.size}")
 
-    resources_page = get_resources_paginated(page=params.page, size=params.size)
+    # Создаем session и передаем в database функцию
+    with Session(engine) as session:
+        resources_page = get_resources_paginated(session)
 
     logger.info(
         f"[API] Returning {len(resources_page.items)} resources for page={params.page}"

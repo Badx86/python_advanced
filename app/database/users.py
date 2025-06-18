@@ -24,22 +24,19 @@ def get_user(user_id: int) -> Optional[User]:
         return None
 
 
-def get_users_paginated(page: int = 1, size: int = 6) -> Page[User]:
+def get_users_paginated(session: Session) -> Page[User]:
     """Получить список пользователей с пагинацией"""
     try:
-        with Session(engine) as session:
-            query = select(User).order_by(User.id)
+        query = select(User).order_by(User.id)
+        result = paginate(session, query)
 
-            # Создаем params объект для fastapi-pagination
-            params = Params(page=page, size=size)
-            result = paginate(session, query, params)
-
-            logger.debug(f"[DB] Retrieved {len(result.items)} users for page {page}")
-            return result
+        logger.debug(f"[DB] Retrieved {len(result.items)} users")
+        return result
 
     except Exception as e:
-        logger.error(f"[DB] Error getting users page {page}: {e}")
-        return Page(items=[], page=page, size=size, total=0, pages=0)
+        logger.error(f"[DB] Error getting users: {e}")
+        # В случае ошибки возвращаем пустую страницу
+        return Page(items=[], page=1, size=6, total=0, pages=0)
 
 
 def get_all_users() -> Iterable[User]:
