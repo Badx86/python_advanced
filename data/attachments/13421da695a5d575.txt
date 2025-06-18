@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:36 GET /api/users/1000000 - Status: 404
-INFO     tests.test_users:test_users.py:74 User 1000000 not found (404)

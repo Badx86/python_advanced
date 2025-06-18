@@ -1,5 +1,0 @@
-ID: 19
-Name: magenta
-Year: 2030
-Color: #ceca05
-Pantone: CONDUCT-153

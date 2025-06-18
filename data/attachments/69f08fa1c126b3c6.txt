@@ -1,5 +1,0 @@
-ID: 16
-Name: red
-Year: 2026
-Color: #48ba24
-Pantone: INSTRUMENT-620

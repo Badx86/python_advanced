@@ -1,4 +1,0 @@
-Resource ID: 17
-Name: cyan
-Year: 2028
-Color: #b804ee

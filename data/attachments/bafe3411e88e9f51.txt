@@ -1,0 +1,5 @@
+ID: 18
+Name: white
+Year: 2021
+Color: #7baa6a
+Pantone: AFFILIATED-766

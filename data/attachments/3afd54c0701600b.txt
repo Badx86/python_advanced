@@ -1,5 +1,0 @@
-ID: 17
-Email: katherina@example.com
-First Name: katherina
-Last Name: 
-Avatar: https://reqres.in/img/faces/10-image.jpg

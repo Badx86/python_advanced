@@ -1,5 +1,0 @@
-UPDATED:
-Name: red
-Year: 2021
-Color: #744164
-Pantone: FEATURING-396

@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:36 GET /status - Status: 200
-INFO     tests.test_smoke:test_smoke.py:34 All application data loaded successfully

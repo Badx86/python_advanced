@@ -1,5 +1,0 @@
-UPDATED:
-Name: red
-Year: 2025
-Color: #b01a9a
-Pantone: SUMMER-980

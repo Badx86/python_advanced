@@ -1,0 +1,5 @@
+ID: 13
+Email: casimira@example.com
+First Name: casimira
+Last Name: 
+Avatar: https://reqres.in/img/faces/1-image.jpg

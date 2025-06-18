@@ -1,0 +1,5 @@
+UPDATED:
+Name: red
+Year: 2020
+Color: #96ba0c
+Pantone: ANGLE-408

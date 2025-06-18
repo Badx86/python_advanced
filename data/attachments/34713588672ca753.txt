@@ -1,0 +1,5 @@
+ID: 16
+Email: leeanna@example.com
+First Name: leeanna
+Last Name: 
+Avatar: https://reqres.in/img/faces/2-image.jpg

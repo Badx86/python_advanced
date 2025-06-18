@@ -1,5 +1,0 @@
-ID: 14
-Name: cyan
-Year: 2025
-Color: #c9ec38
-Pantone: FRAUD-567

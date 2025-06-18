@@ -1,0 +1,4 @@
+Resource ID: 17
+Name: white
+Year: 2026
+Color: #34c732

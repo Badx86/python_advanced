@@ -1,4 +1,0 @@
-Resource ID: 8
-Name: chili pepper
-Year: 2007
-Color: #9B1B30
