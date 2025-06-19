@@ -66,13 +66,7 @@ class APIAssertions:
                 f"{response.request.method} {endpoint} - Status: {response.status_code}"
             )
 
-            # Attachments для отладки
-            allure.attach(
-                f"Method: {response.request.method}\nURL: {endpoint}\nExpected: {expected_status.value}\nActual: {response.status_code}",
-                "Request Details",
-                allure.attachment_type.TEXT,
-            )
-
+            # ТОЛЬКО Response Body для отладки API - это критично
             if response.text:
                 allure.attach(
                     response.text, "Response Body", allure.attachment_type.JSON
@@ -92,8 +86,6 @@ class APIAssertions:
     ) -> None:
         """Проверяет структуру пагинации ответа"""
         with allure.step("Verify pagination structure"):
-            allure.attach(str(data), "Pagination Data", allure.attachment_type.JSON)
-
             assert data["page"] == page, f"Expected page {page}, got {data['page']}"
             assert (
                 data["size"] == per_page
@@ -139,6 +131,7 @@ class APIAssertions:
             assert "error" in data["detail"], "Missing 'error' in detail"
             assert data["detail"]["error"], "Error message is empty"
 
+            # Только Error Message
             allure.attach(
                 data["detail"]["error"], "Error Message", allure.attachment_type.TEXT
             )
@@ -173,13 +166,6 @@ class APIAssertions:
             assert db_user.email, "DB email is empty"
             assert "@" in db_user.email, f"DB email format invalid: {db_user.email}"
 
-            # Attachment с данными пользователя из БД
-            allure.attach(
-                f"ID: {db_user.id}\nEmail: {db_user.email}\nFirst Name: {db_user.first_name}\nLast Name: {db_user.last_name}\nAvatar: {db_user.avatar}",
-                "User Data from Database",
-                allure.attachment_type.TEXT,
-            )
-
             logger.info(
                 f"User {user_id} verified in database: {db_user.first_name} {db_user.last_name}"
             )
@@ -194,11 +180,6 @@ class APIAssertions:
                 db_user is None
             ), f"User {user_id} should be deleted but still exists in database"
 
-            allure.attach(
-                f"User {user_id} confirmed as deleted",
-                "Deletion Verified",
-                allure.attachment_type.TEXT,
-            )
             logger.info(f"User {user_id} confirmed deleted from database")
 
     @staticmethod
@@ -232,13 +213,6 @@ class APIAssertions:
             assert (
                 updated_user.avatar == original_user.avatar
             ), f"DB avatar should not change: '{updated_user.avatar}' != '{original_user.avatar}'"
-
-            # Attachment с изменениями
-            allure.attach(
-                f"BEFORE:\nFirst: {original_user.first_name}\nLast: {original_user.last_name}\n\nAFTER:\nFirst: {updated_user.first_name}\nLast: {updated_user.last_name}",
-                "User Update Comparison",
-                allure.attachment_type.TEXT,
-            )
 
             logger.info(
                 f"User {user_id} updated in database: {updated_user.first_name} {updated_user.last_name}"
@@ -274,13 +248,6 @@ class APIAssertions:
                     db_resource.pantone_value == expected_data["pantone_value"]
                 ), f"DB pantone_value mismatch: '{db_resource.pantone_value}' != '{expected_data['pantone_value']}'"
 
-            # Attachment с данными ресурса из БД
-            allure.attach(
-                f"ID: {db_resource.id}\nName: {db_resource.name}\nYear: {db_resource.year}\nColor: {db_resource.color}\nPantone: {db_resource.pantone_value}",
-                "Resource Data from Database",
-                allure.attachment_type.TEXT,
-            )
-
             logger.info(
                 f"Resource {resource_id} verified in database: {db_resource.name} ({db_resource.year})"
             )
@@ -295,11 +262,6 @@ class APIAssertions:
                 db_resource is None
             ), f"Resource {resource_id} should be deleted but still exists in database"
 
-            allure.attach(
-                f"Resource {resource_id} confirmed as deleted",
-                "Deletion Verified",
-                allure.attachment_type.TEXT,
-            )
             logger.info(f"Resource {resource_id} confirmed deleted from database")
 
     @staticmethod
@@ -326,13 +288,6 @@ class APIAssertions:
                 updated_resource.pantone_value == expected_data["pantone_value"]
             ), f"DB pantone_value not updated: '{updated_resource.pantone_value}' != '{expected_data['pantone_value']}'"
 
-            # Attachment с изменениями
-            allure.attach(
-                f"UPDATED:\nName: {updated_resource.name}\nYear: {updated_resource.year}\nColor: {updated_resource.color}\nPantone: {updated_resource.pantone_value}",
-                "Resource Update Comparison",
-                allure.attachment_type.TEXT,
-            )
-
             logger.info(
                 f"Resource {resource_id} updated in database: {updated_resource.name} ({updated_resource.year})"
             )
@@ -352,11 +307,7 @@ class APIAssertions:
     ) -> UserResponse:
         """Проверяет ответ создания пользователя (API + БД)"""
         with allure.step(f"Send POST request to create user: {expected_name}"):
-            allure.attach(
-                f"Name: {expected_name}\nJob: {expected_job}",
-                "User Data",
-                allure.attachment_type.TEXT,
-            )
+            pass
 
         with allure.step("Verify user creation API response"):
             # 1. API проверка
@@ -377,10 +328,6 @@ class APIAssertions:
                 user_id > 0
             ), f"ID должен быть положительным числом, получен: {user_id}"
 
-            allure.attach(
-                f"Created user ID: {user_id}", "User ID", allure.attachment_type.TEXT
-            )
-
         with allure.step("Verify user exists in database"):
             # 2. БД проверка
             cls.check_user_in_database(user_id, expected_name)
@@ -399,11 +346,7 @@ class APIAssertions:
     ) -> UserResponse:
         """Проверяет ответ обновления пользователя (API + БД)"""
         with allure.step(f"Send PUT/PATCH request to update user {user_id}"):
-            allure.attach(
-                f"User ID: {user_id}\nNew Name: {expected_name}\nNew Job: {expected_job}",
-                "Update Data",
-                allure.attachment_type.TEXT,
-            )
+            pass
 
         with allure.step("Verify user update API response"):
             # 1. API проверка
@@ -430,9 +373,7 @@ class APIAssertions:
     ) -> None:
         """Проверяет ответ удаления пользователя (API + БД)"""
         with allure.step(f"Send DELETE request for user {user_id}"):
-            allure.attach(
-                f"User ID: {user_id}", "Delete Target", allure.attachment_type.TEXT
-            )
+            pass
 
         with allure.step("Verify user deletion API response"):
             # 1. API проверка
@@ -457,9 +398,7 @@ class APIAssertions:
         with allure.step(
             f"Send POST request to create resource: {expected_resource['name']}"
         ):
-            allure.attach(
-                str(expected_resource), "Resource Data", allure.attachment_type.JSON
-            )
+            pass
 
         with allure.step("Verify resource creation API response"):
             # 1. API проверка
@@ -478,12 +417,6 @@ class APIAssertions:
                 resource_id > 0
             ), f"ID должен быть положительным числом, получен: {resource_id}"
 
-            allure.attach(
-                f"Created resource ID: {resource_id}",
-                "Resource ID",
-                allure.attachment_type.TEXT,
-            )
-
         with allure.step("Verify resource exists in database"):
             # 2. БД проверка
             cls.check_resource_in_database(resource_id, expected_resource)
@@ -500,11 +433,7 @@ class APIAssertions:
     ) -> dict:
         """Проверяет ответ обновления ресурса (API + БД)"""
         with allure.step(f"Send PUT/PATCH request to update resource {resource_id}"):
-            allure.attach(
-                f"Resource ID: {resource_id}\nNew Data: {expected_resource}",
-                "Update Data",
-                allure.attachment_type.JSON,
-            )
+            pass
 
         with allure.step("Verify resource update API response"):
             # 1. API проверка
@@ -529,11 +458,7 @@ class APIAssertions:
     ) -> None:
         """Проверяет ответ удаления ресурса (API + БД)"""
         with allure.step(f"Send DELETE request for resource {resource_id}"):
-            allure.attach(
-                f"Resource ID: {resource_id}",
-                "Delete Target",
-                allure.attachment_type.TEXT,
-            )
+            pass
 
         with allure.step("Verify resource deletion API response"):
             # 1. API проверка
@@ -556,12 +481,6 @@ class APIAssertions:
             cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
             user_response = SingleUserResponse(**response.json())
 
-            allure.attach(
-                f"User ID: {user_response.data.id}\nEmail: {user_response.data.email}\nName: {user_response.data.first_name} {user_response.data.last_name}",
-                "Retrieved User Data",
-                allure.attachment_type.TEXT,
-            )
-
             return user_response
 
     @classmethod
@@ -572,12 +491,6 @@ class APIAssertions:
         with allure.step("Verify single resource API response"):
             cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
             resource_response = SingleResourceResponse(**response.json())
-
-            allure.attach(
-                f"Resource ID: {resource_response.data.id}\nName: {resource_response.data.name}\nYear: {resource_response.data.year}\nColor: {resource_response.data.color}",
-                "Retrieved Resource Data",
-                allure.attachment_type.TEXT,
-            )
 
             return resource_response
 
@@ -597,12 +510,6 @@ class APIAssertions:
             cls.check_pagination_structure(data, page, per_page)
 
             users = [User(**user_data) for user_data in data["items"]]
-
-            allure.attach(
-                f"Total users: {data['total']}\nPage: {page}\nPer Page: {per_page}\nReturned: {len(users)}",
-                "Users List Summary",
-                allure.attachment_type.TEXT,
-            )
 
             return Page(
                 items=users,
@@ -628,12 +535,6 @@ class APIAssertions:
             cls.check_pagination_structure(data, page, per_page)
 
             resources = [Resource(**resource_data) for resource_data in data["items"]]
-
-            allure.attach(
-                f"Total resources: {data['total']}\nPage: {page}\nPer Page: {per_page}\nReturned: {len(resources)}",
-                "Resources List Summary",
-                allure.attachment_type.TEXT,
-            )
 
             return Page(
                 items=resources,
@@ -668,12 +569,6 @@ class APIAssertions:
             assert data["id"] > 0, f"ID should be positive, got {data['id']}"
             assert len(data["token"]) > 0, "Token should not be empty"
 
-            allure.attach(
-                f"User ID: {data['id']}\nToken: {data['token']}",
-                "Registration Success Data",
-                allure.attachment_type.TEXT,
-            )
-
             logger.info(f"Registration successful: ID={data['id']}")
             return data
 
@@ -692,13 +587,7 @@ class APIAssertions:
             ), f"Token should be string, got {type(data['token'])}"
             assert len(data["token"]) > 0, "Token should not be empty"
 
-            allure.attach(
-                f"Token: {data['token']}",
-                "Login Success Data",
-                allure.attachment_type.TEXT,
-            )
-
-            logger.info(f"Login successful")
+            logger.info("Login successful")
             return data
 
     @classmethod
@@ -715,15 +604,6 @@ class APIAssertions:
             assert (
                 data["detail"]["error"] == expected_error
             ), f"Expected '{expected_error}', got '{data['detail']['error']}'"
-
-            allure.attach(
-                expected_error, "Expected Error Message", allure.attachment_type.TEXT
-            )
-            allure.attach(
-                data["detail"]["error"],
-                "Actual Error Message",
-                allure.attachment_type.TEXT,
-            )
 
     # ========================================
     # СПЕЦИАЛЬНЫЕ ТЕСТЫ (test_special.py)
@@ -747,11 +627,6 @@ class APIAssertions:
             assert isinstance(data["items"], list), "Items should be a list"
             assert len(data["items"]) > 0, "Items array should not be empty"
 
-            allure.attach(
-                f"Minimum delay: {min_duration}s",
-                "Delay Information",
-                allure.attachment_type.TEXT,
-            )
             logger.info(f"Delayed response validated, took at least {min_duration}s")
 
     # ========================================
@@ -769,12 +644,6 @@ class APIAssertions:
                 unique_ids
             ), f"Found duplicate {item_name} IDs: {ids}"
 
-            allure.attach(
-                f"Total items: {len(ids)}\nUnique IDs: {len(unique_ids)}\nAll IDs: {ids}",
-                "ID Uniqueness Check",
-                allure.attachment_type.TEXT,
-            )
-
     @staticmethod
     def check_multiple_fields(obj: Any, **field_expectations) -> None:
         """Проверяет несколько полей объекта сразу"""
@@ -785,11 +654,92 @@ class APIAssertions:
                     actual_value == expected_value
                 ), f"Expected {field_name}={expected_value}, got {actual_value}"
 
-            allure.attach(
-                str(field_expectations),
-                "Field Expectations",
-                allure.attachment_type.JSON,
+    # ========================================
+    # ПРОВЕРКИ ПАГИНАЦИИ
+    # ========================================
+
+    @staticmethod
+    def check_pagination_pages_calculation(page_obj: Any, size: int) -> None:
+        """Проверяет правильность расчета количества страниц"""
+        with allure.step(f"Verify pages calculation for size={size}"):
+            import math
+
+            expected_pages = (
+                math.ceil(page_obj.total / size) if page_obj.total > 0 else 1
             )
+
+            assert (
+                page_obj.pages == expected_pages
+            ), f"Pages calculation wrong: expected {expected_pages}, got {page_obj.pages} (total={page_obj.total}, size={size})"
+
+            logger.info(
+                f"Pages calculation correct: {page_obj.total} total / {size} size = {page_obj.pages} pages"
+            )
+
+    @staticmethod
+    def check_pagination_items_count(page_obj: Any, page: int, size: int) -> None:
+        """Проверяет правильность количества элементов на странице"""
+        with allure.step(f"Verify items count for page={page}, size={size}"):
+            if page <= page_obj.pages:
+                expected_items = min(size, page_obj.total - (page - 1) * size)
+                actual_items = len(page_obj.items)
+
+                assert (
+                    actual_items == expected_items
+                ), f"Items count wrong: expected {expected_items}, got {actual_items} (page={page}, size={size})"
+
+                logger.info(
+                    f"Items count correct: page {page} has {actual_items} items (expected {expected_items})"
+                )
+
+    @staticmethod
+    def check_pagination_different_data(
+        first_page_items: list, second_page_items: list, entity_type: str
+    ) -> None:
+        """Проверяет что данные на разных страницах действительно разные"""
+        with allure.step(
+            f"Verify different pages contain different {entity_type} data"
+        ):
+            # Извлекаем ключевые поля для сравнения
+            if entity_type == "user":
+                first_page_data = [
+                    (item.id, item.email, item.first_name) for item in first_page_items
+                ]
+                second_page_data = [
+                    (item.id, item.email, item.first_name) for item in second_page_items
+                ]
+            elif entity_type == "resource":
+                first_page_data = [
+                    (item.id, item.name, item.year) for item in first_page_items
+                ]
+                second_page_data = [
+                    (item.id, item.name, item.year) for item in second_page_items
+                ]
+            else:
+                raise ValueError(f"Unknown entity_type: {entity_type}")
+
+            assert (
+                first_page_data != second_page_data
+            ), f"Different pages should return different {entity_type} data"
+
+            # Проверяем уникальность ID между страницами
+            APIAssertions.check_unique_ids(
+                first_page_items + second_page_items, f"{entity_type} across pages"
+            )
+
+            logger.info(f"Different pages contain unique {entity_type} data")
+
+    @staticmethod
+    def check_pagination_empty_page(page_obj: Any) -> None:
+        """Проверяет что страница за пределами доступных возвращает пустой результат"""
+        with allure.step("Verify page beyond available returns empty items"):
+            actual_items_count = len(page_obj.items)
+
+            assert (
+                actual_items_count == 0
+            ), f"Page beyond available should return empty items, got {actual_items_count}"
+
+            logger.info("Page beyond available correctly returns empty results")
 
 
 # Создаем экземпляр для удобного использования

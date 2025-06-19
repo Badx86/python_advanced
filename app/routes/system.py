@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from typing import Tuple
 from fastapi import APIRouter
 from sqlmodel import Session, select, func
-from app.models import HealthStatus, User, Resource
+from app.models import HealthStatus, User
 from app.database.engine import engine
 
 logger = logging.getLogger(__name__)

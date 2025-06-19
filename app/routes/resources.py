@@ -27,7 +27,7 @@ def get_resources(params: Params = Depends()) -> Page[Resource]:
     # Работаем напрямую с БД
     with Session(engine) as session:
         query = select(Resource).order_by(Resource.id)
-        return paginate(session, query)
+        return paginate(session, query, params)
 
 
 @router.get("/api/resources/{resource_id}", tags=["Resources"])

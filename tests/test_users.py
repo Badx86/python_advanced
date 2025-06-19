@@ -100,3 +100,77 @@ class TestUsers:
             logger.info(f"Dynamic user {user_id} found, schema valid")
         else:
             logger.warning("No users found in database")
+
+    @allure.title("Verify pagination calculations and item counts")
+    @pytest.mark.pagination
+    @pytest.mark.parametrize("page,size", [(1, 1), (1, 6), (2, 6), (1, 12), (1, 50)])
+    def test_pagination_calculations(self, api_client, page, size) -> None:
+        """Проверка корректности расчетов пагинации и количества элементов"""
+        response = api_client.get("/api/users", params={"page": page, "size": size})
+        users_page = api.check_users_list_response(
+            response, f"/api/users?page={page}&size={size}", page=page, per_page=size
+        )
+
+        api.check_pagination_pages_calculation(users_page, size)
+        api.check_pagination_items_count(users_page, page, size)
+
+        logger.info(
+            f"Pagination calculations correct: page={page}, size={size}, items={len(users_page.items)}, pages={users_page.pages}"
+        )
+
+    @allure.title("Verify different pages return different data")
+    @pytest.mark.pagination
+    def test_pagination_different_pages(self, api_client) -> None:
+        """Проверка уникальности данных на разных страницах пагинации"""
+        response = api_client.get("/api/users", params={"page": 1, "size": 6})
+        first_page = api.check_users_list_response(
+            response, "/api/users?page=1", page=1, per_page=6
+        )
+
+        if first_page.total > 6 and first_page.pages > 1:
+            response = api_client.get("/api/users", params={"page": 2, "size": 6})
+            second_page = api.check_users_list_response(
+                response, "/api/users?page=2", page=2, per_page=6
+            )
+
+            api.check_pagination_different_data(
+                first_page.items, second_page.items, "user"
+            )
+            logger.info("Different pages contain different data and unique IDs")
+        else:
+            logger.info("Skipped different pages test - insufficient data")
+
+    @allure.title("Invalid pagination parameters should be rejected")
+    @pytest.mark.pagination
+    @pytest.mark.parametrize("page,size", [(0, 6), (-1, 6), (1, 0), (1, -5)])
+    def test_pagination_invalid_parameters(self, api_client, page, size) -> None:
+        """Проверка валидации параметров пагинации"""
+        from http import HTTPStatus
+
+        response = api_client.get("/api/users", params={"page": page, "size": size})
+        api.log_and_check_status(
+            response,
+            f"/api/users?page={page}&size={size}",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+        logger.info(f"Invalid pagination correctly rejected: page={page}, size={size}")
+
+    @allure.title("Page beyond available returns empty results")
+    @pytest.mark.pagination
+    def test_pagination_beyond_available(self, api_client) -> None:
+        """Проверка поведения при запросе несуществующей страницы"""
+        response = api_client.get("/api/users", params={"page": 1, "size": 6})
+        users_page = api.check_users_list_response(
+            response, "/api/users", page=1, per_page=6
+        )
+
+        beyond_page = users_page.pages + 5
+        response = api_client.get("/api/users", params={"page": beyond_page, "size": 6})
+        beyond_page_response = api.check_users_list_response(
+            response, f"/api/users?page={beyond_page}", page=beyond_page, per_page=6
+        )
+
+        api.check_pagination_empty_page(beyond_page_response)
+        logger.info(
+            f"Page {beyond_page} beyond {users_page.pages} correctly returns empty"
+        )

@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Query, Depends
 from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlmodel import Session, select, func
+from sqlmodel import Session, select
 from datetime import datetime
-from typing import Dict, Any
 import logging
 import random
 import time
@@ -37,7 +36,7 @@ def get_users_with_delay(
     # Работаем напрямую с БД
     with Session(engine) as session:
         query = select(User).order_by(User.id)
-        return paginate(session, query)
+        return paginate(session, query, params)
 
 
 @router.get("/api/users/{user_id}", tags=["Users"])
