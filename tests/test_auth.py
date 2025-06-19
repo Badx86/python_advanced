@@ -45,7 +45,7 @@ class TestAuth:
             "test.@domain.com",  # точка перед @
         ],
     )
-    def test_register_invalid_email(self, api_client, invalid_email) -> None:
+    def test_register_invalid_email(self, api_client, invalid_email: str) -> None:
         """Тест регистрации с невалидным email"""
         register_data = {"email": invalid_email, "password": "testpass"}
 
@@ -65,7 +65,7 @@ class TestAuth:
             "test..test@domain.com",
         ],
     )
-    def test_login_invalid_email(self, api_client, invalid_email) -> None:
+    def test_login_invalid_email(self, api_client, invalid_email: str) -> None:
         """Тест логина с невалидным email"""
         login_data = {"email": invalid_email, "password": "testpass"}
 

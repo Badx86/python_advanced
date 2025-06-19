@@ -67,7 +67,7 @@ class TestUsers:
 
     @allure.title("Get non-existent user by ID")
     @pytest.mark.parametrize("user_id", [1000000, 999999, 888888])
-    def test_single_user_not_found(self, api_client, user_id) -> None:
+    def test_single_user_not_found(self, api_client, user_id: int) -> None:
         """Тест получения несуществующего пользователя"""
         response = api_client.get(f"/api/users/{user_id}")
         api.check_404_error(response, f"/api/users/{user_id}")
@@ -75,7 +75,7 @@ class TestUsers:
 
     @allure.title("Get user with invalid ID")
     @pytest.mark.parametrize("user_id", [0, -1, -999])
-    def test_single_user_invalid_id(self, api_client, user_id) -> None:
+    def test_single_user_invalid_id(self, api_client, user_id: int) -> None:
         """Тест невалидного ID пользователя"""
         response = api_client.get(f"/api/users/{user_id}")
         api.log_and_check_status(
@@ -104,7 +104,7 @@ class TestUsers:
     @allure.title("Verify pagination calculations and item counts")
     @pytest.mark.pagination
     @pytest.mark.parametrize("page,size", [(1, 1), (1, 6), (2, 6), (1, 12), (1, 50)])
-    def test_pagination_calculations(self, api_client, page, size) -> None:
+    def test_pagination_calculations(self, api_client, page: int, size: int) -> None:
         """Проверка корректности расчетов пагинации и количества элементов"""
         response = api_client.get("/api/users", params={"page": page, "size": size})
         users_page = api.check_users_list_response(
@@ -143,7 +143,7 @@ class TestUsers:
     @allure.title("Invalid pagination parameters should be rejected")
     @pytest.mark.pagination
     @pytest.mark.parametrize("page,size", [(0, 6), (-1, 6), (1, 0), (1, -5)])
-    def test_pagination_invalid_parameters(self, api_client, page, size) -> None:
+    def test_pagination_invalid_parameters(self, api_client, page: int, size: int) -> None:
         """Проверка валидации параметров пагинации"""
         from http import HTTPStatus
 

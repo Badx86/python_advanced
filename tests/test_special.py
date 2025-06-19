@@ -14,7 +14,7 @@ class TestSpecial:
 
     @allure.title("Test delayed response functionality")
     @pytest.mark.parametrize("delay_seconds", [1, 2])
-    def test_delayed_response(self, api_client, delay_seconds) -> None:
+    def test_delayed_response(self, api_client, delay_seconds: int) -> None:
         """Тест задержанного ответа"""
         start_time = time.time()
 

@@ -34,7 +34,7 @@ class TestResources:
 
     @allure.title("Get non-existent resource by ID")
     @pytest.mark.parametrize("resource_id", [999999, 888888, 777777])
-    def test_single_resource_not_found(self, api_client, resource_id) -> None:
+    def test_single_resource_not_found(self, api_client, resource_id: int) -> None:
         """Тест получения несуществующего ресурса"""
         response = api_client.get(f"/api/resources/{resource_id}")
         api.check_404_error(response, f"/api/resources/{resource_id}")
@@ -67,7 +67,7 @@ class TestResources:
     @allure.title("Verify pagination calculations and item counts")
     @pytest.mark.pagination
     @pytest.mark.parametrize("page,size", [(1, 1), (1, 6), (2, 6), (1, 12), (1, 50)])
-    def test_pagination_calculations(self, api_client, page, size) -> None:
+    def test_pagination_calculations(self, api_client, page: int, size: int) -> None:
         """Проверка корректности расчетов пагинации и количества элементов"""
         response = api_client.get("/api/resources", params={"page": page, "size": size})
         resources_page = api.check_resources_list_response(
@@ -109,7 +109,7 @@ class TestResources:
     @allure.title("Invalid pagination parameters should be rejected")
     @pytest.mark.pagination
     @pytest.mark.parametrize("page,size", [(0, 6), (-1, 6), (1, 0), (1, -5)])
-    def test_pagination_invalid_parameters(self, api_client, page, size) -> None:
+    def test_pagination_invalid_parameters(self, api_client, page: int, size: int) -> None:
         """Проверка валидации параметров пагинации"""
         response = api_client.get("/api/resources", params={"page": page, "size": size})
 
