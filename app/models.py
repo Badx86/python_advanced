@@ -34,21 +34,35 @@ class Resource(SQLModel, table=True):
 # ================================
 
 
-class UserCreate(BaseModel):
+class UserCreate(SQLModel):
     """Создание пользователя"""
 
     name: str
     job: str
 
 
-class UserUpdate(BaseModel):
+class UserUpdate(SQLModel):
     """Обновление пользователя"""
 
     name: Optional[str] = None
     job: Optional[str] = None
 
 
-class ResourceCreate(BaseModel):
+class RegisterRequest(SQLModel):
+    """Запрос регистрации"""
+
+    email: str
+    password: str
+
+
+class LoginRequest(SQLModel):
+    """Запрос входа"""
+
+    email: str
+    password: str
+
+
+class ResourceCreate(SQLModel):
     """Создание ресурса"""
 
     name: str
@@ -57,7 +71,7 @@ class ResourceCreate(BaseModel):
     pantone_value: str
 
 
-class ResourceUpdate(BaseModel):
+class ResourceUpdate(SQLModel):
     """Обновление ресурса"""
 
     name: Optional[str] = None
@@ -76,6 +90,19 @@ class Support(SQLModel):
 
     url: HttpUrl
     text: str
+
+
+class RegisterResponse(SQLModel):
+    """Ответ регистрации"""
+
+    id: int
+    token: str
+
+
+class LoginResponse(SQLModel):
+    """Ответ входа"""
+
+    token: str
 
 
 class UserResponse(BaseModel):

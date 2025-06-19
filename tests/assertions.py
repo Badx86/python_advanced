@@ -648,6 +648,60 @@ class APIAssertions:
     # ========================================
 
     @classmethod
+    def check_register_success_response(
+        cls, response: requests.Response, endpoint: str
+    ) -> dict:
+        """Проверяет успешный ответ регистрации"""
+        with allure.step("Verify successful registration API response"):
+            cls.log_and_check_status(response, endpoint, HTTPStatus.CREATED)
+            data = response.json()
+
+            assert "id" in data, "Missing 'id' in registration response"
+            assert "token" in data, "Missing 'token' in registration response"
+
+            assert isinstance(
+                data["id"], int
+            ), f"ID should be integer, got {type(data['id'])}"
+            assert isinstance(
+                data["token"], str
+            ), f"Token should be string, got {type(data['token'])}"
+            assert data["id"] > 0, f"ID should be positive, got {data['id']}"
+            assert len(data["token"]) > 0, "Token should not be empty"
+
+            allure.attach(
+                f"User ID: {data['id']}\nToken: {data['token']}",
+                "Registration Success Data",
+                allure.attachment_type.TEXT,
+            )
+
+            logger.info(f"Registration successful: ID={data['id']}")
+            return data
+
+    @classmethod
+    def check_login_success_response(
+        cls, response: requests.Response, endpoint: str
+    ) -> dict:
+        """Проверяет успешный ответ логина"""
+        with allure.step("Verify successful login API response"):
+            cls.log_and_check_status(response, endpoint, HTTPStatus.OK)
+            data = response.json()
+
+            assert "token" in data, "Missing 'token' in login response"
+            assert isinstance(
+                data["token"], str
+            ), f"Token should be string, got {type(data['token'])}"
+            assert len(data["token"]) > 0, "Token should not be empty"
+
+            allure.attach(
+                f"Token: {data['token']}",
+                "Login Success Data",
+                allure.attachment_type.TEXT,
+            )
+
+            logger.info(f"Login successful")
+            return data
+
+    @classmethod
     def check_email_error_response(
         cls, response: requests.Response, endpoint: str, expected_error: str
     ) -> None:

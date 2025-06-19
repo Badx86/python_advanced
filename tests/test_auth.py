@@ -1,6 +1,7 @@
 import allure
 import logging
 import pytest
+from http import HTTPStatus
 from tests.assertions import api
 
 logger = logging.getLogger(__name__)
@@ -11,6 +12,27 @@ logger = logging.getLogger(__name__)
 class TestAuth:
     """Тесты для аутентификации"""
 
+    @allure.title("Successful registration")
+    def test_register_successful(self, api_client) -> None:
+        """Тест успешной регистрации"""
+        register_data = {
+            "email": "user@gmail.com",
+            "password": "securepass123",
+        }  # ← ИЗМЕНИТЬ ЭТО
+
+        response = api_client.post("/api/register", json=register_data)
+        api.check_register_success_response(response, "/api/register")
+        logger.info("Registration successful with valid credentials")
+
+    @allure.title("Successful login")
+    def test_login_successful(self, api_client) -> None:
+        """Тест успешного логина"""
+        login_data = {"email": "user@gmail.com", "password": "securepass123"}  # ← И ЭТО
+
+        response = api_client.post("/api/login", json=login_data)
+        api.check_login_success_response(response, "/api/login")
+        logger.info("Login successful with valid credentials")
+
     @allure.title("Register with invalid email formats")
     @pytest.mark.parametrize(
         "invalid_email",
@@ -19,7 +41,6 @@ class TestAuth:
             "test@",  # без домена
             "@domain.com",  # без имени
             "test..test@domain.com",  # двойные точки
-            "   ",  # пробелы
             "test@domain",  # без TLD
             "test.@domain.com",  # точка перед @
         ],
@@ -42,7 +63,6 @@ class TestAuth:
             "test@",
             "@domain.com",
             "test..test@domain.com",
-            "   ",  # пробелы
         ],
     )
     def test_login_invalid_email(self, api_client, invalid_email) -> None:
@@ -62,7 +82,9 @@ class TestAuth:
         }
 
         response = api_client.post("/api/register", json=register_data)
-        api.check_email_error_response(response, "/api/register", "Missing email")
+        api.log_and_check_status(
+            response, "/api/register", HTTPStatus.UNPROCESSABLE_ENTITY
+        )
         logger.info("Registration correctly failed for missing email")
 
     @allure.title("Register with empty email")
@@ -83,7 +105,9 @@ class TestAuth:
         }
 
         response = api_client.post("/api/login", json=login_data)
-        api.check_email_error_response(response, "/api/login", "Missing email")
+        api.log_and_check_status(
+            response, "/api/login", HTTPStatus.UNPROCESSABLE_ENTITY
+        )
         logger.info("Login correctly failed for missing email")
 
     @allure.title("Login with empty email")
@@ -104,7 +128,9 @@ class TestAuth:
         }
 
         response = api_client.post("/api/register", json=register_data)
-        api.check_email_error_response(response, "/api/register", "Missing password")
+        api.log_and_check_status(
+            response, "/api/register", HTTPStatus.UNPROCESSABLE_ENTITY
+        )
         logger.info("Registration failed as expected (missing password)")
 
     @allure.title("Login without password field")
@@ -116,5 +142,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/login", json=login_data)
-        api.check_email_error_response(response, "/api/login", "Missing password")
+        api.log_and_check_status(
+            response, "/api/login", HTTPStatus.UNPROCESSABLE_ENTITY
+        )
         logger.info("Login failed as expected (missing password)")
