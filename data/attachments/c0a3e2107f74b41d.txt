@@ -1,0 +1,5 @@
+UPDATED:
+Name: magenta
+Year: 2028
+Color: #88604a
+Pantone: VARIOUS-864

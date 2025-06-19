@@ -1,5 +1,0 @@
-ID: 15
-Name: white
-Year: 2023
-Color: #b535b8
-Pantone: LOWEST-453

@@ -1,0 +1,5 @@
+ID: 16
+Name: red
+Year: 2027
+Color: #33cd97
+Pantone: REFERENCE-120

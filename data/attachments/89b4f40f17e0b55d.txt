@@ -1,5 +1,0 @@
-ID: 16
-Name: white
-Year: 2028
-Color: #f3ff71
-Pantone: INQUIRY-588

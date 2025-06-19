@@ -1,5 +1,0 @@
-UPDATED:
-Name: magenta
-Year: 2025
-Color: #a96ec7
-Pantone: WEALTH-331

@@ -1,5 +1,0 @@
-ID: 13
-Email: felix@example.com
-First Name: felix
-Last Name: 
-Avatar: https://reqres.in/img/faces/2-image.jpg

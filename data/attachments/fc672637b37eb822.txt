@@ -1,3 +1,0 @@
-User ID: 11
-Email: george.edwards@reqres.in
-Name: George Edwards

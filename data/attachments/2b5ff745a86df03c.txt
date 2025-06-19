@@ -1,5 +1,0 @@
-UPDATED:
-Name: orange
-Year: 2026
-Color: #ffbf67
-Pantone: EDITED-889
