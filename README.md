@@ -1,10 +1,15 @@
-[![Allure Report](https://img.shields.io/badge/Allure%20Report-deployed-brightgreen)](https://Badx86.github.io/python_advanced/)
-[![Python](https://img.shields.io/badge/python-3.11+-blue)](https://www.python.org/)
+[![Allure Report](https://github.com/Badx86/python_advanced/actions/workflows/tests.yml/badge.svg)](https://Badx86.github.io/python_advanced/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
 [![Pydantic](https://img.shields.io/badge/Pydantic-2.9+-E92063)](https://pydantic.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green)](https://fastapi.tiangolo.com/)
+[![Uvicorn](https://img.shields.io/badge/Uvicorn-0.34+-green)](https://www.uvicorn.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)](https://www.postgresql.org/)
+[![SQLModel](https://img.shields.io/badge/SQLModel-0.0.24-red)](https://sqlmodel.tiangolo.com/)
+[![Pytest](https://img.shields.io/badge/pytest-8.4+-blue)](https://docs.pytest.org/)
+[![pytest-sugar](https://img.shields.io/badge/pytest--sugar-1.0+-pink)](https://pypi.org/project/pytest-sugar/)
+[![Poetry](https://img.shields.io/badge/Poetry-dependency%20management-blue)](https://python-poetry.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-blue)](https://www.docker.com/)
-[![dependency](https://img.shields.io/badge/dependency-pytest-blue)](https://docs.pytest.org/)
+[![Mimesis](https://img.shields.io/badge/Mimesis-test%20data-purple)](https://mimesis.name/)
 [![code style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
 
 # FastAPI Reqres with PostgreSQL
