@@ -3,7 +3,6 @@ from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlmodel import Session, select
 from datetime import datetime
-from typing import Dict, Any
 import logging
 
 from app.database.engine import engine
@@ -21,7 +20,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/api/unknown", tags=["Resources"])
+@router.get("/api/resources", tags=["Resources"])
 def get_resources(params: Params = Depends()) -> Page[Resource]:
     """Получить список ресурсов с пагинацией"""
 
@@ -31,7 +30,7 @@ def get_resources(params: Params = Depends()) -> Page[Resource]:
         return paginate(session, query)
 
 
-@router.get("/api/unknown/{resource_id}", tags=["Resources"])
+@router.get("/api/resources/{resource_id}", tags=["Resources"])
 def get_single_resource(resource_id: int) -> SingleResourceResponse:
     """Получить ресурс по ID"""
 
@@ -54,7 +53,7 @@ def get_single_resource(resource_id: int) -> SingleResourceResponse:
     )
 
 
-@router.post("/api/unknown", status_code=201, tags=["Resources"])
+@router.post("/api/resources", status_code=201, tags=["Resources"])
 def create_resource(resource_data: ResourceCreate) -> ResourceResponse:
     """Создать новый ресурс"""
 
@@ -93,7 +92,7 @@ def create_resource(resource_data: ResourceCreate) -> ResourceResponse:
         raise ValidationError("Failed to create resource")
 
 
-@router.put("/api/unknown/{resource_id}", tags=["Resources"])
+@router.put("/api/resources/{resource_id}", tags=["Resources"])
 def update_resource_put(
     resource_id: int, resource_data: ResourceUpdate
 ) -> ResourceResponse:
@@ -140,7 +139,7 @@ def update_resource_put(
         raise ValidationError("Failed to update resource")
 
 
-@router.patch("/api/unknown/{resource_id}", tags=["Resources"])
+@router.patch("/api/resources/{resource_id}", tags=["Resources"])
 def update_resource_patch(
     resource_id: int, resource_data: ResourceUpdate
 ) -> ResourceResponse:
@@ -187,7 +186,7 @@ def update_resource_patch(
         raise ValidationError("Failed to update resource")
 
 
-@router.delete("/api/unknown/{resource_id}", status_code=204, tags=["Resources"])
+@router.delete("/api/resources/{resource_id}", status_code=204, tags=["Resources"])
 def delete_resource(resource_id: int) -> None:
     """Удалить ресурс"""
 

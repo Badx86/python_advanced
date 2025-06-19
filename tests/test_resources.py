@@ -14,8 +14,10 @@ class TestResources:
     @pytest.mark.pagination
     def test_list_resources(self, api_client) -> None:
         """Тест списка ресурсов"""
-        response = api_client.get("/api/unknown", params={"page": 1, "size": 6})
-        resources_response = api.check_resources_list_response(response, "/api/unknown")
+        response = api_client.get("/api/resources", params={"page": 1, "size": 6})
+        resources_response = api.check_resources_list_response(
+            response, "/api/resources"
+        )
 
         api.check_multiple_fields(
             resources_response.items[0], name="cerulean", year=2000
@@ -25,25 +27,25 @@ class TestResources:
     @allure.title("Get single resource by ID")
     def test_single_resource(self, api_client) -> None:
         """Тест получения одного ресурса"""
-        response = api_client.get("/api/unknown/2")
-        api.check_resource_response(response, "/api/unknown/2")
+        response = api_client.get("/api/resources/2")
+        api.check_resource_response(response, "/api/resources/2")
         logger.info("Resource 2 found, schema valid")
 
     @allure.title("Get non-existent resource by ID")
     @pytest.mark.parametrize("resource_id", [999999, 888888, 777777])
     def test_single_resource_not_found(self, api_client, resource_id) -> None:
         """Тест получения несуществующего ресурса"""
-        response = api_client.get(f"/api/unknown/{resource_id}")
-        api.check_404_error(response, f"/api/unknown/{resource_id}")
+        response = api_client.get(f"/api/resources/{resource_id}")
+        api.check_404_error(response, f"/api/resources/{resource_id}")
         logger.info(f"Resource {resource_id} not found (404)")
 
     @allure.title("Get resources list - second page")
     @pytest.mark.pagination
     def test_resources_page_2(self, api_client) -> None:
         """Тест второй страницы ресурсов"""
-        response = api_client.get("/api/unknown", params={"page": 2, "size": 6})
+        response = api_client.get("/api/resources", params={"page": 2, "size": 6})
         resources_response = api.check_resources_list_response(
-            response, "/api/unknown?page=2", page=2
+            response, "/api/resources?page=2", page=2
         )
 
         api.check_multiple_fields(resources_response.items[0], id=7, name="sand dollar")
@@ -52,9 +54,9 @@ class TestResources:
     @allure.title("Verify unique resource IDs")
     def test_resources_no_duplicates(self, api_client) -> None:
         """Тест уникальности ID ресурсов"""
-        response = api_client.get("/api/unknown", params={"page": 1, "size": 12})
+        response = api_client.get("/api/resources", params={"page": 1, "size": 12})
         resources_page = api.check_resources_list_response(
-            response, "/api/unknown", page=1, per_page=12
+            response, "/api/resources", page=1, per_page=12
         )
 
         # Проверяем уникальность ID

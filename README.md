@@ -197,12 +197,12 @@ psql -h localhost -U postgres -d postgres
 
 **Ресурсы:**
 
-- `GET /api/unknown` - Список ресурсов (из JSON файла)
-- `GET /api/unknown/{id}` - Получить ресурс по ID
-- `POST /api/unknown` - Создать ресурс (сохраняется в БД)
-- `PUT /api/unknown/{id}` - Полное обновление ресурса
-- `PATCH /api/unknown/{id}` - Частичное обновление ресурса
-- `DELETE /api/unknown/{id}` - Удалить ресурс (из БД)
+- `GET /api/resources` - Список ресурсов (из JSON файла)
+- `GET /api/resources/{id}` - Получить ресурс по ID
+- `POST /api/resources` - Создать ресурс (сохраняется в БД)
+- `PUT /api/resources/{id}` - Полное обновление ресурса
+- `PATCH /api/resources/{id}` - Частичное обновление ресурса
+- `DELETE /api/resources/{id}` - Удалить ресурс (из БД)
 
 ## Структура проекта
 

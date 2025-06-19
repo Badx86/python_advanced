@@ -33,17 +33,17 @@ class TestResourcesCRUD:
         resource_data = generate_random_resource()
         logger.info(f"Creating resource with data: {resource_data}")
 
-        response = api_client.post("/api/unknown", json=resource_data)
-        api.check_create_resource_response(response, "/api/unknown", resource_data)
+        response = api_client.post("/api/resources", json=resource_data)
+        api.check_create_resource_response(response, "/api/resources", resource_data)
         logger.info("Resource created and verified in database successfully")
 
     @allure.title("Read existing resource by ID")
     def test_read_resource(self, api_client) -> None:
         """Тест чтения случайного ресурса"""
         # Получаем список ресурсов
-        response = api_client.get("/api/unknown", params={"page": 1, "size": 50})
+        response = api_client.get("/api/resources", params={"page": 1, "size": 50})
         resources_page = api.check_resources_list_response(
-            response, "/api/unknown", page=1, per_page=50
+            response, "/api/resources", page=1, per_page=50
         )
 
         if resources_page.items:
@@ -52,8 +52,8 @@ class TestResourcesCRUD:
             resource_id = random_resource.id
 
             # Читаем этот случайный ресурс
-            response = api_client.get(f"/api/unknown/{resource_id}")
-            api.check_resource_response(response, f"/api/unknown/{resource_id}")
+            response = api_client.get(f"/api/resources/{resource_id}")
+            api.check_resource_response(response, f"/api/resources/{resource_id}")
             logger.info(f"Random resource {resource_id} read successfully")
         else:
             logger.warning("No resources found in database for read test")
@@ -63,9 +63,9 @@ class TestResourcesCRUD:
         """Тест полного обновления ресурса (API + БД)"""
         # Создаем ресурс
         resource_data = generate_random_resource()
-        create_response = api_client.post("/api/unknown", json=resource_data)
+        create_response = api_client.post("/api/resources", json=resource_data)
         created_resource = api.check_create_resource_response(
-            create_response, "/api/unknown", resource_data
+            create_response, "/api/resources", resource_data
         )
         resource_id = int(created_resource["id"])
 
@@ -73,9 +73,9 @@ class TestResourcesCRUD:
         updated_data = generate_random_resource()
         logger.info(f"Updating resource {resource_id} with data: {updated_data}")
 
-        response = api_client.put(f"/api/unknown/{resource_id}", json=updated_data)
+        response = api_client.put(f"/api/resources/{resource_id}", json=updated_data)
         api.check_update_resource_response(
-            response, f"/api/unknown/{resource_id}", updated_data, resource_id
+            response, f"/api/resources/{resource_id}", updated_data, resource_id
         )
         logger.info(
             f"Resource {resource_id} updated and verified in database successfully"
@@ -86,9 +86,9 @@ class TestResourcesCRUD:
         """Тест частичного обновления ресурса (API + БД)"""
         # Создаем ресурс
         resource_data = generate_random_resource()
-        create_response = api_client.post("/api/unknown", json=resource_data)
+        create_response = api_client.post("/api/resources", json=resource_data)
         created_resource = api.check_create_resource_response(
-            create_response, "/api/unknown", resource_data
+            create_response, "/api/resources", resource_data
         )
         resource_id = int(created_resource["id"])
 
@@ -96,9 +96,9 @@ class TestResourcesCRUD:
         updated_data = generate_random_resource()
         logger.info(f"Patching resource {resource_id} with data: {updated_data}")
 
-        response = api_client.patch(f"/api/unknown/{resource_id}", json=updated_data)
+        response = api_client.patch(f"/api/resources/{resource_id}", json=updated_data)
         api.check_update_resource_response(
-            response, f"/api/unknown/{resource_id}", updated_data, resource_id
+            response, f"/api/resources/{resource_id}", updated_data, resource_id
         )
         logger.info(
             f"Resource {resource_id} patched and verified in database successfully"
@@ -109,16 +109,16 @@ class TestResourcesCRUD:
         """Тест удаления ресурса (API + БД)"""
         # Создаем ресурс
         resource_data = generate_random_resource()
-        create_response = api_client.post("/api/unknown", json=resource_data)
+        create_response = api_client.post("/api/resources", json=resource_data)
         created_resource = api.check_create_resource_response(
-            create_response, "/api/unknown", resource_data
+            create_response, "/api/resources", resource_data
         )
         resource_id = int(created_resource["id"])
 
         # Удаляем его
-        response = api_client.delete(f"/api/unknown/{resource_id}")
+        response = api_client.delete(f"/api/resources/{resource_id}")
         api.check_delete_resource_response(
-            response, f"/api/unknown/{resource_id}", resource_id
+            response, f"/api/resources/{resource_id}", resource_id
         )
         logger.info(
             f"Resource {resource_id} deleted and verified removed from database"
@@ -130,15 +130,15 @@ class TestResourcesCRUD:
         updated_data = generate_random_resource()
         logger.info(f"Updating non-existent resource with data: {updated_data}")
 
-        response = api_client.put("/api/unknown/999999", json=updated_data)
-        api.check_404_error(response, "/api/unknown/999999")
+        response = api_client.put("/api/resources/999999", json=updated_data)
+        api.check_404_error(response, "/api/resources/999999")
         logger.info("Non-existent resource correctly failed with 404")
 
     @allure.title("Delete non-existent resource")
     def test_delete_nonexistent_resource(self, api_client) -> None:
         """Тест удаления несуществующего ресурса"""
-        response = api_client.delete("/api/unknown/999999")
-        api.check_404_error(response, "/api/unknown/999999")
+        response = api_client.delete("/api/resources/999999")
+        api.check_404_error(response, "/api/resources/999999")
         logger.info("Non-existent resource DELETE correctly failed with 404")
 
     @allure.title("Full CRUD cycle for resource")
@@ -146,9 +146,9 @@ class TestResourcesCRUD:
         """Тест полного цикла: создание -> проверка -> удаление (с БД проверками)"""
         # Создаем ресурс
         resource_data = generate_random_resource()
-        create_response = api_client.post("/api/unknown", json=resource_data)
+        create_response = api_client.post("/api/resources", json=resource_data)
         created_resource = api.check_create_resource_response(
-            create_response, "/api/unknown", resource_data
+            create_response, "/api/resources", resource_data
         )
         resource_id = int(created_resource["id"])
 
@@ -156,18 +156,18 @@ class TestResourcesCRUD:
         api.check_resource_in_database(resource_id, resource_data)
 
         # Проверяем что ресурс доступен через API
-        get_response = api_client.get(f"/api/unknown/{resource_id}")
-        api.check_resource_response(get_response, f"/api/unknown/{resource_id}")
+        get_response = api_client.get(f"/api/resources/{resource_id}")
+        api.check_resource_response(get_response, f"/api/resources/{resource_id}")
 
         # Удаляем ресурс
-        delete_response = api_client.delete(f"/api/unknown/{resource_id}")
+        delete_response = api_client.delete(f"/api/resources/{resource_id}")
         api.check_delete_resource_response(
-            delete_response, f"/api/unknown/{resource_id}", resource_id
+            delete_response, f"/api/resources/{resource_id}", resource_id
         )
 
         # Проверяем что ресурс удален из API
-        get_after_delete = api_client.get(f"/api/unknown/{resource_id}")
-        api.check_404_error(get_after_delete, f"/api/unknown/{resource_id}")
+        get_after_delete = api_client.get(f"/api/resources/{resource_id}")
+        api.check_404_error(get_after_delete, f"/api/resources/{resource_id}")
 
         logger.info(
             f"Full CRUD cycle with database verification completed for resource {resource_id}"
@@ -181,9 +181,9 @@ class TestResourcesCRUD:
         # Создаем 3 ресурса
         for i in range(3):
             resource_data = generate_random_resource()
-            response = api_client.post("/api/unknown", json=resource_data)
+            response = api_client.post("/api/resources", json=resource_data)
             created_resource = api.check_create_resource_response(
-                response, "/api/unknown", resource_data
+                response, "/api/resources", resource_data
             )
             created_resources.append((int(created_resource["id"]), resource_data))
             logger.info(f"Created resource {i + 1}/3 with ID {created_resource['id']}")
@@ -194,9 +194,9 @@ class TestResourcesCRUD:
 
         # Удаляем все созданные ресурсы
         for resource_id, _ in created_resources:
-            response = api_client.delete(f"/api/unknown/{resource_id}")
+            response = api_client.delete(f"/api/resources/{resource_id}")
             api.check_delete_resource_response(
-                response, f"/api/unknown/{resource_id}", resource_id
+                response, f"/api/resources/{resource_id}", resource_id
             )
             logger.info(f"Deleted resource {resource_id}")
 

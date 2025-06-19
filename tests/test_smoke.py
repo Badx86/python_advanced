@@ -36,7 +36,7 @@ class TestSmoke:
     @allure.title("Main endpoints are accessible")
     def test_main_endpoints_accessible(self, api_client) -> None:
         """Основные эндпоинты доступны"""
-        endpoints = ["/api/users", "/api/unknown"]
+        endpoints = ["/api/users", "/api/resources"]
 
         for endpoint in endpoints:
             response = api_client.get(endpoint)
