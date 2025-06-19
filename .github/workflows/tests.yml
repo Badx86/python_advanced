@@ -55,11 +55,26 @@ jobs:
 
       - name: 📈 Download previous history
         uses: dawidd6/action-download-artifact@v11
-        if: always()
         continue-on-error: true
         with:
           name: allure-history
           path: allure-history
+
+      - name: 📂 Prepare directories
+        run: |
+          mkdir -p allure-results/history
+          echo "Created allure-results/history directory"
+
+      - name: 📥 Copy history
+        continue-on-error: true
+        run: |
+          if [ -d "allure-history" ] && [ "$(ls -A allure-history 2>/dev/null)" ]; then
+            cp -r allure-history/* allure-results/history/
+            echo "✅ History copied successfully"
+            ls -la allure-results/history/
+          else
+            echo "ℹ️ No previous history found"
+          fi
 
       - name: 🚀 Start FastAPI server
         run: |
@@ -70,10 +85,6 @@ jobs:
           API_URL: http://localhost:8000
           HOST: 0.0.0.0
           PORT: 8000
-
-      - name: 📥 Copy history
-        if: always()
-        run: cp -r allure-history/* allure-results/ 2>/dev/null || true
 
       - name: 🧪 Run tests
         continue-on-error: true
@@ -94,8 +105,22 @@ jobs:
           sudo mv allure-2.24.1 /opt/allure
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
           
+          # Проверяем содержимое в allure-results
+          echo "📁 Contents of allure-results before generation:"
+          ls -la allure-results/
+          
           # Генерируем отчет
           allure generate allure-results --clean -o allure-report
+          
+          # Проверяем создание истории
+          echo "📈 Contents of allure-report after generation:"
+          ls -la allure-report/
+          if [ -d "allure-report/history" ]; then
+            echo "✅ History directory created"
+            ls -la allure-report/history/
+          else
+            echo "❌ No history directory found"
+          fi
 
       - name: 💾 Save history
         uses: actions/upload-artifact@v4
