@@ -1,5 +1,0 @@
-ID: 15
-Name: cyan
-Year: 2026
-Color: #ea27ea
-Pantone: PORTIONS-167

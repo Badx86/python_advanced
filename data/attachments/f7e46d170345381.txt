@@ -1,5 +1,0 @@
-ID: 16
-Email: hien@example.com
-First Name: hien
-Last Name: 
-Avatar: https://reqres.in/img/faces/2-image.jpg

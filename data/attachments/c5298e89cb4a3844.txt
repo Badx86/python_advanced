@@ -1,5 +1,0 @@
-ID: 17
-Email: dante@example.com
-First Name: dante
-Last Name: 
-Avatar: https://reqres.in/img/faces/12-image.jpg

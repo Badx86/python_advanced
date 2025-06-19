@@ -1,0 +1,3 @@
+INFO     tests.assertions:assertions.py:65 POST /api/register - Status: 201
+INFO     tests.assertions:assertions.py:677 Registration successful: ID=3
+INFO     tests.test_auth:test_auth.py:25 Registration successful with valid credentials

@@ -1,2 +1,0 @@
-Name: glenn
-Job: bank messenger

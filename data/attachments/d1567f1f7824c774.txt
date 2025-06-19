@@ -1,5 +1,0 @@
-ID: 19
-Name: pink
-Year: 2026
-Color: #4ca991
-Pantone: MORTGAGES-376

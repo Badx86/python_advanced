@@ -1,5 +1,0 @@
-UPDATED:
-Name: black
-Year: 2029
-Color: #28f8fb
-Pantone: PARTICIPANTS-587

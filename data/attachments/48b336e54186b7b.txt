@@ -1,0 +1,5 @@
+ID: 15
+Name: cyan
+Year: 2026
+Color: #d61c8e
+Pantone: REPEAT-881

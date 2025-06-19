@@ -1,4 +1,0 @@
-Resource ID: 3
-Name: true red
-Year: 2002
-Color: #BF1932

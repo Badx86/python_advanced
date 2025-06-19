@@ -1,0 +1,5 @@
+ID: 13
+Name: black
+Year: 2026
+Color: #0ee5ca
+Pantone: STRATEGY-626

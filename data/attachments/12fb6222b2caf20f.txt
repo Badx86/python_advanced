@@ -1,4 +1,0 @@
-Resource ID: 17
-Name: brown
-Year: 2030
-Color: #9a0aa8

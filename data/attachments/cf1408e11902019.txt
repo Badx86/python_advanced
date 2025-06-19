@@ -1,0 +1,5 @@
+ID: 18
+Name: beige
+Year: 2025
+Color: #6c55af
+Pantone: BIKE-404
