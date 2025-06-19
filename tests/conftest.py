@@ -153,37 +153,35 @@ def pytest_runtest_makereport(item, call):
 
 def pytest_configure(config):
     """Конфигурация Allure categories"""
-    # Возможность добавления кастомных категорий
-    if hasattr(config, "_allure_config"):
-        # Создаем categories.json для группировки ошибок
-        categories = [
-            {
-                "name": "API Response Errors",
-                "messageRegex": ".*status_code.*|.*HTTP.*|.*Response.*",
-                "traceRegex": ".*requests.*|.*urllib.*",
-            },
-            {
-                "name": "Database Errors",
-                "messageRegex": ".*database.*|.*SQL.*|.*connection.*",
-                "traceRegex": ".*sqlalchemy.*|.*psycopg.*",
-            },
-            {
-                "name": "Validation Errors",
-                "messageRegex": ".*validation.*|.*assert.*|.*ValidationError.*",
-                "traceRegex": ".*pydantic.*|.*marshmallow.*",
-            },
-            {
-                "name": "Service Unavailable",
-                "messageRegex": ".*Service unavailable.*|.*Connection.*|.*timeout.*",
-                "traceRegex": ".*requests.*",
-            },
-        ]
+    import json
 
-        allure_results_dir = "allure-results"
-        if not os.path.exists(allure_results_dir):
-            os.makedirs(allure_results_dir)
+    # Создаем categories.json для группировки ошибок
+    categories = [
+        {
+            "name": "API Response Errors",
+            "messageRegex": ".*status_code.*|.*HTTP.*|.*Response.*",
+            "traceRegex": ".*requests.*|.*urllib.*",
+        },
+        {
+            "name": "Database Errors",
+            "messageRegex": ".*database.*|.*SQL.*|.*connection.*",
+            "traceRegex": ".*sqlalchemy.*|.*psycopg.*",
+        },
+        {
+            "name": "Validation Errors",
+            "messageRegex": ".*validation.*|.*assert.*|.*ValidationError.*",
+            "traceRegex": ".*pydantic.*|.*marshmallow.*",
+        },
+        {
+            "name": "Service Unavailable",
+            "messageRegex": ".*Service unavailable.*|.*Connection.*|.*timeout.*",
+            "traceRegex": ".*requests.*",
+        },
+    ]
 
-        import json
+    allure_results_dir = "allure-results"
+    if not os.path.exists(allure_results_dir):
+        os.makedirs(allure_results_dir)
 
-        with open(f"{allure_results_dir}/categories.json", "w") as f:
-            json.dump(categories, f, indent=2)
+    with open(f"{allure_results_dir}/categories.json", "w") as f:
+        json.dump(categories, f, indent=2)
