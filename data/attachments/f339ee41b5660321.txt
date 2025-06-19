@@ -1,4 +1,0 @@
-Method: POST
-URL: /api/register
-Expected: 201
-Actual: 201

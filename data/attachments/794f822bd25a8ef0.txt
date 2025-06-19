@@ -1,4 +1,0 @@
-Method: PUT
-URL: /api/users/999999
-Expected: 404
-Actual: 404

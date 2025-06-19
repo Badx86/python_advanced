@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:65 GET /api/resources - Status: 200
-INFO     tests.test_resources:test_resources.py:25 Resources list works, schema valid

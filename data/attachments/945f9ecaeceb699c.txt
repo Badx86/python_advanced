@@ -1,4 +1,0 @@
-Total users: 15
-Page: 1
-Per Page: 6
-Returned: 6

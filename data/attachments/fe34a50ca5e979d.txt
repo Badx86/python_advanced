@@ -1,4 +1,0 @@
-Method: GET
-URL: /api/resources/777777
-Expected: 404
-Actual: 404

@@ -1,5 +1,0 @@
-ID: 14
-Name: purple
-Year: 2024
-Color: #237c13
-Pantone: PAIR-890

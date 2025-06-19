@@ -1,4 +1,0 @@
-Method: GET
-URL: /api/users/-1
-Expected: 422
-Actual: 422

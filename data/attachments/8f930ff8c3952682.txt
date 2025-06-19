@@ -1,5 +1,0 @@
-ID: 20
-Name: blue
-Year: 2023
-Color: #d449e1
-Pantone: SICK-885

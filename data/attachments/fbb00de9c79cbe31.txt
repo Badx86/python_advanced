@@ -1,4 +1,0 @@
-Method: PUT
-URL: /api/resources/14
-Expected: 200
-Actual: 200

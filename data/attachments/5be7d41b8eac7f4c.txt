@@ -1,4 +1,0 @@
-Total resources: 15
-Page: 2
-Per Page: 6
-Returned: 6

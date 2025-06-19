@@ -1,5 +1,0 @@
-ID: 15
-Email: clayton@example.com
-First Name: clayton
-Last Name: 
-Avatar: https://reqres.in/img/faces/3-image.jpg

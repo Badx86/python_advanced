@@ -1,5 +1,0 @@
-ID: 16
-Name: yellow
-Year: 2030
-Color: #c43b8e
-Pantone: LAY-805

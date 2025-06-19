@@ -1,4 +1,0 @@
-Method: POST
-URL: /api/users
-Expected: 201
-Actual: 201

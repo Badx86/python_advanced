@@ -1,4 +1,0 @@
-INFO     tests.test_crud_resources:test_crud_resources.py:34 Creating resource with data: {'name': 'black', 'year': 2026, 'color': '#0ee5ca', 'pantone_value': 'STRATEGY-626'}
-INFO     tests.assertions:assertions.py:65 POST /api/resources - Status: 201
-INFO     tests.assertions:assertions.py:284 Resource 13 verified in database: black (2026)
-INFO     tests.test_crud_resources:test_crud_resources.py:38 Resource created and verified in database successfully

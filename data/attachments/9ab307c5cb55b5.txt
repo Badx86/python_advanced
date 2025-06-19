@@ -1,4 +1,0 @@
-Resource ID: 17
-Name: white
-Year: 2022
-Color: #5c96bd

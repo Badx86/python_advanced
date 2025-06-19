@@ -1,5 +1,0 @@
-UPDATED:
-Name: black
-Year: 2030
-Color: #65c069
-Pantone: LACK-211

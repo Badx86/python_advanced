@@ -1,4 +1,0 @@
-Method: POST
-URL: /api/login
-Expected: 200
-Actual: 200

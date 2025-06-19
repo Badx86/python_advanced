@@ -1,4 +1,0 @@
-Method: GET
-URL: /api/users/17
-Expected: 404
-Actual: 404

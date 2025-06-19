@@ -1,4 +1,0 @@
-Method: DELETE
-URL: /api/resources/20
-Expected: 204
-Actual: 204

@@ -1,4 +1,0 @@
-Method: POST
-URL: POST /api/users/1
-Expected: 405
-Actual: 405
