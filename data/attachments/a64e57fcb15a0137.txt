@@ -1,0 +1,4 @@
+Method: GET
+URL: /api/resources
+Expected: 200
+Actual: 200

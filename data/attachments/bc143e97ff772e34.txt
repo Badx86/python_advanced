@@ -1,6 +1,0 @@
-INFO     tests.assertions:assertions.py:65 POST /api/unknown - Status: 201
-INFO     tests.assertions:assertions.py:284 Resource 15 verified in database: orange (2029)
-INFO     tests.test_crud_resources:test_crud_resources.py:97 Patching resource 15 with data: {'name': 'red', 'year': 2020, 'color': '#96ba0c', 'pantone_value': 'ANGLE-408'}
-INFO     tests.assertions:assertions.py:65 PATCH /api/unknown/15 - Status: 200
-INFO     tests.assertions:assertions.py:336 Resource 15 updated in database: red (2020)
-INFO     tests.test_crud_resources:test_crud_resources.py:103 Resource 15 patched and verified in database successfully

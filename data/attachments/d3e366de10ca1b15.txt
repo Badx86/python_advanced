@@ -1,0 +1,5 @@
+ID: 13
+Name: yellow
+Year: 2030
+Color: #93bcaf
+Pantone: PUBLISHERS-619

@@ -1,5 +1,0 @@
-ID: 19
-Name: white
-Year: 2022
-Color: #7509a8
-Pantone: EIGHT-994

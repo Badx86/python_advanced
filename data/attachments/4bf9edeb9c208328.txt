@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:65 DELETE /api/unknown/999999 - Status: 404
-INFO     tests.test_crud_resources:test_crud_resources.py:142 Non-existent resource DELETE correctly failed with 404

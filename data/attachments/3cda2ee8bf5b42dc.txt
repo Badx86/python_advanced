@@ -1,5 +1,0 @@
-ID: 16
-Name: black
-Year: 2028
-Color: #1c23c1
-Pantone: RUGBY-720

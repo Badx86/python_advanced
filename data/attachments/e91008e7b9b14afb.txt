@@ -1,0 +1,4 @@
+Resource ID: 7
+Name: sand dollar
+Year: 2006
+Color: #DECDBE

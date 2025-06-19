@@ -1,5 +1,0 @@
-UPDATED:
-Name: yellow
-Year: 2026
-Color: #aca252
-Pantone: EXPLORER-605

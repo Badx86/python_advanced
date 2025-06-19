@@ -1,0 +1,4 @@
+Method: DELETE
+URL: /api/resources/17
+Expected: 204
+Actual: 204

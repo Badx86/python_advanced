@@ -1,0 +1,5 @@
+ID: 19
+Name: red
+Year: 2022
+Color: #13e1a6
+Pantone: CALLED-555

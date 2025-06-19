@@ -1,2 +1,0 @@
-Name: anette
-Job: calibration manager

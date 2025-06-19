@@ -1,0 +1,5 @@
+ID: 20
+Name: pink
+Year: 2026
+Color: #e067bc
+Pantone: DUTY-971

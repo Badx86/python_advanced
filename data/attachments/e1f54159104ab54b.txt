@@ -1,4 +1,0 @@
-Method: DELETE
-URL: /api/unknown/16
-Expected: 204
-Actual: 204

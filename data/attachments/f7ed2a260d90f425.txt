@@ -1,0 +1,5 @@
+ID: 14
+Name: purple
+Year: 2020
+Color: #4a2d55
+Pantone: GIVEN-908

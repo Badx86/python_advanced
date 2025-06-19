@@ -1,0 +1,5 @@
+UPDATED:
+Name: purple
+Year: 2024
+Color: #89371b
+Pantone: SCIENCE-630

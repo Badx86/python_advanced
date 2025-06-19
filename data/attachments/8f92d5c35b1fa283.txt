@@ -1,5 +1,0 @@
-ID: 13
-Name: white
-Year: 2020
-Color: #416cee
-Pantone: DESIGNER-527
