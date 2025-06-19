@@ -1,0 +1,5 @@
+ID: 14
+Name: cyan
+Year: 2030
+Color: #cd356d
+Pantone: RANGE-777

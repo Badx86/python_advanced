@@ -1,0 +1,5 @@
+ID: 18
+Name: pink
+Year: 2025
+Color: #425501
+Pantone: TROPICAL-672

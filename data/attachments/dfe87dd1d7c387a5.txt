@@ -1,3 +1,0 @@
-INFO     tests.test_crud_resources:test_crud_resources.py:131 Updating non-existent resource with data: {'name': 'red', 'year': 2020, 'color': '#94afce', 'pantone_value': 'IEEE-631'}
-INFO     tests.assertions:assertions.py:65 PUT /api/resources/999999 - Status: 404
-INFO     tests.test_crud_resources:test_crud_resources.py:135 Non-existent resource correctly failed with 404

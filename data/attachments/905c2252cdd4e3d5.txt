@@ -1,5 +1,0 @@
-UPDATED:
-Name: red
-Year: 2023
-Color: #88f633
-Pantone: BAG-569

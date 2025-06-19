@@ -1,5 +1,0 @@
-ID: 17
-Name: purple
-Year: 2020
-Color: #94711e
-Pantone: SHELL-159

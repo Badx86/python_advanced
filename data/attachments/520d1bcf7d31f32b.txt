@@ -1,3 +1,0 @@
-User ID: 5
-Email: charles.morris@reqres.in
-Name: Charles Morris

@@ -1,2 +1,0 @@
-Name: zulma
-Job: potter

@@ -1,5 +1,0 @@
-ID: 16
-Name: cyan
-Year: 2025
-Color: #0ea6ee
-Pantone: PARTNERS-889

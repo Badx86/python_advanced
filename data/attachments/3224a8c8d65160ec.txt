@@ -1,0 +1,5 @@
+ID: 19
+Name: red
+Year: 2025
+Color: #6b153b
+Pantone: CHOICE-913

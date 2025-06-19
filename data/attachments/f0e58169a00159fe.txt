@@ -1,0 +1,5 @@
+ID: 20
+Name: red
+Year: 2023
+Color: #50a9a9
+Pantone: PIN-497
