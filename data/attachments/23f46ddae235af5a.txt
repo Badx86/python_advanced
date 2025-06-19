@@ -1,5 +1,0 @@
-ID: 17
-Name: magenta
-Year: 2023
-Color: #1d382f
-Pantone: NEWSPAPERS-541

@@ -1,6 +1,0 @@
-INFO     tests.assertions:assertions.py:65 POST /api/resources - Status: 201
-INFO     tests.assertions:assertions.py:284 Resource 14 verified in database: purple (2030)
-INFO     tests.test_crud_resources:test_crud_resources.py:74 Updating resource 14 with data: {'name': 'magenta', 'year': 2023, 'color': '#e64e8b', 'pantone_value': 'PRESIDENTIAL-495'}
-INFO     tests.assertions:assertions.py:65 PUT /api/resources/14 - Status: 200
-INFO     tests.assertions:assertions.py:336 Resource 14 updated in database: magenta (2023)
-INFO     tests.test_crud_resources:test_crud_resources.py:80 Resource 14 updated and verified in database successfully

@@ -1,5 +1,0 @@
-ID: 18
-Name: white
-Year: 2023
-Color: #12abdb
-Pantone: DISCHARGE-247

@@ -1,5 +1,0 @@
-ID: 19
-Name: purple
-Year: 2029
-Color: #4aeb1e
-Pantone: APR-786

@@ -1,0 +1,5 @@
+UPDATED:
+Name: purple
+Year: 2023
+Color: #f3821e
+Pantone: CF-706

@@ -1,5 +1,0 @@
-UPDATED:
-Name: magenta
-Year: 2023
-Color: #e64e8b
-Pantone: PRESIDENTIAL-495

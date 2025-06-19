@@ -1,5 +1,0 @@
-ID: 14
-Email: reyes@example.com
-First Name: reyes
-Last Name: 
-Avatar: https://reqres.in/img/faces/12-image.jpg

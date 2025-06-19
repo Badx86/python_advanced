@@ -1,0 +1,5 @@
+ID: 18
+Name: pink
+Year: 2026
+Color: #19dcbb
+Pantone: OUTSIDE-734

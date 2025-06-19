@@ -1,5 +1,0 @@
-ID: 14
-Name: purple
-Year: 2030
-Color: #683736
-Pantone: VILLAGE-765

@@ -1,0 +1,5 @@
+ID: 20
+Name: beige
+Year: 2023
+Color: #8f8d8c
+Pantone: BELIEVES-139
