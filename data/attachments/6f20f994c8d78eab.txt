@@ -1,3 +1,0 @@
-INFO     tests.test_crud_users:test_crud_users.py:137 Updating non-existent user with data: {'name': 'kristeen', 'job': 'charity worker'}
-INFO     tests.assertions:assertions.py:65 PUT /api/users/999999 - Status: 404
-INFO     tests.test_crud_users:test_crud_users.py:141 Non-existent user correctly failed with 404
