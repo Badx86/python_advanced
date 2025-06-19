@@ -54,7 +54,7 @@ jobs:
         run: poetry install --no-interaction --no-ansi --no-root
 
       - name: 📈 Download previous history
-        uses: actions/download-artifact@v4
+        uses: dawidd6/action-download-artifact@v11
         if: always()
         continue-on-error: true
         with:
