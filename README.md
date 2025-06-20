@@ -1,3 +1,5 @@
+<div align="center">
+
 [![Allure Report](https://github.com/Badx86/python_advanced/actions/workflows/tests.yml/badge.svg)](https://Badx86.github.io/python_advanced/)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
 [![Pydantic](https://img.shields.io/badge/Pydantic-2.9+-E92063)](https://pydantic.dev/)
@@ -11,8 +13,6 @@
 [![Poetry](https://img.shields.io/badge/Poetry-1.8+-blue)](https://python-poetry.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-blue)](https://www.docker.com/)
 [![Mimesis](https://img.shields.io/badge/Mimesis-test%20data-purple)](https://mimesis.name/)
-<div align="center">
-
 [![code style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
 
 </div>
