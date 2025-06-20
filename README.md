@@ -11,7 +11,11 @@
 [![Poetry](https://img.shields.io/badge/Poetry-1.8+-blue)](https://python-poetry.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-blue)](https://www.docker.com/)
 [![Mimesis](https://img.shields.io/badge/Mimesis-test%20data-purple)](https://mimesis.name/)
+<div align="center">
+
 [![code style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
+
+</div>
 
 
 
