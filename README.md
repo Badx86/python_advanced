@@ -6,11 +6,15 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)](https://www.postgresql.org/)
 [![SQLModel](https://img.shields.io/badge/SQLModel-0.0.24-red)](https://sqlmodel.tiangolo.com/)
 [![Pytest](https://img.shields.io/badge/pytest-8.4+-blue)](https://docs.pytest.org/)
+[![Requests](https://img.shields.io/badge/requests-2.32+-orange)](https://docs.python-requests.org/)
 [![pytest-sugar](https://img.shields.io/badge/pytest--sugar-1.0+-pink)](https://pypi.org/project/pytest-sugar/)
 [![Poetry](https://img.shields.io/badge/Poetry-dependency-blue)](https://python-poetry.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-blue)](https://www.docker.com/)
 [![Mimesis](https://img.shields.io/badge/Mimesis-test%20data-purple)](https://mimesis.name/)
 [![code style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
+
+
+
 
 # FastAPI Reqres with PostgreSQL
 
