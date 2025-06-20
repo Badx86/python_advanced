@@ -1,5 +1,0 @@
-INFO     tests.assertions:assertions.py:65 POST /api/users - Status: 201
-INFO     tests.assertions:assertions.py:169 User 16 verified in database: lovetta 
-INFO     tests.assertions:assertions.py:65 DELETE /api/users/16 - Status: 204
-INFO     tests.assertions:assertions.py:183 User 16 confirmed deleted from database
-INFO     tests.test_crud_users:test_crud_users.py:131 User 16 deleted and verified removed from database
