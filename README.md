@@ -135,9 +135,9 @@ poetry run python app/main.py
 poetry run pytest tests/ -v --alluredir=allure-results
 
 # По маркерам
-poetry run pytest -m smoke --alluredir=allure-results     # Smoke тесты
-poetry run pytest -m auth --alluredir=allure-results      # Аутентификация  
-poetry run pytest -m crud --alluredir=allure-results      # CRUD операции
+poetry run pytest -m smoke --alluredir=allure-results      # Smoke тесты
+poetry run pytest -m auth --alluredir=allure-results       # Аутентификация  
+poetry run pytest -m crud --alluredir=allure-results       # CRUD операции
 poetry run pytest -m pagination --alluredir=allure-results # Пагинация
 poetry run pytest -m "not slow" --alluredir=allure-results # Исключить медленные
 
