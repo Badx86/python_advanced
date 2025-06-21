@@ -1,6 +1,8 @@
 name: Tests with Allure Report
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:  # manual run
