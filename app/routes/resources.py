@@ -112,10 +112,13 @@ def update_resource_put(
             # Обновляем ресурс в БД
             if resource_data.name is not None:
                 resource.name = resource_data.name
+
             if resource_data.year is not None:
                 resource.year = resource_data.year
+
             if resource_data.color is not None:
                 resource.color = resource_data.color
+
             if resource_data.pantone_value is not None:
                 resource.pantone_value = resource_data.pantone_value
 
@@ -159,10 +162,13 @@ def update_resource_patch(
             # Частичное обновление в БД
             if resource_data.name is not None:
                 resource.name = resource_data.name
+
             if resource_data.year is not None:
                 resource.year = resource_data.year
+
             if resource_data.color is not None:
                 resource.color = resource_data.color
+
             if resource_data.pantone_value is not None:
                 resource.pantone_value = resource_data.pantone_value
 
@@ -197,6 +203,7 @@ def delete_resource(resource_id: int) -> None:
     try:
         with Session(engine) as session:
             resource = session.get(Resource, resource_id)
+
             if not resource:
                 raise ResourceNotFoundError(resource_id)
 

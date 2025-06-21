@@ -36,12 +36,16 @@ def get_app_version() -> str:
 def get_database_type() -> str:
     """Определяет тип БД из connection string"""
     db_url = os.getenv("DATABASE_ENGINE", "")
+
     if "postgresql" in db_url:
         return "postgresql"
+
     elif "sqlite" in db_url:
         return "sqlite"
+
     elif "mysql" in db_url:
         return "mysql"
+
     else:
         return "unknown"
 
@@ -52,6 +56,7 @@ def check_database_connection() -> Tuple[bool, int]:
         with Session(engine) as session:
             users_count = session.exec(select(func.count(User.id))).one()
             return True, users_count
+
     except Exception as e:
         logger.error(f"Database connection failed: {e}")
         return False, 0

@@ -109,7 +109,9 @@ class TestResources:
     @allure.title("Invalid pagination parameters should be rejected")
     @pytest.mark.pagination
     @pytest.mark.parametrize("page,size", [(0, 6), (-1, 6), (1, 0), (1, -5)])
-    def test_pagination_invalid_parameters(self, api_client, page: int, size: int) -> None:
+    def test_pagination_invalid_parameters(
+        self, api_client, page: int, size: int
+    ) -> None:
         """Проверка валидации параметров пагинации"""
         response = api_client.get("/api/resources", params={"page": page, "size": size})
 
