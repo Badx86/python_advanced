@@ -1,1 +1,1 @@
-[{"values":["http://localhost:8000"],"name":"API_URL"},{"values":["3.11.13"],"name":"Python_Version"},{"values":["0.0.0.0"],"name":"Host"},{"values":["8000"],"name":"Port"},{"values":["1.1.0"],"name":"App_Version"}]
+[{"values":["http://localhost:8000"],"name":"Environment"},{"values":["30s"],"name":"Timeout"},{"values":["3.11.13"],"name":"Python_Version"},{"values":["postgresql+psycopg2://postgres:example@localhost:5432/postgres"],"name":"Database_Engine"},{"values":["1.0.0"],"name":"App_Version"},{"values":["pytest + voluptuous"],"name":"Test_Framework"}]

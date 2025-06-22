@@ -1,0 +1,2 @@
+Requested delay: 2s
+Actual duration: 2.01s
