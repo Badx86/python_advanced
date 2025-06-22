@@ -107,10 +107,9 @@ def allure_environment(base_url: str):
     environment_properties = [
         f"API_URL={base_url}",
         f"Python_Version={sys.version.split()[0]}",
-        f"Database_Engine={os.getenv('DATABASE_ENGINE', 'Not specified')}",
         f"Host={os.getenv('HOST', 'localhost')}",
         f"Port={os.getenv('PORT', '8000')}",
-        f"App_Version={os.getenv('APP_VERSION', '1.0.0')}",
+        f"App_Version={os.getenv('APP_VERSION', '1.1.0')}",
     ]
 
     # Записываем в файл для Allure
