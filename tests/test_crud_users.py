@@ -3,7 +3,7 @@ import logging
 import pytest
 import random
 from mimesis import Person
-from tests.assertions import api
+from tests.assertions import APIAssertions
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class TestUsersCRUD:
         logger.info(f"Creating user with data: {user_data}")
 
         response = api_client.post("/api/users", json=user_data)
-        api.check_create_user_response(
+        APIAssertions.check_create_user_response(
             response, "/api/users", user_data["name"], user_data["job"]
         )
         logger.info("User created and verified in database successfully")
@@ -38,7 +38,7 @@ class TestUsersCRUD:
         """Тест чтения случайного пользователя"""
         # Получаем список пользователей
         response = api_client.get("/api/users", params={"page": 1, "size": 50})
-        users_page = api.check_users_list_response(
+        users_page = APIAssertions.check_users_list_response(
             response, "/api/users", page=1, per_page=50
         )
 
@@ -48,7 +48,7 @@ class TestUsersCRUD:
 
             # Читаем этого случайного пользователя
             response = api_client.get(f"/api/users/{user_id}")
-            api.check_user_response(response, f"/api/users/{user_id}")
+            APIAssertions.check_user_response(response, f"/api/users/{user_id}")
             logger.info(f"Random user {user_id} read successfully")
         else:
             logger.warning("No users found in database for read test")
@@ -60,20 +60,20 @@ class TestUsersCRUD:
 
         # Создаем пользователя
         create_response = api_client.post("/api/users", json=user_data)
-        created_user = api.check_create_user_response(
+        created_user = APIAssertions.check_create_user_response(
             create_response, "/api/users", user_data["name"], user_data["job"]
         )
         user_id = int(created_user.id)
 
         # Получаем исходные данные из БД для проверки
-        original_user = api.check_user_in_database(user_id)
+        original_user = APIAssertions.check_user_in_database(user_id)
 
         # Обновляем его
         updated_data = generate_random_user()
         logger.info(f"Updating user {user_id} with data: {updated_data}")
 
         response = api_client.put(f"/api/users/{user_id}", json=updated_data)
-        api.check_update_user_response(
+        APIAssertions.check_update_user_response(
             response,
             f"/api/users/{user_id}",
             updated_data["name"],
@@ -90,20 +90,20 @@ class TestUsersCRUD:
 
         # Создаем пользователя
         create_response = api_client.post("/api/users", json=user_data)
-        created_user = api.check_create_user_response(
+        created_user = APIAssertions.check_create_user_response(
             create_response, "/api/users", user_data["name"], user_data["job"]
         )
         user_id = int(created_user.id)
 
         # Получаем исходные данные из БД
-        original_user = api.check_user_in_database(user_id)
+        original_user = APIAssertions.check_user_in_database(user_id)
 
         # Обновляем его
         updated_data = generate_random_user()
         logger.info(f"Patching user {user_id} with data: {updated_data}")
 
         response = api_client.patch(f"/api/users/{user_id}", json=updated_data)
-        api.check_update_user_response(
+        APIAssertions.check_update_user_response(
             response,
             f"/api/users/{user_id}",
             updated_data["name"],
@@ -120,14 +120,16 @@ class TestUsersCRUD:
 
         # Создаем пользователя
         create_response = api_client.post("/api/users", json=user_data)
-        created_user = api.check_create_user_response(
+        created_user = APIAssertions.check_create_user_response(
             create_response, "/api/users", user_data["name"], user_data["job"]
         )
         user_id = int(created_user.id)
 
         # Удаляем его
         response = api_client.delete(f"/api/users/{user_id}")
-        api.check_delete_user_response(response, f"/api/users/{user_id}", user_id)
+        APIAssertions.check_delete_user_response(
+            response, f"/api/users/{user_id}", user_id
+        )
         logger.info(f"User {user_id} deleted and verified removed from database")
 
     @allure.title("Update non-existent user")
@@ -137,14 +139,14 @@ class TestUsersCRUD:
         logger.info(f"Updating non-existent user with data: {updated_data}")
 
         response = api_client.put("/api/users/999999", json=updated_data)
-        api.check_404_error(response, "/api/users/999999")
+        APIAssertions.check_404_error(response, "/api/users/999999")
         logger.info("Non-existent user correctly failed with 404")
 
     @allure.title("Delete non-existent user")
     def test_delete_nonexistent_user(self, api_client) -> None:
         """Тест удаления несуществующего пользователя"""
         response = api_client.delete("/api/users/999999")
-        api.check_404_error(response, "/api/users/999999")
+        APIAssertions.check_404_error(response, "/api/users/999999")
         logger.info("Non-existent user DELETE correctly failed with 404")
 
     @allure.title("Full CRUD cycle for user")
@@ -154,27 +156,27 @@ class TestUsersCRUD:
 
         # Создаем пользователя
         create_response = api_client.post("/api/users", json=user_data)
-        created_user = api.check_create_user_response(
+        created_user = APIAssertions.check_create_user_response(
             create_response, "/api/users", user_data["name"], user_data["job"]
         )
         user_id = int(created_user.id)
 
         # Проверяем что пользователь существует в БД
-        api.check_user_in_database(user_id, user_data["name"])
+        APIAssertions.check_user_in_database(user_id, user_data["name"])
 
         # Проверяем что пользователь доступен через API
         get_response = api_client.get(f"/api/users/{user_id}")
-        api.check_user_response(get_response, f"/api/users/{user_id}")
+        APIAssertions.check_user_response(get_response, f"/api/users/{user_id}")
 
         # Удаляем пользователя
         delete_response = api_client.delete(f"/api/users/{user_id}")
-        api.check_delete_user_response(
+        APIAssertions.check_delete_user_response(
             delete_response, f"/api/users/{user_id}", user_id
         )
 
         # Проверяем что пользователь удален из API
         get_after_delete = api_client.get(f"/api/users/{user_id}")
-        api.check_404_error(get_after_delete, f"/api/users/{user_id}")
+        APIAssertions.check_404_error(get_after_delete, f"/api/users/{user_id}")
 
         logger.info(
             f"Full CRUD cycle with database verification completed for user {user_id}"

@@ -1,7 +1,7 @@
 import allure
 import pytest
 import logging
-from tests.assertions import api
+from tests.assertions import APIAssertions
 
 logger = logging.getLogger(__name__)
 
@@ -15,14 +15,14 @@ class TestSmoke:
     def test_service_is_alive(self, api_client) -> None:
         """Сервис отвечает на запросы"""
         response = api_client.get("/status")
-        api.log_and_check_status(response, "/status")
+        APIAssertions.log_and_check_status(response, "/status")
         logger.info("Service is alive and responding")
 
     @allure.title("Application status endpoint returns valid data")
     def test_app_status(self, api_client) -> None:
         """Проверка статуса приложения"""
         response = api_client.get("/status")
-        api.log_and_check_status(response, "/status")
+        APIAssertions.log_and_check_status(response, "/status")
 
         status = response.json()
 
@@ -40,14 +40,14 @@ class TestSmoke:
 
         for endpoint in endpoints:
             response = api_client.get(endpoint)
-            api.log_and_check_status(response, endpoint)
+            APIAssertions.log_and_check_status(response, endpoint)
             logger.info(f"Endpoint {endpoint} is accessible")
 
     @allure.title("Service returns valid data structure")
     def test_service_info(self, api_client) -> None:
         """Сервис возвращает корректную информацию"""
         response = api_client.get("/api/users", params={"size": 1})
-        api.log_and_check_status(response, "/api/users")
+        APIAssertions.log_and_check_status(response, "/api/users")
 
         data = response.json()
         assert "items" in data, "Response structure is invalid"

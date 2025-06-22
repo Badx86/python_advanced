@@ -2,7 +2,7 @@ import allure
 import logging
 import pytest
 from http import HTTPStatus
-from tests.assertions import api
+from tests.assertions import APIAssertions
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class TestAuth:
         }  # ← ИЗМЕНИТЬ ЭТО
 
         response = api_client.post("/api/register", json=register_data)
-        api.check_register_success_response(response, "/api/register")
+        APIAssertions.check_register_success_response(response, "/api/register")
         logger.info("Registration successful with valid credentials")
 
     @allure.title("Successful login")
@@ -30,7 +30,7 @@ class TestAuth:
         login_data = {"email": "user@gmail.com", "password": "securepass123"}  # ← И ЭТО
 
         response = api_client.post("/api/login", json=login_data)
-        api.check_login_success_response(response, "/api/login")
+        APIAssertions.check_login_success_response(response, "/api/login")
         logger.info("Login successful with valid credentials")
 
     @allure.title("Register with invalid email formats")
@@ -50,7 +50,7 @@ class TestAuth:
         register_data = {"email": invalid_email, "password": "testpass"}
 
         response = api_client.post("/api/register", json=register_data)
-        api.check_email_error_response(
+        APIAssertions.check_email_error_response(
             response, "/api/register", "Invalid email format"
         )
         logger.info(f"Registration correctly failed for invalid email: {invalid_email}")
@@ -70,7 +70,9 @@ class TestAuth:
         login_data = {"email": invalid_email, "password": "testpass"}
 
         response = api_client.post("/api/login", json=login_data)
-        api.check_email_error_response(response, "/api/login", "Invalid email format")
+        APIAssertions.check_email_error_response(
+            response, "/api/login", "Invalid email format"
+        )
         logger.info(f"Login correctly failed for invalid email: {invalid_email}")
 
     @allure.title("Register without email field")
@@ -82,7 +84,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/register", json=register_data)
-        api.log_and_check_status(
+        APIAssertions.log_and_check_status(
             response, "/api/register", HTTPStatus.UNPROCESSABLE_ENTITY
         )
         logger.info("Registration correctly failed for missing email")
@@ -93,7 +95,9 @@ class TestAuth:
         register_data = {"email": "", "password": "testpass"}  # пустая строка
 
         response = api_client.post("/api/register", json=register_data)
-        api.check_email_error_response(response, "/api/register", "Missing email")
+        APIAssertions.check_email_error_response(
+            response, "/api/register", "Missing email"
+        )
         logger.info("Registration correctly failed for empty email")
 
     @allure.title("Login without email field")
@@ -105,7 +109,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/login", json=login_data)
-        api.log_and_check_status(
+        APIAssertions.log_and_check_status(
             response, "/api/login", HTTPStatus.UNPROCESSABLE_ENTITY
         )
         logger.info("Login correctly failed for missing email")
@@ -116,7 +120,9 @@ class TestAuth:
         login_data = {"email": "", "password": "testpass"}  # пустая строка
 
         response = api_client.post("/api/login", json=login_data)
-        api.check_email_error_response(response, "/api/login", "Missing email")
+        APIAssertions.check_email_error_response(
+            response, "/api/login", "Missing email"
+        )
         logger.info("Login correctly failed for empty email")
 
     @allure.title("Register without password field")
@@ -128,7 +134,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/register", json=register_data)
-        api.log_and_check_status(
+        APIAssertions.log_and_check_status(
             response, "/api/register", HTTPStatus.UNPROCESSABLE_ENTITY
         )
         logger.info("Registration failed as expected (missing password)")
@@ -142,7 +148,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/login", json=login_data)
-        api.log_and_check_status(
+        APIAssertions.log_and_check_status(
             response, "/api/login", HTTPStatus.UNPROCESSABLE_ENTITY
         )
         logger.info("Login failed as expected (missing password)")

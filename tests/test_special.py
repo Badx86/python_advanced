@@ -2,7 +2,7 @@ import allure
 import logging
 import time
 import pytest
-from tests.assertions import api
+from tests.assertions import APIAssertions
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class TestSpecial:
         )
         actual_duration = time.time() - start_time
 
-        api.check_delayed_response(
+        APIAssertions.check_delayed_response(
             response, f"/api/users?delay={delay_seconds}", delay_seconds
         )
 

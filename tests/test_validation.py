@@ -1,7 +1,7 @@
 import allure
 import logging
 from http import HTTPStatus
-from tests.assertions import api
+from tests.assertions import APIAssertions
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class TestValidation:
         """Тест неподдерживаемых HTTP методов - должен возвращать 405"""
         # POST на GET эндпоинт
         response = api_client.post("/api/users/1")
-        api.log_and_check_status(
+        APIAssertions.log_and_check_status(
             response, "POST /api/users/1", HTTPStatus.METHOD_NOT_ALLOWED
         )
         logger.info("Method POST correctly rejected on GET endpoint with 405")
@@ -26,7 +26,7 @@ class TestValidation:
         user_data = {"job": "developer"}
 
         response = api_client.post("/api/users", json=user_data)
-        api.log_and_check_status(
+        APIAssertions.log_and_check_status(
             response, "POST /api/users", HTTPStatus.UNPROCESSABLE_ENTITY
         )
         logger.info("User creation correctly failed without 'name' field (422)")
@@ -37,7 +37,7 @@ class TestValidation:
         user_data = {"name": "testuser"}
 
         response = api_client.post("/api/users", json=user_data)
-        api.log_and_check_status(
+        APIAssertions.log_and_check_status(
             response, "POST /api/users", HTTPStatus.UNPROCESSABLE_ENTITY
         )
         logger.info("User creation correctly failed without 'job' field (422)")
