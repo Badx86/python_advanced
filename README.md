@@ -23,7 +23,7 @@
 
 # FastAPI Reqres with PostgreSQL + Schema Validation
 
-Микросервис на FastAPI с автотестами и **интеграцией PostgreSQL и двойной валидацией схем API: серверная(Pydantic) и клиентская (Voluptuous) **.
+Микросервис на FastAPI с автотестами, интеграцией PostgreSQL и двойной валидацией схем API: серверная (Pydantic) и клиентская (Voluptuous).
 
 ## Основные возможности
 
@@ -138,12 +138,21 @@ poetry run python app/main.py
 # Все тесты с Allure отчетом (убедитесь что сервер запущен)
 poetry run pytest tests/ -v --alluredir=allure-results
 
+# Тесты с валидацией схем
+pytest tests/test_api_schemas.py -v
+
+# Разные окружения
+pytest tests/ --env=local      # http://localhost:8000
+pytest tests/ --env=staging    # https://staging-api.com
+pytest tests/ --env=prod       # https://api.com
+
 # По маркерам
 poetry run pytest -m smoke --alluredir=allure-results      # Smoke тесты
 poetry run pytest -m auth --alluredir=allure-results       # Аутентификация  
 poetry run pytest -m crud --alluredir=allure-results       # CRUD операции
 poetry run pytest -m pagination --alluredir=allure-results # Пагинация
-poetry run pytest -m "not slow" --alluredir=allure-results # Исключить медленные
+poetry run pytest -m "not slow" --alluredir=allure-results # Исключить медленные (delay)
+pytest -m schema                                           # Валидация схем
 
 # Конкретный файл
 poetry run pytest tests/test_auth.py -v --alluredir=allure-results
@@ -242,6 +251,9 @@ psql -h localhost -U postgres -d postgres
 │   ├── exceptions.py            # Унифицированные исключения
 │   └── models.py                # SQLModel модели для БД и API
 ├── tests/
+|   ├── schemas.py               # Схемы валидации API (Voluptuous)
+|   ├── api_client.py            # Fluent API клиент
+|   ├── test_api_schemas.py      # Тесты с валидацией схем
 │   ├── test_auth.py             # Тесты аутентификации (email валидация)
 │   ├── test_crud_users.py       # CRUD операции с users
 │   ├── test_crud_resources.py   # CRUD операции с resources
@@ -251,7 +263,7 @@ psql -h localhost -U postgres -d postgres
 │   ├── test_users.py            # Тесты пользователей
 │   ├── test_pagination.py       # Тесты пагинации
 │   ├── test_validation.py       # Валидация
-│   ├── conftest.py              # Pytest фикстуры и Allure конфигурация
+│   ├── conftest.py              # Поддержка различных окружений, Pytest фикстуры и Allure конфигурация
 │   └── assertions.py            # Хелперы для проверок с Allure отчетностью
 ├── allure-results/              # Результаты тестов для Allure (генерируется)
 ├── allure-report/               # Статический Allure отчет (генерируется)
@@ -339,6 +351,9 @@ poetry run black app/ tests/
 
 # Линтинг
 poetry run pylint app/
+
+# Тесты с Fluent API
+poetry run pytest tests/test_api_schemas.py --env=local
 
 # Просмотр зависимостей
 poetry show --tree
