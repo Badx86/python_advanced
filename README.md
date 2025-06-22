@@ -3,6 +3,7 @@
 [![Allure Report](https://github.com/Badx86/python_advanced/actions/workflows/test.yml/badge.svg)](https://Badx86.github.io/python_advanced/)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
 [![Pydantic](https://img.shields.io/badge/Pydantic-2.9+-E92063)](https://pydantic.dev/)
+[![Voluptuous](https://img.shields.io/badge/voluptuous-0.11.7-purple)](https://pypi.org/project/voluptuous/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green)](https://fastapi.tiangolo.com/)
 [![Uvicorn](https://img.shields.io/badge/Uvicorn-0.34+-green)](https://www.uvicorn.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)](https://www.postgresql.org/)
