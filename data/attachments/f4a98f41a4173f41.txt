@@ -1,0 +1,4 @@
+INFO     tests.assertions:assertions.py:65 GET /api/users - Status: 200
+INFO     tests.assertions:assertions.py:65 GET /api/users?page=8 - Status: 200
+INFO     tests.assertions:assertions.py:1031 Page beyond available correctly returns empty results
+INFO     tests.test_users:test_users.py:177 Page 8 beyond 3 correctly returns empty

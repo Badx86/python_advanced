@@ -1,0 +1,4 @@
+INFO     tests.assertions:assertions.py:65 GET /api/users?page=1 - Status: 200
+INFO     tests.assertions:assertions.py:65 GET /api/users?page=2 - Status: 200
+INFO     tests.assertions:assertions.py:1019 Different pages contain unique user data
+INFO     tests.test_users:test_users.py:140 Different pages contain different data and unique IDs

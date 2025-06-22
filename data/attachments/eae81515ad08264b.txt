@@ -1,0 +1,2 @@
+INFO     tests.assertions:assertions.py:65 GET /api/resources?page=1&size=-5 - Status: 422
+INFO     tests.test_resources:test_resources.py:127 Invalid pagination correctly rejected: page=1, size=-5
