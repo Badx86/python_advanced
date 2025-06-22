@@ -1,6 +1,6 @@
 <div align="center">
 
-[![Allure Report](https://github.com/Badx86/python_advanced/actions/workflows/tests.yml/badge.svg)](https://Badx86.github.io/python_advanced/)
+[![Allure Report](https://github.com/Badx86/python_advanced/actions/workflows/test.yml/badge.svg)](https://Badx86.github.io/python_advanced/)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
 [![Pydantic](https://img.shields.io/badge/Pydantic-2.9+-E92063)](https://pydantic.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green)](https://fastapi.tiangolo.com/)
