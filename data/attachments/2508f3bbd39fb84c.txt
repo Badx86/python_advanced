@@ -1,0 +1,3 @@
+System Status: healthy
+Version: 0.1.0
+DB: connected

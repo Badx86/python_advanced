@@ -1,5 +1,0 @@
-tests/test_api_schemas.py:95: in test_system_status_comprehensive
-    APIAssertions.check_fluent_system_health(response)
-tests/assertions.py:308: in check_fluent_system_health
-    version.count(".") >= 2
-E   AssertionError: Version should follow semantic versioning: unknown

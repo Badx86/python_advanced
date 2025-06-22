@@ -1,1 +1,0 @@
-INFO     tests.api_client:api_client.py:108 API Client initialized: http://localhost:8000
