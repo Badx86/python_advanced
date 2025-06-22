@@ -11,13 +11,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_ENGINE: postgresql+psycopg2://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}
+      API_URL: http://localhost:8000
+      HOST: 0.0.0.0
+      PORT: 8000
+
     services:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: example
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -80,11 +86,6 @@ jobs:
         run: |
           poetry run python app/main.py &
           sleep 10  # Ждем запуска сервера
-        env:
-          DATABASE_ENGINE: postgresql+psycopg2://postgres:example@localhost:5432/postgres
-          API_URL: http://localhost:8000
-          HOST: 0.0.0.0
-          PORT: 8000
 
       - name: 🧪 Run tests
         continue-on-error: true
@@ -92,9 +93,6 @@ jobs:
           poetry run pytest tests/ -v \
             --alluredir=allure-results \
             --tb=short
-        env:
-          DATABASE_ENGINE: postgresql+psycopg2://postgres:example@localhost:5432/postgres
-          API_URL: http://localhost:8000
 
       - name: 📊 Generate Allure Report
         if: always()
