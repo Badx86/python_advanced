@@ -1,8 +1,0 @@
-INFO     tests.assertions:assertions.py:65 POST /api/users - Status: 201
-INFO     tests.assertions:assertions.py:169 User 17 verified in database: vannessa 
-INFO     tests.assertions:assertions.py:169 User 17 verified in database: vannessa 
-INFO     tests.assertions:assertions.py:65 GET /api/users/17 - Status: 200
-INFO     tests.assertions:assertions.py:65 DELETE /api/users/17 - Status: 204
-INFO     tests.assertions:assertions.py:183 User 17 confirmed deleted from database
-INFO     tests.assertions:assertions.py:65 GET /api/users/17 - Status: 404
-INFO     tests.test_crud_users:test_crud_users.py:179 Full CRUD cycle with database verification completed for user 17
