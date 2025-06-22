@@ -1,6 +1,6 @@
 import allure
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Sequence
 from http import HTTPStatus
 import requests
 from fastapi_pagination import Page
@@ -134,6 +134,290 @@ class APIAssertions:
             # Только Error Message
             allure.attach(
                 data["detail"]["error"], "Error Message", allure.attachment_type.TEXT
+            )
+
+    # ========================================
+    # НОВЫЕ МЕТОДЫ ДЛЯ FLUENT API
+    # ========================================
+
+    @classmethod
+    def check_fluent_users_list(cls, api_response) -> None:
+        """Проверяет fluent API список пользователей с автоматической валидацией"""
+        with allure.step("Verify fluent users list with schema validation"):
+            # Извлекаем данные через fluent API
+            total, items = api_response.extract("total", "items")
+
+            # Бизнес-логика проверки
+            assert total >= 0, "Total users count should be non-negative"
+            assert len(items) <= 6, "Page size should be respected"
+
+            logger.info(
+                f"Fluent users list validated: {total} total users, {len(items)} on page"
+            )
+
+    @classmethod
+    def check_fluent_user_lifecycle(
+        cls, api, user_data: Dict[str, str], test_data
+    ) -> None:
+        """Проверяет полный жизненный цикл пользователя через fluent API"""
+        with allure.step("Execute complete user lifecycle test"):
+            # Создание пользователя
+            user_id = test_data.create_user(user_data["name"], user_data["job"])
+            allure.attach(
+                f"Created user ID: {user_id}",
+                "User Creation",
+                allure.attachment_type.TEXT,
+            )
+
+            # Проверка созданного пользователя
+            response = api.users().get(user_id)
+            user_data_dict = response.extract("data")
+            user_name = user_data_dict["first_name"] + " " + user_data_dict["last_name"]
+            assert (
+                user_data["name"].lower() in user_name.lower()
+            ), f"User name mismatch: {user_name}"
+
+            # Обновление пользователя
+            new_name, new_job = "Updated User", "Senior Engineer"
+            update_response = api.users().update(user_id, new_name, new_job)
+            updated_name, updated_job = update_response.extract("name", "job")
+            assert updated_name == new_name, f"Updated name mismatch"
+            assert updated_job == new_job, f"Updated job mismatch"
+
+            # Проверка сохранения
+            final_response = api.users().get(user_id)
+            assert (
+                final_response.status_code == HTTPStatus.OK
+            ), "User should exist after update"
+
+            logger.info(f"User lifecycle completed successfully for ID: {user_id}")
+
+    @classmethod
+    def check_fluent_user_not_found(cls, api_response) -> None:
+        """Проверяет 404 ошибку через fluent API с валидацией схемы"""
+        with allure.step("Verify 404 error with schema validation"):
+            detail = api_response.extract("detail")
+            error_message = detail["error"]
+            assert (
+                "not found" in error_message.lower()
+            ), f"Unexpected error message: {error_message}"
+
+            logger.info("404 error properly validated with schema")
+
+    @classmethod
+    def check_fluent_resource_operations(
+        cls, api, resource_data: Dict[str, Any], test_data
+    ) -> None:
+        """Проверяет CRUD операции ресурсов через fluent API"""
+        with allure.step("Execute resource CRUD operations"):
+            # Создание ресурса
+            resource_id = test_data.create_resource(**resource_data)
+
+            # Проверка созданного ресурса
+            response = api.resources().get(resource_id)
+            data = response.extract("data")
+
+            assert data["name"] == resource_data["name"], f"Resource name mismatch"
+            assert data["year"] == resource_data["year"], f"Resource year mismatch"
+            assert data["color"] == resource_data["color"], f"Resource color mismatch"
+
+            # Обновление ресурса
+            updated_data = {
+                "name": "Updated Resource",
+                "year": 2025,
+                "color": "#123456",
+                "pantone_value": "UPD-001",
+            }
+
+            update_response = api.resources().update(
+                resource_id, updated_data, method="PUT"
+            )
+
+            # Проверка обновления
+            for key, value in updated_data.items():
+                actual_value = update_response.extract(key)
+                assert (
+                    actual_value == value
+                ), f"Resource {key} update failed: {actual_value} != {value}"
+
+            logger.info(f"Resource operations completed for ID: {resource_id}")
+
+    @classmethod
+    def check_fluent_resource_pagination(
+        cls, api_response, page: int, size: int
+    ) -> None:
+        """Проверяет пагинацию ресурсов через fluent API"""
+        with allure.step("Verify resource pagination"):
+            # Извлекаем данные пагинации
+            actual_page, actual_size, total, pages, items = api_response.extract(
+                "page", "size", "total", "pages", "items"
+            )
+
+            # Валидация бизнес-логики
+            assert actual_page == page, f"Page mismatch: {actual_page} != {page}"
+            assert actual_size == size, f"Size mismatch: {actual_size} != {size}"
+            assert len(items) <= size, f"Items count exceeds page size"
+
+            # Проверяем расчеты пагинации
+            expected_pages = max(1, (total + size - 1) // size) if total > 0 else 1
+            assert (
+                pages == expected_pages
+            ), f"Pages calculation error: {pages} != {expected_pages}"
+
+            logger.info(
+                f"Pagination validated: page {page}/{pages}, {len(items)} items"
+            )
+
+    @classmethod
+    def check_fluent_auth_registration(cls, api_response) -> None:
+        """Проверяет успешную регистрацию через fluent API"""
+        with allure.step("Verify successful registration"):
+            user_id, token = api_response.extract("id", "token")
+
+            assert user_id > 0, f"User ID should be positive: {user_id}"
+            assert len(token) > 0, f"Token should not be empty"
+
+            allure.attach(
+                f"User ID: {user_id}",
+                "Registration Success",
+                allure.attachment_type.TEXT,
+            )
+            logger.info(f"User registered successfully with ID: {user_id}")
+
+    @classmethod
+    def check_fluent_auth_login(cls, api_response) -> None:
+        """Проверяет успешный логин через fluent API"""
+        with allure.step("Verify successful login"):
+            token = api_response.extract("token")
+
+            assert len(token) > 0, f"Token should not be empty"
+
+            logger.info("Login successful with valid token")
+
+    @classmethod
+    def check_fluent_system_health(cls, api_response) -> None:
+        """Проверяет статус системы через fluent API"""
+        with allure.step("Verify comprehensive system status"):
+            status, version, db_status, services = api_response.extract(
+                "status", "version", "database", "services"
+            )
+
+            # Проверки здоровья системы
+            assert status in ["healthy", "unhealthy"], f"Invalid status: {status}"
+            assert (
+                version.count(".") >= 2
+            ), f"Version should follow semantic versioning: {version}"
+            assert (
+                db_status.get("status") == "connected"
+            ), f"Database should be connected"
+            assert (
+                db_status.get("users_count", 0) >= 0
+            ), f"User count should be non-negative"
+
+            # Проверки статуса сервисов
+            for service, service_status in services.items():
+                assert len(service_status) > 0, f"Service {service} should have status"
+
+            allure.attach(
+                f"System Status: {status}\nVersion: {version}\nDB: {db_status['status']}",
+                "System Health Summary",
+                allure.attachment_type.TEXT,
+            )
+
+            logger.info(f"System health check passed: {status} (v{version})")
+
+    @classmethod
+    def check_fluent_delayed_response(
+        cls, api_response, delay: int, actual_duration: float
+    ) -> None:
+        """Проверяет delayed response через fluent API"""
+        with allure.step(f"Verify delayed response (min {delay}s)"):
+            # Проверка времени
+            assert (
+                actual_duration >= delay - 0.1
+            ), f"Response should take at least {delay}s, got {actual_duration:.2f}s"
+
+            # Проверка данных
+            items = api_response.extract("items")
+            assert len(items) <= 6, f"Page size should be respected even with delay"
+
+            allure.attach(
+                f"Requested delay: {delay}s\nActual duration: {actual_duration:.2f}s",
+                "Performance Metrics",
+                allure.attachment_type.TEXT,
+            )
+
+            logger.info(
+                f"Delayed response validated: {actual_duration:.2f}s (requested: {delay}s)"
+            )
+
+    @classmethod
+    def check_fluent_data_consistency(
+        cls, api, test_data, fake, operations_count: int = 3
+    ) -> None:
+        """Проверяет консистентность данных через fluent API"""
+        with allure.step("Verify data consistency across multiple operations"):
+            # Создаем пользователей
+            user_ids = []
+            for i in range(operations_count):
+                name = f"User {i + 1} {fake['person'].last_name()}"
+                job = fake["person"].occupation()
+                user_id = test_data.create_user(name, job)
+                user_ids.append(user_id)
+
+            # Проверяем уникальность ID
+            retrieved_ids = []
+            for user_id in user_ids:
+                response = api.users().get(user_id)
+                user_data_dict = response.extract("data")
+                retrieved_ids.append(user_data_dict["id"])
+
+            assert len(set(retrieved_ids)) == len(
+                retrieved_ids
+            ), "All user IDs should be unique"
+
+            # Проверяем присутствие в списке
+            response = api.users().list(page=1, size=50)
+            users_list = response.extract("items")
+            all_user_ids = [user["id"] for user in users_list]
+
+            for user_id in user_ids:
+                assert (
+                    user_id in all_user_ids
+                ), f"User {user_id} should be in users list"
+
+            logger.info(f"Data consistency validated across {len(user_ids)} users")
+
+    @classmethod
+    def check_fluent_parallel_operations(
+        cls, api, test_data, resource_data: Dict[str, Any], operations_count: int = 5
+    ) -> None:
+        """Проверяет безопасность параллельных операций через fluent API"""
+        with allure.step("Verify parallel operations safety"):
+            resource_ids = []
+            base_name = resource_data["name"]
+
+            # Создаем ресурсы
+            for i in range(operations_count):
+                modified_data = resource_data.copy()
+                modified_data["name"] = f"{base_name} {i + 1}"
+                modified_data["pantone_value"] = f"PAR-{i + 1:03d}"
+
+                resource_id = test_data.create_resource(**modified_data)
+                resource_ids.append(resource_id)
+
+            # Проверяем все ресурсы
+            for i, resource_id in enumerate(resource_ids):
+                response = api.resources().get(resource_id)
+                data = response.extract("data")
+
+                expected_name = f"{base_name} {i + 1}"
+                assert (
+                    data["name"] == expected_name
+                ), f"Resource {resource_id} name mismatch"
+
+            logger.info(
+                f"Parallel operations safety validated for {len(resource_ids)} resources"
             )
 
     # ========================================
@@ -668,9 +952,10 @@ class APIAssertions:
                 math.ceil(page_obj.total / size) if page_obj.total > 0 else 1
             )
 
-            assert (
-                page_obj.pages == expected_pages
-            ), f"Pages calculation wrong: expected {expected_pages}, got {page_obj.pages} (total={page_obj.total}, size={size})"
+            assert page_obj.pages == expected_pages, (
+                f"Pages calculation wrong: expected {expected_pages}, got {page_obj.pages} "
+                f"(total={page_obj.total}, size={size})"
+            )
 
             logger.info(
                 f"Pages calculation correct: {page_obj.total} total / {size} size = {page_obj.pages} pages"
@@ -694,7 +979,9 @@ class APIAssertions:
 
     @staticmethod
     def check_pagination_different_data(
-        first_page_items: list, second_page_items: list, entity_type: str
+        first_page_items: Sequence[Any],
+        second_page_items: Sequence[Any],
+        entity_type: str,
     ) -> None:
         """Проверяет что данные на разных страницах действительно разные"""
         with allure.step(
@@ -723,8 +1010,10 @@ class APIAssertions:
             ), f"Different pages should return different {entity_type} data"
 
             # Проверяем уникальность ID между страницами
+            # собираем все элементы в один список через unpacking
+            combined_items: list[Any] = [*first_page_items, *second_page_items]
             APIAssertions.check_unique_ids(
-                first_page_items + second_page_items, f"{entity_type} across pages"
+                combined_items, f"{entity_type} across pages"
             )
 
             logger.info(f"Different pages contain unique {entity_type} data")

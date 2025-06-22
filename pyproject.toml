@@ -22,6 +22,8 @@ psycopg2-binary = "^2.9.10"
 sqlalchemy = "^2.0.41"
 sqlmodel = "^0.0.24"
 allure-pytest = "^2.14.3"
+pytest-voluptuous = "^1.2.0"
+voluptuous = "^0.14.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"

@@ -1088,6 +1088,21 @@ termcolor = ">=2.1.0"
 dev = ["black", "flake8", "pre-commit"]
 
 [[package]]
+name = "pytest-voluptuous"
+version = "1.2.0"
+description = "Pytest plugin for asserting data against voluptuous schema."
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+groups = ["main"]
+files = [
+    {file = "pytest_voluptuous-1.2.0-py2.py3-none-any.whl", hash = "sha256:a3856e9812b219fec1c3f2fd8249c0bac6927e1d5e52a3961e4ae903f54d494f"},
+]
+
+[package.dependencies]
+pytest = "*"
+voluptuous = ">=0.9.0"
+
+[[package]]
 name = "python-dotenv"
 version = "1.1.0"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -1460,6 +1475,18 @@ h11 = ">=0.8"
 standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.15.1) ; sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\"", "watchfiles (>=0.13)", "websockets (>=10.4)"]
 
 [[package]]
+name = "voluptuous"
+version = "0.14.2"
+description = "Python data validation library"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "voluptuous-0.14.2-py3-none-any.whl", hash = "sha256:efc1dadc9ae32a30cc622602c1400a17b7bf8ee2770d64f70418144860739c3b"},
+    {file = "voluptuous-0.14.2.tar.gz", hash = "sha256:533e36175967a310f1b73170d091232bf881403e4ebe52a9b4ade8404d151f5d"},
+]
+
+[[package]]
 name = "webdriver-manager"
 version = "4.0.2"
 description = "Library provides the way to automatically manage drivers for different browsers"
@@ -1511,4 +1538,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "7dac125de71a2bf51b8e546346d6d69457bad55d798decb69a55256f92156a6d"
+content-hash = "48eb22ecc4061c5ad683efd9c9ada9838dffc88dd434c08b8914c7dd41475f04"
