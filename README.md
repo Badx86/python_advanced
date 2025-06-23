@@ -29,19 +29,26 @@ graph LR
     Client[Клиент] --> API[FastAPI API]
     API --> Pydantic[Pydantic валидация]
     Pydantic --> DB[(PostgreSQL)]
+    
     Tests[Автотесты] --> FluentAPI[Fluent API клиент]
     FluentAPI --> API
     API --> Response[JSON ответ]
     Response --> Voluptuous[Voluptuous валидация]
-
+    
+    %% Обратный поток тоже через Pydantic
+    DB --> Pydantic
+    Pydantic --> API
+    
     subgraph "Серверная валидация"
         Pydantic
-        style Pydantic fill: #e1f5fe
+        DB
+        style Pydantic fill:#e1f5fe
+        style DB fill:#e1f5fe
     end
-
-    subgraph "Клиентская валидация"
+    
+    subgraph "Клиентская валидация"  
         Voluptuous
-        style Voluptuous fill: #f3e5f5
+        style Voluptuous fill:#f3e5f5
     end
 ```
 
