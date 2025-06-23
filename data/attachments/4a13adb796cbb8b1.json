@@ -1,1 +1,0 @@
-{"status":"healthy","timestamp":"2025-06-23T23:15:03.677519Z","version":"0.1.0","database":{"status":"connected","type":"postgresql","users_count":15},"data":{"users":{"loaded":true,"count":15},"resources":{"loaded":true,"count":12}},"services":{"api":"running","database":"postgresql"}}

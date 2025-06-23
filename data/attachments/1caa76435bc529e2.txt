@@ -1,7 +1,0 @@
-INFO     tests.assertions:assertions.py:84 POST /api/users - Status: 201
-INFO     tests.assertions:assertions.py:478 User 18 verified in database: angelic 
-INFO     tests.assertions:assertions.py:478 User 18 verified in database: angelic 
-INFO     tests.test_crud_users:test_crud_users.py:77 Updating user 18 with data: {'name': 'loren', 'job': 'regulator'}
-INFO     tests.assertions:assertions.py:84 PUT /api/users/18 - Status: 200
-INFO     tests.assertions:assertions.py:526 User 18 updated in database: loren 
-INFO     tests.test_crud_users:test_crud_users.py:92 User 18 updated and verified in database successfully
