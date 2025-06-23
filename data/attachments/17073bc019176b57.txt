@@ -1,0 +1,4 @@
+INFO     tests.assertions:assertions.py:84 GET /api/resources?page=1&size=50 - Status: 200
+INFO     tests.assertions:assertions.py:985 Pages calculation correct: 15 total / 50 size = 1 pages
+INFO     tests.assertions:assertions.py:1001 Items count correct: page 1 has 15 items (expected 15)
+INFO     tests.test_resources:test_resources.py:85 Pagination calculations correct: page=1, size=50, items=15, pages=1

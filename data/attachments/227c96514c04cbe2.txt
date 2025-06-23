@@ -1,0 +1,4 @@
+INFO     tests.assertions:assertions.py:84 GET /api/users - Status: 200
+INFO     tests.test_smoke:test_smoke.py:48 Endpoint /api/users is accessible
+INFO     tests.assertions:assertions.py:84 GET /api/resources - Status: 200
+INFO     tests.test_smoke:test_smoke.py:48 Endpoint /api/resources is accessible

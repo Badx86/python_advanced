@@ -1,0 +1,4 @@
+Test: test_fail_example
+File: test_demo_statuses.py
+Duration: 0.00s
+Stage: call

@@ -1,0 +1,4 @@
+INFO     tests.api_client:api_client.py:108 API Client initialized: http://localhost:8000
+INFO     tests.assertions:assertions.py:268 Resource operations completed for ID: 13
+INFO     tests.test_api_schemas:test_api_schemas.py:54 Resource operations completed with fluent API
+INFO     tests.api_client:api_client.py:369 Test data cleanup completed

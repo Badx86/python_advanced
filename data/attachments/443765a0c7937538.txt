@@ -1,0 +1,1 @@
+curl -H 'User-Agent: python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept: */*' -H 'Connection: keep-alive' -H 'Content-Length: 28' -H 'Content-Type: application/json' -d '{"email": "valid@email.com"}' http://localhost:8000/api/login

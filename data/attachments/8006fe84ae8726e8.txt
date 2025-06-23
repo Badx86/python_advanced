@@ -1,0 +1,1 @@
+INFO     tests.test_demo_statuses:test_demo_statuses.py:17 ✅ This test passed as expected

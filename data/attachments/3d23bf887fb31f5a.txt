@@ -1,0 +1,5 @@
+tests/test_demo_statuses.py:42: in test_fail_example
+    assert (
+E   AssertionError: Deliberately failing test for demo purposes
+E   assert 200 == 500
+E    +  where 200 = <Response [200]>.status_code

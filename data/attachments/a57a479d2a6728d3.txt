@@ -1,0 +1,2 @@
+INFO     tests.assertions:assertions.py:84 GET /api/users/-999 - Status: 422
+INFO     tests.test_users:test_users.py:84 Invalid user ID -999 correctly rejected (422)

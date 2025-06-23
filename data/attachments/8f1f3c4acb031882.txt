@@ -1,2 +1,0 @@
-INFO     tests.assertions:assertions.py:65 POST /api/register - Status: 422
-INFO     tests.test_auth:test_auth.py:90 Registration correctly failed for missing email

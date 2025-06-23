@@ -1,4 +1,0 @@
-INFO     tests.assertions:assertions.py:65 GET /api/users?page=2&size=6 - Status: 200
-INFO     tests.assertions:assertions.py:960 Pages calculation correct: 16 total / 6 size = 3 pages
-INFO     tests.assertions:assertions.py:976 Items count correct: page 2 has 6 items (expected 6)
-INFO     tests.test_users:test_users.py:117 Pagination calculations correct: page=2, size=6, items=6, pages=3

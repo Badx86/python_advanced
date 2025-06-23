@@ -1,4 +1,0 @@
-INFO     tests.assertions:assertions.py:65 GET /api/resources - Status: 200
-INFO     tests.assertions:assertions.py:65 GET /api/resources?page=8 - Status: 200
-INFO     tests.assertions:assertions.py:1031 Page beyond available correctly returns empty results
-INFO     tests.test_resources:test_resources.py:147 Page 8 beyond 3 correctly returns empty

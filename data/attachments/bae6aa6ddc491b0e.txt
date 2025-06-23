@@ -1,8 +1,0 @@
-INFO     tests.assertions:assertions.py:65 POST /api/users - Status: 201
-INFO     tests.assertions:assertions.py:453 User 21 verified in database: apolonia 
-INFO     tests.assertions:assertions.py:453 User 21 verified in database: apolonia 
-INFO     tests.assertions:assertions.py:65 GET /api/users/21 - Status: 200
-INFO     tests.assertions:assertions.py:65 DELETE /api/users/21 - Status: 204
-INFO     tests.assertions:assertions.py:467 User 21 confirmed deleted from database
-INFO     tests.assertions:assertions.py:65 GET /api/users/21 - Status: 404
-INFO     tests.test_crud_users:test_crud_users.py:181 Full CRUD cycle with database verification completed for user 21
