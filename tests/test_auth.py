@@ -18,18 +18,26 @@ class TestAuth:
         register_data = {
             "email": "user@gmail.com",
             "password": "securepass123",
-        }  # ← ИЗМЕНИТЬ ЭТО
+        }
 
         response = api_client.post("/api/register", json=register_data)
+
+        # Логируем curl для документации успешной регистрации
+        APIAssertions.log_curl_command(response, "✅ Successful Registration")
+
         APIAssertions.check_register_success_response(response, "/api/register")
         logger.info("Registration successful with valid credentials")
 
     @allure.title("Successful login")
     def test_login_successful(self, api_client) -> None:
         """Тест успешного логина"""
-        login_data = {"email": "user@gmail.com", "password": "securepass123"}  # ← И ЭТО
+        login_data = {"email": "user@gmail.com", "password": "securepass123"}
 
         response = api_client.post("/api/login", json=login_data)
+
+        # Логируем curl для документации успешного логина
+        APIAssertions.log_curl_command(response, "✅ Successful Login")
+
         APIAssertions.check_login_success_response(response, "/api/login")
         logger.info("Login successful with valid credentials")
 
@@ -50,6 +58,7 @@ class TestAuth:
         register_data = {"email": invalid_email, "password": "testpass"}
 
         response = api_client.post("/api/register", json=register_data)
+        # curl автоматически появится при ошибке 400
         APIAssertions.check_email_error_response(
             response, "/api/register", "Invalid email format"
         )
@@ -70,6 +79,7 @@ class TestAuth:
         login_data = {"email": invalid_email, "password": "testpass"}
 
         response = api_client.post("/api/login", json=login_data)
+        # curl автоматически появится при ошибке 400
         APIAssertions.check_email_error_response(
             response, "/api/login", "Invalid email format"
         )
@@ -84,6 +94,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/register", json=register_data)
+        # curl автоматически появится при ошибке 422
         APIAssertions.log_and_check_status(
             response, "/api/register", HTTPStatus.UNPROCESSABLE_ENTITY
         )
@@ -95,6 +106,7 @@ class TestAuth:
         register_data = {"email": "", "password": "testpass"}  # пустая строка
 
         response = api_client.post("/api/register", json=register_data)
+        # curl автоматически появится при ошибке 400
         APIAssertions.check_email_error_response(
             response, "/api/register", "Missing email"
         )
@@ -109,6 +121,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/login", json=login_data)
+        # curl автоматически появится при ошибке 422
         APIAssertions.log_and_check_status(
             response, "/api/login", HTTPStatus.UNPROCESSABLE_ENTITY
         )
@@ -120,6 +133,7 @@ class TestAuth:
         login_data = {"email": "", "password": "testpass"}  # пустая строка
 
         response = api_client.post("/api/login", json=login_data)
+        # curl автоматически появится при ошибке 400
         APIAssertions.check_email_error_response(
             response, "/api/login", "Missing email"
         )
@@ -134,6 +148,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/register", json=register_data)
+        # curl автоматически появится при ошибке 422
         APIAssertions.log_and_check_status(
             response, "/api/register", HTTPStatus.UNPROCESSABLE_ENTITY
         )
@@ -148,6 +163,7 @@ class TestAuth:
         }
 
         response = api_client.post("/api/login", json=login_data)
+        # curl автоматически появится при ошибке 422
         APIAssertions.log_and_check_status(
             response, "/api/login", HTTPStatus.UNPROCESSABLE_ENTITY
         )

@@ -15,6 +15,7 @@ class TestValidation:
         """Тест неподдерживаемых HTTP методов - должен возвращать 405"""
         # POST на GET эндпоинт
         response = api_client.post("/api/users/1")
+        # curl автоматически появится при ошибке 405
         APIAssertions.log_and_check_status(
             response, "POST /api/users/1", HTTPStatus.METHOD_NOT_ALLOWED
         )
@@ -26,6 +27,7 @@ class TestValidation:
         user_data = {"job": "developer"}
 
         response = api_client.post("/api/users", json=user_data)
+        # curl автоматически появится при ошибке 422
         APIAssertions.log_and_check_status(
             response, "POST /api/users", HTTPStatus.UNPROCESSABLE_ENTITY
         )
@@ -37,6 +39,7 @@ class TestValidation:
         user_data = {"name": "testuser"}
 
         response = api_client.post("/api/users", json=user_data)
+        # curl автоматически появится при ошибке 422
         APIAssertions.log_and_check_status(
             response, "POST /api/users", HTTPStatus.UNPROCESSABLE_ENTITY
         )

@@ -15,6 +15,10 @@ class TestSmoke:
     def test_service_is_alive(self, api_client) -> None:
         """Сервис отвечает на запросы"""
         response = api_client.get("/status")
+
+        # Логируем curl для мониторинга
+        APIAssertions.log_curl_command(response, "🔍 Health Check for Monitoring")
+
         APIAssertions.log_and_check_status(response, "/status")
         logger.info("Service is alive and responding")
 

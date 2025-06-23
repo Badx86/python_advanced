@@ -13,6 +13,12 @@ from app.models import (
     Resource,
 )
 
+# Curlify для генерации curl команд
+try:
+    import curlify
+except ImportError:
+    curlify = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -53,6 +59,19 @@ class APIAssertions:
     # ========================================
 
     @staticmethod
+    def log_curl_command(
+        response: requests.Response, title: str = "cURL Command"
+    ) -> None:
+        """Логирует cURL команду в Allure отчет"""
+        if curlify:
+            try:
+                curl_cmd = curlify.to_curl(response.request)
+                allure.attach(curl_cmd, title, allure.attachment_type.TEXT)
+                logger.debug(f"cURL: {curl_cmd}")
+            except Exception as e:
+                logger.warning(f"Failed to generate cURL: {e}")
+
+    @staticmethod
     def log_and_check_status(
         response: requests.Response,
         endpoint: str,
@@ -66,7 +85,13 @@ class APIAssertions:
                 f"{response.request.method} {endpoint} - Status: {response.status_code}"
             )
 
-            # ТОЛЬКО Response Body для отладки API - это критично
+            # Логируем cURL при ошибках
+            if response.status_code >= 400:
+                APIAssertions.log_curl_command(
+                    response, f"🐛 Debug {response.status_code} Error"
+                )
+
+            # ТОЛЬКО Response Body для отладки API
             if response.text:
                 allure.attach(
                     response.text, "Response Body", allure.attachment_type.JSON

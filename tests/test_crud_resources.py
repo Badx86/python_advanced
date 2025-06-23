@@ -34,6 +34,10 @@ class TestResourcesCRUD:
         logger.info(f"Creating resource with data: {resource_data}")
 
         response = api_client.post("/api/resources", json=resource_data)
+
+        # Логируем curl для документации создания ресурса
+        APIAssertions.log_curl_command(response, "📝 Create Resource")
+
         APIAssertions.check_create_resource_response(
             response, "/api/resources", resource_data
         )
@@ -78,6 +82,10 @@ class TestResourcesCRUD:
         logger.info(f"Updating resource {resource_id} with data: {updated_data}")
 
         response = api_client.put(f"/api/resources/{resource_id}", json=updated_data)
+
+        # Логируем curl для документации обновления ресурса
+        APIAssertions.log_curl_command(response, f"🔄 Update Resource {resource_id}")
+
         APIAssertions.check_update_resource_response(
             response, f"/api/resources/{resource_id}", updated_data, resource_id
         )
@@ -121,6 +129,10 @@ class TestResourcesCRUD:
 
         # Удаляем его
         response = api_client.delete(f"/api/resources/{resource_id}")
+
+        # Логируем curl для документации удаления ресурса
+        APIAssertions.log_curl_command(response, f"🗑️ Delete Resource {resource_id}")
+
         APIAssertions.check_delete_resource_response(
             response, f"/api/resources/{resource_id}", resource_id
         )
@@ -135,6 +147,7 @@ class TestResourcesCRUD:
         logger.info(f"Updating non-existent resource with data: {updated_data}")
 
         response = api_client.put("/api/resources/999999", json=updated_data)
+        # curl автоматически появится при ошибке 404
         APIAssertions.check_404_error(response, "/api/resources/999999")
         logger.info("Non-existent resource correctly failed with 404")
 
@@ -142,6 +155,7 @@ class TestResourcesCRUD:
     def test_delete_nonexistent_resource(self, api_client) -> None:
         """Тест удаления несуществующего ресурса"""
         response = api_client.delete("/api/resources/999999")
+        # curl автоматически появится при ошибке 404
         APIAssertions.check_404_error(response, "/api/resources/999999")
         logger.info("Non-existent resource DELETE correctly failed with 404")
 
@@ -173,6 +187,7 @@ class TestResourcesCRUD:
 
         # Проверяем что ресурс удален из API
         get_after_delete = api_client.get(f"/api/resources/{resource_id}")
+        # curl автоматически появится при ошибке 404
         APIAssertions.check_404_error(get_after_delete, f"/api/resources/{resource_id}")
 
         logger.info(

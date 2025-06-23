@@ -208,11 +208,12 @@ def user_test_cases(request) -> tuple:
 def allure_environment(environment: Environment):
     """Настраивает свойства окружения для Allure"""
 
-    db_engine = os.getenv('DATABASE_ENGINE', 'Not specified')
-    if db_engine != 'Not specified':
+    db_engine = os.getenv("DATABASE_ENGINE", "Not specified")
+    if db_engine != "Not specified":
         # Скрываем пароль: postgres:example@ -> postgres:***@
         import re
-        db_engine_masked = re.sub(r'://([^:]+):([^@]+)@', r'://\1:***@', db_engine)
+
+        db_engine_masked = re.sub(r"://([^:]+):([^@]+)@", r"://\1:***@", db_engine)
     else:
         db_engine_masked = db_engine
 

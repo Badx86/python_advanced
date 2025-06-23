@@ -24,12 +24,16 @@ class TestUsersCRUD:
     @allure.title("Create new user via API")
     def test_create_user(self, api_client) -> None:
         """Тест создания пользователя (API + БД)"""
-        user_data = generate_random_user()
-        logger.info(f"Creating user with data: {user_data}")
+        user_info = generate_random_user()
+        logger.info(f"Creating user with data: {user_info}")
 
-        response = api_client.post("/api/users", json=user_data)
+        response = api_client.post("/api/users", json=user_info)
+
+        # Логируем curl для документации создания пользователя
+        APIAssertions.log_curl_command(response, "📝 Create User")
+
         APIAssertions.check_create_user_response(
-            response, "/api/users", user_data["name"], user_data["job"]
+            response, "/api/users", user_info["name"], user_info["job"]
         )
         logger.info("User created and verified in database successfully")
 
@@ -56,12 +60,12 @@ class TestUsersCRUD:
     @allure.title("Update user with PUT method")
     def test_update_user_put(self, api_client) -> None:
         """Тест полного обновления пользователя (API + БД)"""
-        user_data = generate_random_user()
+        user_info = generate_random_user()
 
         # Создаем пользователя
-        create_response = api_client.post("/api/users", json=user_data)
+        create_response = api_client.post("/api/users", json=user_info)
         created_user = APIAssertions.check_create_user_response(
-            create_response, "/api/users", user_data["name"], user_data["job"]
+            create_response, "/api/users", user_info["name"], user_info["job"]
         )
         user_id = int(created_user.id)
 
@@ -69,15 +73,19 @@ class TestUsersCRUD:
         original_user = APIAssertions.check_user_in_database(user_id)
 
         # Обновляем его
-        updated_data = generate_random_user()
-        logger.info(f"Updating user {user_id} with data: {updated_data}")
+        updated_info = generate_random_user()
+        logger.info(f"Updating user {user_id} with data: {updated_info}")
 
-        response = api_client.put(f"/api/users/{user_id}", json=updated_data)
+        response = api_client.put(f"/api/users/{user_id}", json=updated_info)
+
+        # Логируем curl для документации обновления пользователя
+        APIAssertions.log_curl_command(response, f"🔄 Update User {user_id}")
+
         APIAssertions.check_update_user_response(
             response,
             f"/api/users/{user_id}",
-            updated_data["name"],
-            updated_data["job"],
+            updated_info["name"],
+            updated_info["job"],
             user_id,
             original_user,
         )
@@ -86,12 +94,12 @@ class TestUsersCRUD:
     @allure.title("Update user with PATCH method")
     def test_update_user_patch(self, api_client) -> None:
         """Тест частичного обновления пользователя (API + БД)"""
-        user_data = generate_random_user()
+        user_info = generate_random_user()
 
         # Создаем пользователя
-        create_response = api_client.post("/api/users", json=user_data)
+        create_response = api_client.post("/api/users", json=user_info)
         created_user = APIAssertions.check_create_user_response(
-            create_response, "/api/users", user_data["name"], user_data["job"]
+            create_response, "/api/users", user_info["name"], user_info["job"]
         )
         user_id = int(created_user.id)
 
@@ -99,15 +107,15 @@ class TestUsersCRUD:
         original_user = APIAssertions.check_user_in_database(user_id)
 
         # Обновляем его
-        updated_data = generate_random_user()
-        logger.info(f"Patching user {user_id} with data: {updated_data}")
+        updated_info = generate_random_user()
+        logger.info(f"Patching user {user_id} with data: {updated_info}")
 
-        response = api_client.patch(f"/api/users/{user_id}", json=updated_data)
+        response = api_client.patch(f"/api/users/{user_id}", json=updated_info)
         APIAssertions.check_update_user_response(
             response,
             f"/api/users/{user_id}",
-            updated_data["name"],
-            updated_data["job"],
+            updated_info["name"],
+            updated_info["job"],
             user_id,
             original_user,
         )
@@ -116,17 +124,21 @@ class TestUsersCRUD:
     @allure.title("Delete user from system")
     def test_delete_user(self, api_client) -> None:
         """Тест удаления пользователя (API + БД)"""
-        user_data = generate_random_user()
+        user_info = generate_random_user()
 
         # Создаем пользователя
-        create_response = api_client.post("/api/users", json=user_data)
+        create_response = api_client.post("/api/users", json=user_info)
         created_user = APIAssertions.check_create_user_response(
-            create_response, "/api/users", user_data["name"], user_data["job"]
+            create_response, "/api/users", user_info["name"], user_info["job"]
         )
         user_id = int(created_user.id)
 
         # Удаляем его
         response = api_client.delete(f"/api/users/{user_id}")
+
+        # Логируем curl для документации удаления пользователя
+        APIAssertions.log_curl_command(response, f"🗑️ Delete User {user_id}")
+
         APIAssertions.check_delete_user_response(
             response, f"/api/users/{user_id}", user_id
         )
@@ -135,10 +147,11 @@ class TestUsersCRUD:
     @allure.title("Update non-existent user")
     def test_update_nonexistent_user(self, api_client) -> None:
         """Тест обновления несуществующего пользователя"""
-        updated_data = generate_random_user()
-        logger.info(f"Updating non-existent user with data: {updated_data}")
+        updated_info = generate_random_user()
+        logger.info(f"Updating non-existent user with data: {updated_info}")
 
-        response = api_client.put("/api/users/999999", json=updated_data)
+        response = api_client.put("/api/users/999999", json=updated_info)
+        # curl автоматически появится при ошибке 404
         APIAssertions.check_404_error(response, "/api/users/999999")
         logger.info("Non-existent user correctly failed with 404")
 
@@ -146,23 +159,24 @@ class TestUsersCRUD:
     def test_delete_nonexistent_user(self, api_client) -> None:
         """Тест удаления несуществующего пользователя"""
         response = api_client.delete("/api/users/999999")
+        # curl автоматически появится при ошибке 404
         APIAssertions.check_404_error(response, "/api/users/999999")
         logger.info("Non-existent user DELETE correctly failed with 404")
 
     @allure.title("Full CRUD cycle for user")
     def test_create_and_delete_flow(self, api_client) -> None:
         """Тест полного цикла: создание -> проверка -> удаление (с БД проверками)"""
-        user_data = generate_random_user()
+        user_info = generate_random_user()
 
         # Создаем пользователя
-        create_response = api_client.post("/api/users", json=user_data)
+        create_response = api_client.post("/api/users", json=user_info)
         created_user = APIAssertions.check_create_user_response(
-            create_response, "/api/users", user_data["name"], user_data["job"]
+            create_response, "/api/users", user_info["name"], user_info["job"]
         )
         user_id = int(created_user.id)
 
         # Проверяем что пользователь существует в БД
-        APIAssertions.check_user_in_database(user_id, user_data["name"])
+        APIAssertions.check_user_in_database(user_id, user_info["name"])
 
         # Проверяем что пользователь доступен через API
         get_response = api_client.get(f"/api/users/{user_id}")
@@ -176,6 +190,7 @@ class TestUsersCRUD:
 
         # Проверяем что пользователь удален из API
         get_after_delete = api_client.get(f"/api/users/{user_id}")
+        # curl автоматически появится при ошибке 404
         APIAssertions.check_404_error(get_after_delete, f"/api/users/{user_id}")
 
         logger.info(
