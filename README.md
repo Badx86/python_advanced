@@ -18,12 +18,56 @@
 
 </div>
 
-
-
-
 # FastAPI Reqres with PostgreSQL + Schema Validation
 
-Микросервис на FastAPI с автотестами, интеграцией PostgreSQL и двойной валидацией схем API: серверная (Pydantic) и клиентская (Voluptuous).
+Микросервис на FastAPI с автотестами, интеграцией PostgreSQL и двойной валидацией схем API.
+
+## 🏗️ Архитектура валидации данных
+
+```mermaid
+graph LR
+    Client[Клиент] --> API[FastAPI API]
+    API --> Pydantic[Pydantic валидация]
+    Pydantic --> DB[(PostgreSQL)]
+    Tests[Автотесты] --> FluentAPI[Fluent API клиент]
+    FluentAPI --> API
+    API --> Response[JSON ответ]
+    Response --> Voluptuous[Voluptuous валидация]
+
+    subgraph "Серверная валидация"
+        Pydantic
+        style Pydantic fill: #e1f5fe
+    end
+
+    subgraph "Клиентская валидация"
+        Voluptuous
+        style Voluptuous fill: #f3e5f5
+    end
+```
+
+| Тип            | Библиотека | Назначение                               | Пример                                       |
+|----------------|------------|------------------------------------------|----------------------------------------------|
+| **Серверная**  | Pydantic   | Валидирует входящие/исходящие данные API | `class UserCreate(SQLModel): name: str`      |
+| **Клиентская** | Voluptuous | Проверяет структуру ответов в тестах     | `USER_CREATED = S({"id": str, "name": str})` |
+
+## 🚀 Fluent API для тестов
+
+**Было (verbose):**
+
+```python
+response = requests.post("/api/users", json={"name": "John", "job": "Dev"})
+assert response.status_code == 201
+data = response.json()
+assert "id" in data
+assert "name" in data
+# + еще 'N' строк проверок...
+```
+
+**Стало (fluent):**
+
+```python
+user_id = test_data.create_user("John", "Dev")
+```
 
 ## Основные возможности
 
@@ -59,6 +103,7 @@ docker-compose up --build
 ```
 
 **Что включено в Docker Compose:**
+
 - **FastAPI app** - основное приложение на порту 8000
 - **PostgreSQL 15** - база данных на порту 5432
 - **Adminer** - веб-интерфейс для управления БД на порту 8080
