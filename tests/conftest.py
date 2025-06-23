@@ -207,13 +207,24 @@ def user_test_cases(request) -> tuple:
 @pytest.fixture(scope="session", autouse=True)
 def allure_environment(environment: Environment):
     """Настраивает свойства окружения для Allure"""
+
+    db_engine = os.getenv('DATABASE_ENGINE', 'Not specified')
+    if db_engine != 'Not specified':
+        # Скрываем пароль: postgres:example@ -> postgres:***@
+        import re
+        db_engine_masked = re.sub(r'://([^:]+):([^@]+)@', r'://\1:***@', db_engine)
+    else:
+        db_engine_masked = db_engine
+
     properties = [
         f"Environment={environment.base_url}",
         f"Timeout={environment.timeout}s",
         f"Python_Version={sys.version.split()[0]}",
-        f"Database_Engine={os.getenv('DATABASE_ENGINE', 'Not specified')}",
-        f"App_Version={os.getenv('APP_VERSION', '1.0.0')}",
-        f"Test_Framework=pytest + voluptuous",
+        f"Database_Engine={db_engine_masked}",
+        f"App_Version={os.getenv('APP_VERSION', '1.1.0')}",
+        f"Host={os.getenv('HOST', 'localhost')}",
+        f"Port={os.getenv('PORT', '8000')}",
+        f"Test_Framework=pytest + voluptuous + fluent API",
     ]
 
     # Создаем файл окружения для allure
