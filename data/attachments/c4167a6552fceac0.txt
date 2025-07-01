@@ -1,3 +1,0 @@
-INFO     tests.assertions:assertions.py:84 GET /api/users?delay=1 - Status: 200
-INFO     tests.assertions:assertions.py:939 Delayed response validated, took at least 1s
-INFO     tests.test_special:test_special.py:30 Delayed response: 1.01s (requested: 1s)

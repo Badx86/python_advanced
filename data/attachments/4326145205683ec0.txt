@@ -1,0 +1,1 @@
+curl -H 'User-Agent: python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept: */*' -H 'Connection: keep-alive' -H 'Content-Length: 56' -H 'Content-Type: application/json' -d '{"name": "grant", "job": "recovery vehicle coordinator"}' http://localhost:8000/api/users

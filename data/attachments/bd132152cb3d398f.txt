@@ -1,0 +1,1 @@
+INFO     tests.test_demo_statuses:test_demo_statuses.py:51 This test was expected to fail but actually passed (XPASS)
