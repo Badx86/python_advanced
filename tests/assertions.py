@@ -162,288 +162,241 @@ class APIAssertions:
             )
 
     # ========================================
-    # НОВЫЕ МЕТОДЫ ДЛЯ FLUENT API
+    # ХЕЛПЕРЫ ДЛЯ FLUENT API
     # ========================================
 
     @classmethod
-    def check_fluent_users_list(cls, api_response) -> None:
-        """Проверяет fluent API список пользователей с автоматической валидацией"""
-        with allure.step("Verify fluent users list with schema validation"):
-            # Извлекаем данные через fluent API
-            total, items = api_response.extract("total", "items")
+    def check_fluent_users_list_business_logic(
+        cls, api_response, expected_page: int, expected_size: int
+    ) -> None:
+        """Проверяет бизнес-логику списка пользователей (после валидации схемы)"""
+        with allure.step("Verify users list business logic"):
+            # Предполагается что схема уже валидирована, проверяем только бизнес-логику
+            total, items, page, size = api_response.extract(
+                "total", "items", "page", "size"
+            )
 
-            # Бизнес-логика проверки
+            # Проверки пагинации
+            assert page == expected_page, f"Page mismatch: {page} != {expected_page}"
+            assert size == expected_size, f"Size mismatch: {size} != {expected_size}"
+            assert (
+                len(items) <= expected_size
+            ), f"Items count {len(items)} exceeds page size {expected_size}"
             assert total >= 0, "Total users count should be non-negative"
-            assert len(items) <= 6, "Page size should be respected"
+
+            # Проверки уникальности ID
+            cls.check_unique_ids(items, "user")
 
             logger.info(
-                f"Fluent users list validated: {total} total users, {len(items)} on page"
+                f"Users list business logic validated: {total} total, {len(items)} on page {page}"
             )
 
     @classmethod
-    def check_fluent_user_lifecycle(
-        cls, api, user_data: Dict[str, str], test_data
+    def check_fluent_resource_business_logic(
+        cls, api_response, expected_resource_data: Dict[str, Any]
     ) -> None:
-        """Проверяет полный жизненный цикл пользователя через fluent API"""
-        with allure.step("Execute complete user lifecycle test"):
-            # Создание пользователя
-            user_id = test_data.create_user(user_data["name"], user_data["job"])
-            allure.attach(
-                f"Created user ID: {user_id}",
-                "User Creation",
-                allure.attachment_type.TEXT,
+        """Проверяет бизнес-логику ресурса"""
+        with allure.step("Verify resource business logic"):
+            # Предполагается что схема уже валидирована, проверяем только бизнес-логику
+            data = api_response.extract("data")
+
+            assert (
+                data["name"] == expected_resource_data["name"]
+            ), f"Resource name mismatch"
+            assert (
+                data["year"] == expected_resource_data["year"]
+            ), f"Resource year mismatch"
+            assert (
+                data["color"] == expected_resource_data["color"]
+            ), f"Resource color mismatch"
+            assert (
+                data["pantone_value"] == expected_resource_data["pantone_value"]
+            ), f"Resource pantone mismatch"
+
+            logger.info(
+                f"Resource business logic validated: {data['name']} ({data['year']})"
             )
 
-            # Проверка созданного пользователя
-            response = api.users().get(user_id)
-            user_data_dict = response.extract("data")
-            user_name = user_data_dict["first_name"] + " " + user_data_dict["last_name"]
-            assert (
-                user_data["name"].lower() in user_name.lower()
-            ), f"User name mismatch: {user_name}"
-
-            # Обновление пользователя
-            new_name, new_job = "Updated User", "Senior Engineer"
-            update_response = api.users().update(user_id, new_name, new_job)
-            updated_name, updated_job = update_response.extract("name", "job")
-            assert updated_name == new_name, f"Updated name mismatch"
-            assert updated_job == new_job, f"Updated job mismatch"
-
-            # Проверка сохранения
-            final_response = api.users().get(user_id)
-            assert (
-                final_response.status_code == HTTPStatus.OK
-            ), "User should exist after update"
-
-            logger.info(f"User lifecycle completed successfully for ID: {user_id}")
-
     @classmethod
-    def check_fluent_user_not_found(cls, api_response) -> None:
-        """Проверяет 404 ошибку через fluent API с валидацией схемы"""
-        with allure.step("Verify 404 error with schema validation"):
-            detail = api_response.extract("detail")
-            error_message = detail["error"]
-            assert (
-                "not found" in error_message.lower()
-            ), f"Unexpected error message: {error_message}"
-
-            logger.info("404 error properly validated with schema")
-
-    @classmethod
-    def check_fluent_resource_operations(
-        cls, api, resource_data: Dict[str, Any], test_data
-    ) -> None:
-        """Проверяет CRUD операции ресурсов через fluent API"""
-        with allure.step("Execute resource CRUD operations"):
-            # Создание ресурса
-            resource_id = test_data.create_resource(**resource_data)
-
-            # Проверка созданного ресурса
-            response = api.resources().get(resource_id)
-            data = response.extract("data")
-
-            assert data["name"] == resource_data["name"], f"Resource name mismatch"
-            assert data["year"] == resource_data["year"], f"Resource year mismatch"
-            assert data["color"] == resource_data["color"], f"Resource color mismatch"
-
-            # Обновление ресурса
-            updated_data = {
-                "name": "Updated Resource",
-                "year": 2025,
-                "color": "#123456",
-                "pantone_value": "UPD-001",
-            }
-
-            update_response = api.resources().update(
-                resource_id, updated_data, method="PUT"
+    def check_fluent_user_creation_business_logic(
+        cls, api_response, expected_name: str, expected_job: str
+    ) -> int:
+        """Проверяет бизнес-логику создания пользователя"""
+        with allure.step("Verify user creation business logic"):
+            # Предполагается что схема уже валидирована, проверяем только бизнес-логику
+            name, job, user_id, created_at = api_response.extract(
+                "name", "job", "id", "createdAt"
             )
 
-            # Проверка обновления
-            for key, value in updated_data.items():
-                actual_value = update_response.extract(key)
-                assert (
-                    actual_value == value
-                ), f"Resource {key} update failed: {actual_value} != {value}"
+            assert (
+                name == expected_name
+            ), f"Created user name mismatch: {name} != {expected_name}"
+            assert (
+                job == expected_job
+            ), f"Created user job mismatch: {job} != {expected_job}"
+            assert user_id is not None, "User ID should not be None"
+            assert created_at is not None, "CreatedAt should not be None"
 
-            logger.info(f"Resource operations completed for ID: {resource_id}")
+            user_id_int = int(user_id)
+            assert user_id_int > 0, f"User ID should be positive: {user_id_int}"
+
+            logger.info(
+                f"User creation business logic validated: {name} ({job}) with ID {user_id_int}"
+            )
+            return user_id_int
 
     @classmethod
-    def check_fluent_resource_pagination(
-        cls, api_response, page: int, size: int
+    def check_fluent_pagination_calculations(
+        cls, api_response, expected_page: int, expected_size: int
     ) -> None:
-        """Проверяет пагинацию ресурсов через fluent API"""
-        with allure.step("Verify resource pagination"):
-            # Извлекаем данные пагинации
-            actual_page, actual_size, total, pages, items = api_response.extract(
+        """Проверяет математику пагинации"""
+        with allure.step("Verify pagination calculations"):
+            # Предполагается что схема уже валидирована, проверяем только расчеты
+            page, size, total, pages, items = api_response.extract(
                 "page", "size", "total", "pages", "items"
             )
 
-            # Валидация бизнес-логики
-            assert actual_page == page, f"Page mismatch: {actual_page} != {page}"
-            assert actual_size == size, f"Size mismatch: {actual_size} != {size}"
-            assert len(items) <= size, f"Items count exceeds page size"
+            # Проверяем что параметры соответствуют запрошенным
+            assert page == expected_page, f"Page mismatch: {page} != {expected_page}"
+            assert size == expected_size, f"Size mismatch: {size} != {expected_size}"
 
-            # Проверяем расчеты пагинации
+            # Проверяем математику пагинации
             expected_pages = max(1, (total + size - 1) // size) if total > 0 else 1
             assert (
                 pages == expected_pages
             ), f"Pages calculation error: {pages} != {expected_pages}"
 
+            # Проверяем количество элементов на странице
+            if page <= pages and total > 0:
+                max_items_on_page = min(size, total - (page - 1) * size)
+                assert (
+                    len(items) <= max_items_on_page
+                ), f"Too many items on page: {len(items)} > {max_items_on_page}"
+
             logger.info(
-                f"Pagination validated: page {page}/{pages}, {len(items)} items"
+                f"Pagination calculations verified: page {page}/{pages}, {len(items)} items"
             )
 
     @classmethod
-    def check_fluent_auth_registration(cls, api_response) -> None:
-        """Проверяет успешную регистрацию через fluent API"""
-        with allure.step("Verify successful registration"):
-            user_id, token = api_response.extract("id", "token")
-
-            assert user_id > 0, f"User ID should be positive: {user_id}"
-            assert len(token) > 0, f"Token should not be empty"
-
-            allure.attach(
-                f"User ID: {user_id}",
-                "Registration Success",
-                allure.attachment_type.TEXT,
-            )
-            logger.info(f"User registered successfully with ID: {user_id}")
-
-    @classmethod
-    def check_fluent_auth_login(cls, api_response) -> None:
-        """Проверяет успешный логин через fluent API"""
-        with allure.step("Verify successful login"):
+    def check_fluent_authentication_business_logic(
+        cls, api_response, check_user_id: bool = True
+    ) -> Dict[str, Any]:
+        """Проверяет бизнес-логику аутентификации"""
+        with allure.step("Verify authentication business logic"):
+            # Предполагается что схема уже валидирована, проверяем только бизнес-логику
             token = api_response.extract("token")
 
-            assert len(token) > 0, f"Token should not be empty"
+            assert token is not None, "Token should not be None"
+            assert len(token) > 0, "Token should not be empty"
+            assert len(token) >= 10, f"Token seems too short: {len(token)} chars"
 
-            logger.info("Login successful with valid token")
+            result = {"token": token}
+
+            if check_user_id:
+                user_id = api_response.extract("id")
+                assert (
+                    user_id is not None
+                ), "User ID should not be None for registration"
+                assert isinstance(
+                    user_id, int
+                ), f"User ID should be int, got {type(user_id)}"
+                assert user_id > 0, f"User ID should be positive: {user_id}"
+                result["user_id"] = user_id
+                logger.info(
+                    f"Authentication business logic validated: token length {len(token)}, user ID {user_id}"
+                )
+            else:
+                logger.info(
+                    f"Authentication business logic validated: token length {len(token)}"
+                )
+
+            return result
 
     @classmethod
-    def check_fluent_system_health(cls, api_response) -> None:
-        """Проверяет статус системы через fluent API"""
-        with allure.step("Verify comprehensive system status"):
-            status, version, db_status, services = api_response.extract(
-                "status", "version", "database", "services"
+    def check_fluent_system_health_business_logic(cls, api_response) -> None:
+        """Проверяет бизнес-логику статуса системы"""
+        with allure.step("Verify system health business logic"):
+            # Предполагается что схема уже валидирована, проверяем только бизнес-логику
+            status, version, database, data, services = api_response.extract(
+                "status", "version", "database", "data", "services"
             )
 
-            # Проверки здоровья системы
+            # Проверки общего статуса
             assert status in ["healthy", "unhealthy"], f"Invalid status: {status}"
-            assert (
-                version.count(".") >= 2
-            ), f"Version should follow semantic versioning: {version}"
-            assert (
-                db_status.get("status") == "connected"
-            ), f"Database should be connected"
-            assert (
-                db_status.get("users_count", 0) >= 0
-            ), f"User count should be non-negative"
 
-            # Проверки статуса сервисов
-            for service, service_status in services.items():
-                assert len(service_status) > 0, f"Service {service} should have status"
+            # Проверки версии
+            version_parts = version.split(".")
+            assert (
+                len(version_parts) >= 3
+            ), f"Version should follow semantic versioning: {version}"
+            assert all(
+                part.isdigit() for part in version_parts
+            ), f"Version parts should be numeric: {version}"
+
+            # Проверки базы данных
+            db_status = database.get("status")
+            assert (
+                db_status == "connected"
+            ), f"Database should be connected, got: {db_status}"
+
+            users_count = database.get("users_count", 0)
+            assert isinstance(
+                users_count, int
+            ), f"Users count should be int, got: {type(users_count)}"
+            assert (
+                users_count >= 0
+            ), f"Users count should be non-negative: {users_count}"
+
+            # Проверки данных
+            users_data = data.get("users", {})
+            resources_data = data.get("resources", {})
+
+            assert users_data.get("loaded") is True, "Users data should be loaded"
+            assert (
+                resources_data.get("loaded") is True
+            ), "Resources data should be loaded"
+
+            # Проверки сервисов
+            assert len(services) > 0, "Services dict should not be empty"
+            for service_name, service_status in services.items():
+                assert isinstance(
+                    service_status, str
+                ), f"Service {service_name} status should be string"
+                assert (
+                    len(service_status) > 0
+                ), f"Service {service_name} status should not be empty"
 
             allure.attach(
-                f"System Status: {status}\nVersion: {version}\nDB: {db_status['status']}",
+                f"System Status: {status}\nVersion: {version}\nDB: {db_status}",
                 "System Health Summary",
                 allure.attachment_type.TEXT,
             )
 
-            logger.info(f"System health check passed: {status} (v{version})")
-
-    @classmethod
-    def check_fluent_delayed_response(
-        cls, api_response, delay: int, actual_duration: float
-    ) -> None:
-        """Проверяет delayed response через fluent API"""
-        with allure.step(f"Verify delayed response (min {delay}s)"):
-            # Проверка времени
-            assert (
-                actual_duration >= delay - 0.1
-            ), f"Response should take at least {delay}s, got {actual_duration:.2f}s"
-
-            # Проверка данных
-            items = api_response.extract("items")
-            assert len(items) <= 6, f"Page size should be respected even with delay"
-
-            allure.attach(
-                f"Requested delay: {delay}s\nActual duration: {actual_duration:.2f}s",
-                "Performance Metrics",
-                allure.attachment_type.TEXT,
-            )
-
             logger.info(
-                f"Delayed response validated: {actual_duration:.2f}s (requested: {delay}s)"
+                f"System health business logic validated: {status} (v{version})"
             )
 
     @classmethod
-    def check_fluent_data_consistency(
-        cls, api, test_data, fake, operations_count: int = 3
+    def check_fluent_error_response_business_logic(
+        cls, api_response, expected_error_pattern: str = None
     ) -> None:
-        """Проверяет консистентность данных через fluent API"""
-        with allure.step("Verify data consistency across multiple operations"):
-            # Создаем пользователей
-            user_ids = []
-            for i in range(operations_count):
-                name = f"User {i + 1} {fake['person'].last_name()}"
-                job = fake["person"].occupation()
-                user_id = test_data.create_user(name, job)
-                user_ids.append(user_id)
+        """Проверяет бизнес-логику ошибок API"""
+        with allure.step("Verify API error business logic"):
+            # Предполагается что схема уже валидирована, проверяем только бизнес-логику
+            detail = api_response.extract("detail")
+            error_message = detail["error"]
 
-            # Проверяем уникальность ID
-            retrieved_ids = []
-            for user_id in user_ids:
-                response = api.users().get(user_id)
-                user_data_dict = response.extract("data")
-                retrieved_ids.append(user_data_dict["id"])
+            assert isinstance(
+                error_message, str
+            ), f"Error message should be string, got: {type(error_message)}"
+            assert len(error_message) > 0, "Error message should not be empty"
 
-            assert len(set(retrieved_ids)) == len(
-                retrieved_ids
-            ), "All user IDs should be unique"
-
-            # Проверяем присутствие в списке
-            response = api.users().list(page=1, size=50)
-            users_list = response.extract("items")
-            all_user_ids = [user["id"] for user in users_list]
-
-            for user_id in user_ids:
+            if expected_error_pattern:
                 assert (
-                    user_id in all_user_ids
-                ), f"User {user_id} should be in users list"
+                    expected_error_pattern.lower() in error_message.lower()
+                ), f"Expected error pattern '{expected_error_pattern}' not found in '{error_message}'"
 
-            logger.info(f"Data consistency validated across {len(user_ids)} users")
-
-    @classmethod
-    def check_fluent_parallel_operations(
-        cls, api, test_data, resource_data: Dict[str, Any], operations_count: int = 5
-    ) -> None:
-        """Проверяет безопасность параллельных операций через fluent API"""
-        with allure.step("Verify parallel operations safety"):
-            resource_ids = []
-            base_name = resource_data["name"]
-
-            # Создаем ресурсы
-            for i in range(operations_count):
-                modified_data = resource_data.copy()
-                modified_data["name"] = f"{base_name} {i + 1}"
-                modified_data["pantone_value"] = f"PAR-{i + 1:03d}"
-
-                resource_id = test_data.create_resource(**modified_data)
-                resource_ids.append(resource_id)
-
-            # Проверяем все ресурсы
-            for i, resource_id in enumerate(resource_ids):
-                response = api.resources().get(resource_id)
-                data = response.extract("data")
-
-                expected_name = f"{base_name} {i + 1}"
-                assert (
-                    data["name"] == expected_name
-                ), f"Resource {resource_id} name mismatch"
-
-            logger.info(
-                f"Parallel operations safety validated for {len(resource_ids)} resources"
-            )
+            logger.info(f"API error business logic validated: {error_message}")
 
     # ========================================
     # ПРОВЕРКИ БД ДЛЯ ПОЛЬЗОВАТЕЛЕЙ
@@ -944,9 +897,14 @@ class APIAssertions:
 
     @staticmethod
     def check_unique_ids(items_list, item_name: str = "items") -> None:
-        """Проверяет уникальность ID в списке объектов"""
+        """Проверяет уникальность ID в списке объектов или словарей"""
         with allure.step(f"Verify unique IDs in {item_name} list"):
-            ids = [item.id for item in items_list]
+            # Поддержка как объектов с атрибутами, так и словарей
+            if items_list and hasattr(items_list[0], "id"):
+                ids = [item.id for item in items_list]
+            else:
+                ids = [item["id"] for item in items_list]
+
             unique_ids = set(ids)
 
             assert len(ids) == len(

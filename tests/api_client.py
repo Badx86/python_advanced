@@ -69,8 +69,62 @@ class APIResponse:
                     "Failed Response Data",
                     allure.attachment_type.JSON,
                 )
-                raise AssertionError(f"Schema validation failed for {schema_name}: {e}")
+                raise AssertionError(
+                    f"Schema '{schema_name}' validation failed: {e}"
+                )
         return self
+
+    # ===================================
+    # CONVENIENCE МЕТОДЫ ДЛЯ ВАЛИДАЦИИ
+    # ===================================
+
+    def validate_users_list(self) -> "APIResponse":
+        """Валидирует ответ списка пользователей"""
+        return self.validate_schema("USERS_LIST")
+
+    def validate_single_user(self) -> "APIResponse":
+        """Валидирует ответ одного пользователя"""
+        return self.validate_schema("SINGLE_USER")
+
+    def validate_user_created(self) -> "APIResponse":
+        """Валидирует ответ создания пользователя"""
+        return self.validate_schema("USER_CREATED")
+
+    def validate_user_updated(self) -> "APIResponse":
+        """Валидирует ответ обновления пользователя"""
+        return self.validate_schema("USER_UPDATED")
+
+    def validate_resources_list(self) -> "APIResponse":
+        """Валидирует ответ списка ресурсов"""
+        return self.validate_schema("RESOURCES_LIST")
+
+    def validate_single_resource(self) -> "APIResponse":
+        """Валидирует ответ одного ресурса"""
+        return self.validate_schema("SINGLE_RESOURCE")
+
+    def validate_resource_created(self) -> "APIResponse":
+        """Валидирует ответ создания ресурса"""
+        return self.validate_schema("RESOURCE_CREATED")
+
+    def validate_resource_updated(self) -> "APIResponse":
+        """Валидирует ответ обновления ресурса"""
+        return self.validate_schema("RESOURCE_UPDATED")
+
+    def validate_register_success(self) -> "APIResponse":
+        """Валидирует ответ успешной регистрации"""
+        return self.validate_schema("REGISTER_SUCCESS")
+
+    def validate_login_success(self) -> "APIResponse":
+        """Валидирует ответ успешного логина"""
+        return self.validate_schema("LOGIN_SUCCESS")
+
+    def validate_system_health(self) -> "APIResponse":
+        """Валидирует ответ проверки здоровья системы"""
+        return self.validate_schema("HEALTH_STATUS")
+
+    def validate_api_error(self) -> "APIResponse":
+        """Валидирует ответ с ошибкой API"""
+        return self.validate_schema("API_ERROR")
 
     def assert_status(self, expected: HTTPStatus) -> "APIResponse":
         """Проверяет HTTP статус и возвращает self для цепочки вызовов"""
@@ -92,7 +146,7 @@ class ReqresAPIClient:
     API клиент с валидацией схем
 
     - Fluent интерфейс с цепочкой методов
-    - Автоматическая валидация схем
+    - Явная валидация схем
     - Настройка в зависимости от окружения
     """
 
@@ -107,7 +161,7 @@ class ReqresAPIClient:
 
         logger.info(f"API Client initialized: {environment.base_url}")
 
-    def _request(self, method: str, endpoint: str, **kwargs) -> APIResponse:
+    def request(self, method: str, endpoint: str, **kwargs) -> APIResponse:
         """Внутренний метод запроса с логированием"""
         url = f"{self.env.base_url}{endpoint}"
 
@@ -148,172 +202,145 @@ class ReqresAPIClient:
 
 
 class UsersAPI:
-    """Эндпоинты Users API с валидацией схем"""
+    """Эндпоинты Users API без автоматической валидации схем"""
 
     def __init__(self, client: ReqresAPIClient):
         self.client = client
 
     def list(self, page: int = 1, size: int = 6, delay: int = 0) -> APIResponse:
-        """Получить список пользователей с автоматической валидацией схемы"""
+        """Получить список пользователей"""
         params = {"page": page, "size": size}
 
         if delay > 0:
             params["delay"] = delay
 
-        return (
-            self.client._request("GET", "/api/users", params=params)
-            .assert_status(HTTPStatus.OK)
-            .validate_schema("USERS_LIST")
+        return self.client.request("GET", "/api/users", params=params).assert_status(
+            HTTPStatus.OK
         )
 
     def get(self, user_id: int) -> APIResponse:
-        """Получить одного пользователя с валидацией схемы"""
-        return (
-            self.client._request("GET", f"/api/users/{user_id}")
-            .assert_status(HTTPStatus.OK)
-            .validate_schema("SINGLE_USER")
+        """Получить одного пользователя"""
+        return self.client.request("GET", f"/api/users/{user_id}").assert_status(
+            HTTPStatus.OK
         )
 
-    def create(self, name: str, job: str) -> APIResponse:
-        """Создать пользователя с валидацией схемы"""
-        data = {"name": name, "job": job}
+    def get_raw(self, user_id: int) -> APIResponse:
+        """Получить одного пользователя без автоматической проверки статуса (для edge cases)"""
+        return self.client.request("GET", f"/api/users/{user_id}")
 
-        return (
-            self.client._request("POST", "/api/users", json=data)
-            .assert_status(HTTPStatus.CREATED)
-            .validate_schema("USER_CREATED")
+    def create(self, name: str, job: str) -> APIResponse:
+        """Создать пользователя"""
+        data = {"name": name, "job": job}
+        return self.client.request("POST", "/api/users", json=data).assert_status(
+            HTTPStatus.CREATED
         )
 
     def update(
         self, user_id: int, name: str, job: str, method: str = "PUT"
     ) -> APIResponse:
-        """Обновить пользователя с валидацией схемы"""
+        """Обновить пользователя"""
         data = {"name": name, "job": job}
-
         http_method = "PUT" if method == "PUT" else "PATCH"
-
-        return (
-            self.client._request(http_method, f"/api/users/{user_id}", json=data)
-            .assert_status(HTTPStatus.OK)
-            .validate_schema("USER_UPDATED")
-        )
+        return self.client.request(
+            http_method, f"/api/users/{user_id}", json=data
+        ).assert_status(HTTPStatus.OK)
 
     def delete(self, user_id: int) -> APIResponse:
         """Удалить пользователя"""
-        return self.client._request("DELETE", f"/api/users/{user_id}").assert_status(
+        return self.client.request("DELETE", f"/api/users/{user_id}").assert_status(
             HTTPStatus.NO_CONTENT
         )
 
     def get_404(self, user_id: int) -> APIResponse:
         """Получить несуществующего пользователя (ожидается 404)"""
-        return (
-            self.client._request("GET", f"/api/users/{user_id}")
-            .assert_status(HTTPStatus.NOT_FOUND)
-            .validate_schema("API_ERROR")
+        return self.client.request("GET", f"/api/users/{user_id}").assert_status(
+            HTTPStatus.NOT_FOUND
         )
 
 
 class ResourcesAPI:
-    """Эндпоинты Resources API с валидацией схем"""
+    """Эндпоинты Resources API без автоматической валидации схем"""
 
     def __init__(self, client: ReqresAPIClient):
         self.client = client
 
     def list(self, page: int = 1, size: int = 6) -> APIResponse:
-        """Получить список ресурсов с валидацией схемы"""
+        """Получить список ресурсов"""
         params = {"page": page, "size": size}
-
-        return (
-            self.client._request("GET", "/api/resources", params=params)
-            .assert_status(HTTPStatus.OK)
-            .validate_schema("RESOURCES_LIST")
-        )
+        return self.client.request(
+            "GET", "/api/resources", params=params
+        ).assert_status(HTTPStatus.OK)
 
     def get(self, resource_id: int) -> APIResponse:
-        """Получить один ресурс с валидацией схемы"""
-        return (
-            self.client._request("GET", f"/api/resources/{resource_id}")
-            .assert_status(HTTPStatus.OK)
-            .validate_schema("SINGLE_RESOURCE")
-        )
+        """Получить один ресурс"""
+        return self.client.request(
+            "GET", f"/api/resources/{resource_id}"
+        ).assert_status(HTTPStatus.OK)
+
+    def get_raw(self, resource_id: int) -> APIResponse:
+        """Получить один ресурс без автоматической проверки статуса (для edge cases)"""
+        return self.client.request("GET", f"/api/resources/{resource_id}")
 
     def create(
         self, name: str, year: int, color: str, pantone_value: str
     ) -> APIResponse:
-        """Создать ресурс с валидацией схемы"""
+        """Создать ресурс"""
         data = {
             "name": name,
             "year": year,
             "color": color,
             "pantone_value": pantone_value,
         }
-        return (
-            self.client._request("POST", "/api/resources", json=data)
-            .assert_status(HTTPStatus.CREATED)
-            .validate_schema("RESOURCE_CREATED")
+        return self.client.request("POST", "/api/resources", json=data).assert_status(
+            HTTPStatus.CREATED
         )
 
     def update(
         self, resource_id: int, data: Dict[str, Any], method: str = "PUT"
     ) -> APIResponse:
-        """Обновить ресурс с валидацией схемы"""
+        """Обновить ресурс"""
         http_method = "PUT" if method == "PUT" else "PATCH"
-
-        return (
-            self.client._request(
-                http_method, f"/api/resources/{resource_id}", json=data
-            )
-            .assert_status(HTTPStatus.OK)
-            .validate_schema("RESOURCE_UPDATED")
-        )
+        return self.client.request(
+            http_method, f"/api/resources/{resource_id}", json=data
+        ).assert_status(HTTPStatus.OK)
 
     def delete(self, resource_id: int) -> APIResponse:
         """Удалить ресурс"""
-        return self.client._request(
+        return self.client.request(
             "DELETE", f"/api/resources/{resource_id}"
         ).assert_status(HTTPStatus.NO_CONTENT)
 
 
 class AuthAPI:
-    """Эндпоинты Authentication API"""
+    """Эндпоинты Authentication API без автоматической валидации схем"""
 
     def __init__(self, client: ReqresAPIClient):
         self.client = client
 
     def register(self, email: str, password: str) -> APIResponse:
-        """Регистрировать пользователя с валидацией схемы"""
+        """Регистрировать пользователя"""
         data = {"email": email, "password": password}
-
-        return (
-            self.client._request("POST", "/api/register", json=data)
-            .assert_status(HTTPStatus.CREATED)
-            .validate_schema("REGISTER_SUCCESS")
+        return self.client.request("POST", "/api/register", json=data).assert_status(
+            HTTPStatus.CREATED
         )
 
     def login(self, email: str, password: str) -> APIResponse:
-        """Войти в систему с валидацией схемы"""
+        """Войти в систему"""
         data = {"email": email, "password": password}
-
-        return (
-            self.client._request("POST", "/api/login", json=data)
-            .assert_status(HTTPStatus.OK)
-            .validate_schema("LOGIN_SUCCESS")
+        return self.client.request("POST", "/api/login", json=data).assert_status(
+            HTTPStatus.OK
         )
 
 
 class SystemAPI:
-    """Эндпоинты System API"""
+    """Эндпоинты System API без автоматической валидации схем"""
 
     def __init__(self, client: ReqresAPIClient):
         self.client = client
 
     def status(self) -> APIResponse:
-        """Получить статус системы с валидацией схемы"""
-        return (
-            self.client._request("GET", "/status")
-            .assert_status(HTTPStatus.OK)
-            .validate_schema("HEALTH_STATUS")
-        )
+        """Получить статус системы"""
+        return self.client.request("GET", "/status").assert_status(HTTPStatus.OK)
 
 
 # ===================================
@@ -332,7 +359,7 @@ class TestDataManager:
 
     def create_user(self, name: str, job: str) -> int:
         """Создать пользователя и отследить для очистки"""
-        response = self.api.users().create(name, job)
+        response = self.api.users().create(name, job).validate_user_created()
         user_id = int(response.extract("id"))
 
         self.created_users.append(user_id)
@@ -342,7 +369,11 @@ class TestDataManager:
         self, name: str, year: int, color: str, pantone_value: str
     ) -> int:
         """Создать ресурс и отследить для очистки"""
-        response = self.api.resources().create(name, year, color, pantone_value)
+        response = (
+            self.api.resources()
+            .create(name, year, color, pantone_value)
+            .validate_resource_created()
+        )
         resource_id = int(response.extract("id"))
 
         self.created_resources.append(resource_id)

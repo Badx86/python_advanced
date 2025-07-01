@@ -14,7 +14,7 @@ class TestDemoStatuses:
         """Обычный проходящий тест"""
         response = api_client.get("/status")
         assert response.status_code == 200
-        logger.info("✅ This test passed as expected")
+        logger.info("This test passed as expected")
 
     @allure.title("Test that should be skipped")
     @pytest.mark.skip(reason="Демонстрация skip статуса для Allure отчета")
@@ -32,6 +32,23 @@ class TestDemoStatuses:
         # Проверяем что статус НЕ health
         data = response.json()
         assert data["status"] != "healthy", "Expected status to NOT be healthy"
+
+    @allure.title("Test expected to fail but actually passes (XPASS)")
+    @pytest.mark.xfail(
+        reason="Демонстрация xpass статуса - ожидаем падение, но тест проходит"
+    )
+    def test_xpass_example(self, api_client) -> None:
+        """Тест который помечен как ожидаемое падение, но на самом деле проходит"""
+        response = api_client.get("/status")
+
+        # Проверяем что статус код корректный
+        assert response.status_code == 200, "Status code should be 200"
+
+        # Проверяем что в ответе есть JSON
+        data = response.json()
+        assert isinstance(data, dict), "Response should be JSON object"
+
+        logger.info("This test was expected to fail but actually passed (XPASS)")
 
     @allure.title("Test that will definitely fail")
     def test_fail_example(self, api_client) -> None:
