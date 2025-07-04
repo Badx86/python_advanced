@@ -356,19 +356,19 @@ psql -h localhost -U postgres -d postgres
 │   ├── data/
 │   │   ├── users.json           # Тестовые данные пользователей (seed)
 │   │   └── resources.json       # Тестовые данные ресурсов
-│
+│   │
 │   ├── database/
 │   │   ├── engine.py            # Настройка SQLModel и PostgreSQL
 │   │   └── seed.py              # Загрузка seed данных в БД
-│
+│   │
 │   ├── routes/
 │   │   ├── __init__.py
 │   │   ├── auth.py              # Эндпоинты аутентификации
 │   │   ├── resources.py         # Эндпоинты ресурсов (прямая работа с БД)
 │   │   ├── system.py            # Системные эндпоинты (healthcheck)
 │   │   ├── users.py             # Эндпоинты пользователей (прямая работа с БД)
-│   │   └── ui.py                # 🌐 Веб-интерфейс
-│
+│   │   └── ui.py                # Веб-интерфейс
+│   │
 │   ├── main.py                  # FastAPI приложение и настройка
 │   ├── exceptions.py            # Унифицированные исключения
 │   └── models.py                # SQLModel модели для БД и API
