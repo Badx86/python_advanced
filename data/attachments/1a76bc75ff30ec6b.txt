@@ -1,1 +1,0 @@
-curl -X PUT -H 'User-Agent: python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept: */*' -H 'Connection: keep-alive' -H 'Content-Length: 83' -H 'Content-Type: application/json' -d '{"name": "purple", "year": 2021, "color": "#b1b3c2", "pantone_value": "VACUUM-555"}' http://localhost:8000/api/resources/20

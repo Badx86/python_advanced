@@ -1,6 +1,0 @@
-INFO     tests.assertions:assertions.py:84 POST /api/resources - Status: 201
-INFO     tests.assertions:assertions.py:513 Resource 21 verified in database: orange (2026)
-INFO     tests.test_crud_resources:test_crud_resources.py:109 Patching resource 21 with data: {'name': 'cyan', 'year': 2028, 'color': '#8dcd1b', 'pantone_value': 'EDINBURGH-181'}
-INFO     tests.assertions:assertions.py:84 PATCH /api/resources/21 - Status: 200
-INFO     tests.assertions:assertions.py:553 Resource 21 updated in database: cyan (2028)
-INFO     tests.test_crud_resources:test_crud_resources.py:115 Resource 21 patched and verified in database successfully
