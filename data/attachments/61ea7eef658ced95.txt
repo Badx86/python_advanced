@@ -1,1 +1,0 @@
-curl -H 'User-Agent: python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept: */*' -H 'Connection: keep-alive' -H 'Content-Length: 46' -H 'Content-Type: application/json' -d '{"name": "lionel", "job": "nursery assistant"}' http://localhost:8000/api/users

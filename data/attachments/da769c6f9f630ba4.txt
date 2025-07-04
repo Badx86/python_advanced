@@ -1,2 +1,0 @@
-INFO     tests.api_client:api_client.py:162 API Client initialized: http://localhost:8000
-INFO     tests.assertions:assertions.py:309 Authentication business logic validated: token length 17
