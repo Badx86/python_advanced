@@ -16,13 +16,18 @@
 [![Mimesis](https://img.shields.io/badge/Mimesis-test%20data-purple)](https://mimesis.name/)
 [![cURL Integration](https://img.shields.io/badge/cURL-integrated-orange)](https://pypi.org/project/curlify/)
 [![code style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.1+-7952B3?style=flat&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 </div>
 
-# FastAPI Reqres with PostgreSQL + Schema Validation + Web UI
+# FastAPI with PostgreSQL + Schema Validation + Web UI
 
 Полнофункциональное веб-приложение с REST API, веб-интерфейсом, PostgreSQL и автотестами.
-![chrome_bQ3rOSOKMA](https://github.com/user-attachments/assets/cf01efe3-c726-4963-8afd-71305530cad4)
+
+![chrome_7Bbjsq48nm](https://github.com/user-attachments/assets/9c2c54c7-c69d-46a7-bca8-25f8d71353ee)
+
 
 ## 🏗️ Архитектура валидации данных
 
