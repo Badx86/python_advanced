@@ -1,4 +1,0 @@
-INFO     tests.test_crud_users:test_crud_users.py:28 Creating user with data: {'name': 'daniele', 'job': 'kennel hand'}
-INFO     tests.assertions:assertions.py:84 POST /api/users - Status: 201
-INFO     tests.assertions:assertions.py:431 User 17 verified in database: daniele 
-INFO     tests.test_crud_users:test_crud_users.py:38 User created and verified in database successfully

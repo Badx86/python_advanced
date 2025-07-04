@@ -1,0 +1,1 @@
+curl -X PUT -H 'User-Agent: python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept: */*' -H 'Connection: keep-alive' -H 'Content-Length: 82' -H 'Content-Type: application/json' -d '{"name": "white", "year": 2021, "color": "#e6615a", "pantone_value": "CANVAS-744"}' http://localhost:8000/api/resources/999999

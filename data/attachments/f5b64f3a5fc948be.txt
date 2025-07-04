@@ -1,3 +1,0 @@
-INFO     tests.assertions:assertions.py:84 GET /api/resources - Status: 200
-INFO     tests.assertions:assertions.py:84 GET /api/resources/12 - Status: 200
-INFO     tests.test_crud_resources:test_crud_resources.py:65 Random resource 12 read successfully
