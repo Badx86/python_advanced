@@ -11,7 +11,7 @@ load_dotenv(".env")
 from fastapi_pagination import add_pagination
 from app.database.engine import create_db_and_tables
 from app.database.seed import seed_all_data
-from app.routes import users, resources, auth, system
+from app.routes import users, resources, auth, system, ui
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import logging
@@ -62,8 +62,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="FastAPI Reqres",
-    description="Микросервис Reqres API для тестирования",
+    title="FastAPI Reqres with UI",
+    description="Микросервис Reqres API для тестирования c веб-интерфейсом",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -75,9 +75,11 @@ app.include_router(system.router)
 app.include_router(users.router)
 app.include_router(resources.router)
 app.include_router(auth.router)
+app.include_router(ui.router)  # +веб-интерфейс
 
 if __name__ == "__main__":
     logger.info(f"Starting server on {HOST}:{PORT}...")
+    logger.info(f"🌐 Web UI available at: http://{HOST}:{PORT}/ui")
     import uvicorn
 
     uvicorn.run(app, host=HOST, port=PORT)

@@ -69,9 +69,7 @@ class APIResponse:
                     "Failed Response Data",
                     allure.attachment_type.JSON,
                 )
-                raise AssertionError(
-                    f"Schema '{schema_name}' validation failed: {e}"
-                )
+                raise AssertionError(f"Schema '{schema_name}' validation failed: {e}")
         return self
 
     # ===================================
