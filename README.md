@@ -22,6 +22,7 @@
 # FastAPI Reqres with PostgreSQL + Schema Validation + Web UI
 
 Полнофункциональное веб-приложение с REST API, веб-интерфейсом, PostgreSQL и автотестами.
+![chrome_bQ3rOSOKMA](https://github.com/user-attachments/assets/cf01efe3-c726-4963-8afd-71305530cad4)
 
 ## 🏗️ Архитектура валидации данных
 
