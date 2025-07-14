@@ -1,1 +1,0 @@
-curl -X PUT -H 'User-Agent: python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept: */*' -H 'Connection: keep-alive' -H 'Content-Length: 49' -H 'Content-Type: application/json' -d '{"name": "sydney", "job": "ambulance controller"}' http://localhost:8000/api/users/18

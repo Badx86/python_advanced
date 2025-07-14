@@ -1,0 +1,1 @@
+curl -H 'User-Agent: python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept: */*' -H 'Connection: keep-alive' -H 'Content-Length: 87' -H 'Content-Type: application/json' -d '{"name": "blue", "year": 2026, "color": "#46e2fa", "pantone_value": "PENNSYLVANIA-101"}' http://localhost:8000/api/resources

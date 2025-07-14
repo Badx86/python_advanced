@@ -1,1 +1,0 @@
-curl -H 'User-Agent: python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept: */*' -H 'Connection: keep-alive' -H 'Content-Length: 81' -H 'Content-Type: application/json' -d '{"name": "black", "year": 2021, "color": "#df94de", "pantone_value": "BIKES-914"}' http://localhost:8000/api/resources
